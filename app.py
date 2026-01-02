@@ -43,24 +43,53 @@ st.markdown("""
 class KitchenAI:
     def __init__(self):
         try:
-            genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-            self.model = genai.GenerativeModel('gemini-1.5-pro')
-        except:
+            # Sicherstellen, dass der Key vorhanden ist
+            api_key = st.secrets.get("GEMINI_API_KEY")
+            if not api_key:
+                st.error("GEMINI_API_KEY fehlt in den Secrets.")
+                self.model = None
+                return
+
+            genai.configure(api_key=api_key)
+            
+            # Wir nutzen 'gemini-1.5-flash', da es eine höhere Verfügbarkeit hat 
+            # und für analytische Textaufgaben exzellent geeignet ist.
+            self.model = genai.GenerativeModel('gemini-1.5-flash')
+        except Exception as e:
+            st.error(f"Fehler bei der KI-Initialisierung: {e}")
             self.model = None
 
     def audit_processes(self, df):
-        if not self.model: return "API Key nicht gefunden."
+        if not self.model: 
+            return "KI-Dienst nicht konfiguriert oder Initialisierung fehlgeschlagen."
         
-        context = df[['Dienst', 'Aufgabe', 'Typ', 'Minuten']].to_string()
+        # Reduzierung des Kontexts auf das Wesentliche, um Token-Limits und Fehler zu vermeiden
+        context_data = df[['Dienst', 'Aufgabe', 'Typ', 'Minuten']].to_dict(orient='records')
+        
         prompt = f"""
-        Analysiere folgende Küchendaten: {context}
-        Prüfe auf Ineffizienzen (z.B. zu viel Logistik während der Produktion).
-        Erkläre fachlich fundiert, warum bestimmte SOLL-Optimierungen nötig sind.
-        Beziehe dich auf Personalbindung während der Servicezeit (11:30-12:30).
-        Halte dich kurz, klinisch-präzise und professionell.
+        Du bist ein Experte für Spital-Küchenlogistik und Betriebswirtschaft.
+        Analysiere folgende IST-Daten der Küchenprozesse:
+        {context_data}
+
+        Aufgabe:
+        1. Identifiziere Ineffizienzen (z.B. hohe Logistik-Anteile während der Kern-Produktionszeit).
+        2. Begründe fachlich, warum eine Optimierung der Dienstpläne (SOLL-Zustand) für die Patientensicherheit und Wirtschaftlichkeit notwendig ist.
+        3. Beziehe dich spezifisch auf die Crunch-Time (11:30 - 12:30 Uhr).
+
+        Antworte präzise, professionell und in kurzen Absätzen. Vermeide Emojis.
         """
-        response = self.model.generate_content(prompt)
-        return response.text
+        
+        try:
+            response = self.model.generate_content(prompt)
+            if response and response.text:
+                return response.text
+            else:
+                return "Die KI konnte keine Analyse generieren."
+        except Exception as e:
+            # Spezifische Behandlung für den NotFound Fehler
+            if "not found" in str(e).lower():
+                return "Fehler: Das KI-Modell wurde nicht gefunden. Bitte versuche 'gemini-1.5-flash' oder prüfe deine API-Berechtigungen."
+            return f"Fehler bei der KI-Analyse: {str(e)}"
 
 # --- DATA ENGINE ---
 class KitchenDataManager:
