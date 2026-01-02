@@ -19,7 +19,7 @@ st.markdown("""
     html, body, [class*="st-"] { 
         font-family: 'Inter', sans-serif; 
         color: #1E293B; 
-        background-color: #F1F5F9; /* Etwas dunklerer Background für besseren Kontrast zu Cards */
+        background-color: #F8FAFC; 
     }
     
     /* Header Styling */
@@ -29,18 +29,20 @@ st.markdown("""
         color: #0F172A; 
         border-bottom: 2px solid #CBD5E1; 
         padding-bottom: 15px; 
-        margin-bottom: 30px;
+        margin-bottom: 20px;
         letter-spacing: -0.5px;
-        text-align: left;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
     
     .cluster-header { 
-        font-size: 14px; 
+        font-size: 13px; 
         font-weight: 700; 
         color: #475569; 
         text-transform: uppercase; 
         letter-spacing: 1.2px; 
-        margin-top: 30px; 
+        margin-top: 35px; 
         margin-bottom: 15px; 
         border-left: 4px solid #3B82F6; 
         padding-left: 12px;
@@ -63,7 +65,7 @@ st.markdown("""
     .kpi-card-wrapper:hover {
         transform: translateY(-2px);
         box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        border-color: #CBD5E1;
+        border-color: #94A3B8;
     }
 
     .kpi-title { 
@@ -79,7 +81,7 @@ st.markdown("""
     }
     
     .kpi-value { 
-        font-size: 24px; 
+        font-size: 22px; 
         font-weight: 800; 
         color: #0F172A; 
         margin: 2px 0;
@@ -97,21 +99,37 @@ st.markdown("""
     .trend-neutral { color: #475569; background-color: #F8FAFC; padding: 1px 6px; border-radius: 4px; font-weight: 600; border: 1px solid #E2E8F0;}
 
     /* Tab Overlay Effect - Clean Cards */
-    /* Zwingt Container in weißes Overlay-Design */
-    [data-testid="stVerticalBlock"] > [style*="flex-direction: column;"] > [data-testid="stVerticalBlock"] {
-        background-color: transparent;
-    }
-    
     .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+    }
+    .stTabs [data-baseweb="tab"] {
         background-color: transparent;
+        border-radius: 4px;
+        padding: 4px 16px;
+        font-weight: 600;
+        font-size: 14px;
+    }
+    .stTabs [aria-selected="true"] {
+        background-color: #FFFFFF;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        color: #3B82F6;
     }
 
     .stPlotlyChart {
         background-color: #FFFFFF;
         border-radius: 8px;
-        padding: 10px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        padding: 15px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.03);
         border: 1px solid #E2E8F0;
+    }
+    
+    /* Radio Button Group Styling */
+    div[role="radiogroup"] {
+        background-color: #FFFFFF;
+        padding: 5px;
+        border-radius: 8px;
+        border: 1px solid #E2E8F0;
+        display: inline-flex;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -121,7 +139,6 @@ class DataWarehouse:
     @staticmethod
     def get_full_ist_data():
         # DATEN EXAKT NACH DEN NEUKALKULATIONS-BERICHTEN (ALLE 9 DIENSTE)
-        # UPDATED: Tasks haben nun explizite "Convenience/System" Marker für korrekte Industrialisierungs-KPI (Ziel 80%+)
         data = [
             # --- D1 DIÄTETIK ---
             {"Dienst": "D1", "Start": "08:00", "Ende": "08:25", "Task": "Admin: E-Mails/Mutationen", "Typ": "Admin"},
@@ -149,7 +166,7 @@ class DataWarehouse:
             {"Dienst": "E1", "Start": "09:45", "Ende": "10:00", "Task": "Logistik: Bereitstellung Gastro", "Typ": "Logistik"},
             {"Dienst": "E1", "Start": "10:15", "Ende": "10:45", "Task": "Prod: Wahlkost Spezial (System)", "Typ": "Prod"},
             {"Dienst": "E1", "Start": "10:45", "Ende": "11:20", "Task": "Prod: Regenerieren Band (High-Convenience)", "Typ": "Prod"},
-            {"Dienst": "E1", "Start": "11:20", "Ende": "12:30", "Task": "Waste: 70-Min-Falle (Bereitschaft/Warten)", "Typ": "Waste"},
+            {"Dienst": "E1", "Start": "11:20", "Ende": "12:30", "Task": "Potenzial: 70-Min-Falle (Bereitschaft/Warten)", "Typ": "Potenzial"}, # Renamed from Waste
             {"Dienst": "E1", "Start": "12:30", "Ende": "12:45", "Task": "Logistik: Transport Reste Restaurant", "Typ": "Logistik"},
             {"Dienst": "E1", "Start": "12:45", "Ende": "13:00", "Task": "Logistik: Reinigung Clean-as-you-go", "Typ": "Logistik"},
             {"Dienst": "E1", "Start": "13:30", "Ende": "14:00", "Task": "Prod: Wahlkost MEP (Vorbereitung)", "Typ": "Prod"},
@@ -165,7 +182,7 @@ class DataWarehouse:
             {"Dienst": "S1", "Start": "10:15", "Ende": "10:45", "Task": "Prod: Regenerieren Fleisch/Sauce", "Typ": "Prod"},
             {"Dienst": "S1", "Start": "10:45", "Ende": "11:00", "Task": "Logistik: Wagenübergabe Gastro", "Typ": "Logistik"},
             {"Dienst": "S1", "Start": "11:00", "Ende": "11:20", "Task": "Prod: Wahlkost Setup (Montage)", "Typ": "Prod"},
-            {"Dienst": "S1", "Start": "11:20", "Ende": "12:30", "Task": "Waste: Wahlkost-Idle (Warten auf Bons)", "Typ": "Waste"},
+            {"Dienst": "S1", "Start": "11:20", "Ende": "12:30", "Task": "Potenzial: Wahlkost-Idle (Warten auf Bons)", "Typ": "Potenzial"},
             {"Dienst": "S1", "Start": "12:30", "Ende": "12:45", "Task": "Logistik: Nachschub Restaurant", "Typ": "Logistik"},
             {"Dienst": "S1", "Start": "12:45", "Ende": "13:00", "Task": "Logistik: Reinigung Kipper", "Typ": "Logistik"},
             {"Dienst": "S1", "Start": "13:30", "Ende": "14:15", "Task": "Admin: Planung/TK-Management", "Typ": "Admin"},
@@ -176,14 +193,14 @@ class DataWarehouse:
             # --- R1 GASTRO ---
             {"Dienst": "R1", "Start": "06:30", "Ende": "07:15", "Task": "Logistik: Warenannahme Rampe (HACCP Risiko)", "Typ": "Logistik"},
             {"Dienst": "R1", "Start": "07:15", "Ende": "07:30", "Task": "Logistik: Verräumen Kühlhaus", "Typ": "Logistik"},
-            {"Dienst": "R1", "Start": "07:30", "Ende": "07:45", "Task": "Waste: Hygiene-Schleuse/Umziehen", "Typ": "Waste"},
+            {"Dienst": "R1", "Start": "07:30", "Ende": "07:45", "Task": "Potenzial: Hygiene-Schleuse/Umziehen", "Typ": "Potenzial"},
             {"Dienst": "R1", "Start": "07:45", "Ende": "08:30", "Task": "Admin: Manuelle Deklaration", "Typ": "Admin"},
             {"Dienst": "R1", "Start": "08:30", "Ende": "09:30", "Task": "Prod: MEP Folgetag (Freeflow/Montage)", "Typ": "Prod"},
             {"Dienst": "R1", "Start": "09:30", "Ende": "10:00", "Task": "Service: Setup Heute (Verbrauchsmaterial)", "Typ": "Service"},
             {"Dienst": "R1", "Start": "10:20", "Ende": "10:45", "Task": "Logistik: Transport Speisen", "Typ": "Logistik"},
             {"Dienst": "R1", "Start": "10:45", "Ende": "11:00", "Task": "Service: Einsetzen Buffet", "Typ": "Service"},
             {"Dienst": "R1", "Start": "11:00", "Ende": "11:15", "Task": "Coord: Quality Check/Showteller", "Typ": "Coord"},
-            {"Dienst": "R1", "Start": "11:15", "Ende": "11:30", "Task": "Waste: Bereitschaft", "Typ": "Waste"},
+            {"Dienst": "R1", "Start": "11:15", "Ende": "11:30", "Task": "Potenzial: Bereitschaft", "Typ": "Potenzial"},
             {"Dienst": "R1", "Start": "11:30", "Ende": "13:30", "Task": "Service: Mittagsservice Gastro", "Typ": "Service"},
             {"Dienst": "R1", "Start": "13:30", "Ende": "14:00", "Task": "Logistik: Abbau Buffet", "Typ": "Logistik"},
             {"Dienst": "R1", "Start": "14:00", "Ende": "14:30", "Task": "Logistik: Reinigung Office", "Typ": "Logistik"},
@@ -192,10 +209,10 @@ class DataWarehouse:
             {"Dienst": "R2", "Start": "06:30", "Ende": "06:50", "Task": "Service: Band-Setup (Patienten)", "Typ": "Service"},
             {"Dienst": "R2", "Start": "06:50", "Ende": "07:45", "Task": "Service: Band-Service (Falsche Zuordnung)", "Typ": "Service"},
             {"Dienst": "R2", "Start": "07:45", "Ende": "08:00", "Task": "Logistik: Wechsel Patient->Gastro", "Typ": "Logistik"},
-            {"Dienst": "R2", "Start": "08:00", "Ende": "08:30", "Task": "Waste: Salat-Finish (Gedehnt 12 Stk)", "Typ": "Waste"},
+            {"Dienst": "R2", "Start": "08:00", "Ende": "08:30", "Task": "Potenzial: Salat-Finish (Gedehnt 12 Stk)", "Typ": "Potenzial"},
             {"Dienst": "R2", "Start": "08:30", "Ende": "09:00", "Task": "Logistik: Office/Abfall (Botengänge)", "Typ": "Logistik"},
             {"Dienst": "R2", "Start": "09:00", "Ende": "09:30", "Task": "Logistik: Geräte-Check (Muda)", "Typ": "Logistik"},
-            {"Dienst": "R2", "Start": "09:30", "Ende": "10:00", "Task": "Waste: Leerlauf/Puffer", "Typ": "Waste"},
+            {"Dienst": "R2", "Start": "09:30", "Ende": "10:00", "Task": "Potenzial: Leerlauf/Puffer", "Typ": "Potenzial"},
             {"Dienst": "R2", "Start": "10:20", "Ende": "10:45", "Task": "Logistik: Transport", "Typ": "Logistik"},
             {"Dienst": "R2", "Start": "10:45", "Ende": "11:00", "Task": "Prod: Fritteusen Start (System)", "Typ": "Prod"},
             {"Dienst": "R2", "Start": "11:00", "Ende": "11:30", "Task": "Coord: Show-Setup (Redundanz)", "Typ": "Coord"},
@@ -252,7 +269,7 @@ class DataWarehouse:
             {"Dienst": "G2", "Start": "10:30", "Ende": "11:15", "Task": "Prod: Patienten-Salat (Beutel/Convenience)", "Typ": "Prod"},
             {"Dienst": "G2", "Start": "11:15", "Ende": "12:30", "Task": "Prod: Abendessen (Aufschnitt/Montage)", "Typ": "Prod"},
             {"Dienst": "G2", "Start": "14:15", "Ende": "15:00", "Task": "Prod: MEP Folgetag (System)", "Typ": "Prod"},
-            {"Dienst": "G2", "Start": "15:00", "Ende": "16:00", "Task": "Waste: Leerlauf/Dehnung (Standard-Tag)", "Typ": "Waste"},
+            {"Dienst": "G2", "Start": "15:00", "Ende": "16:00", "Task": "Potenzial: Leerlauf/Dehnung (Standard-Tag)", "Typ": "Potenzial"},
             {"Dienst": "G2", "Start": "16:00", "Ende": "17:00", "Task": "Coord: Band-Setup", "Typ": "Coord"},
             {"Dienst": "G2", "Start": "17:00", "Ende": "18:00", "Task": "Service: Band-Abendessen", "Typ": "Service"},
             {"Dienst": "G2", "Start": "18:00", "Ende": "18:30", "Task": "Admin: Hotellerie-Check", "Typ": "Admin"},
@@ -270,38 +287,44 @@ class DataWarehouse:
         df['Duration'] = (df['End_DT'] - df['Start_DT']).dt.total_seconds() / 60
         return df
 
-# --- 3. ANALYTICAL ENGINE: KPI FACTORY (EXPANDED TO 15) ---
+# --- 3. ANALYTICAL ENGINE: KPI FACTORY (EXPANDED TO 15 & MONETIZED) ---
 class KPI_Engine:
+    HOURLY_RATE_CHF = 55.0 # Mischkalkulation Personalaufwand inkl. NK
+
     @staticmethod
-    def calculate_all(df_ist):
+    def calculate_all(df_ist, mode='time'):
         total_min = df_ist['Duration'].sum()
         if total_min == 0: return {}
 
-        waste_min = df_ist[df_ist['Typ'] == 'Waste']['Duration'].sum()
+        # Change "Waste" references to "Potenzial" internally for mapping
+        potenzial_min = df_ist[df_ist['Typ'] == 'Potenzial']['Duration'].sum()
         skilled_dienste = ['D1', 'S1', 'E1', 'G2', 'R1']
         
-        # 1. Skill-Grade Fehlallokation (Leakage)
-        leakage_min = df_ist[(df_ist['Dienst'].isin(skilled_dienste)) & (df_ist['Typ'].isin(['Logistik', 'Waste']))]['Duration'].sum()
+        # 1. Skill-Drift (ehem. Leakage)
+        leakage_min = df_ist[(df_ist['Dienst'].isin(skilled_dienste)) & (df_ist['Typ'].isin(['Logistik', 'Potenzial']))]['Duration'].sum()
         leakage_pct = (leakage_min / total_min) * 100
+        leakage_cost = (leakage_min / 60) * KPI_Engine.HOURLY_RATE_CHF
         
-        # 2. Parkinson Ratio (Muda)
-        muda_pct = (waste_min / total_min) * 100
+        # 2. Potenzial Ratio (ehem. Muda)
+        muda_pct = (potenzial_min / total_min) * 100
+        muda_cost = (potenzial_min / 60) * KPI_Engine.HOURLY_RATE_CHF
         
         # 3. Kernzeit-Vakuum
         band_crunch = df_ist[(df_ist['Start'] >= "11:00") & (df_ist['Ende'] <= "12:30")]
-        idle_band_min = band_crunch[band_crunch['Typ'] == 'Waste']['Duration'].sum() + 105
+        idle_band_min = band_crunch[band_crunch['Typ'] == 'Potenzial']['Duration'].sum() + 105
+        idle_band_cost = (idle_band_min / 60) * KPI_Engine.HOURLY_RATE_CHF
         
         # 4. Context-Switch Rate
         d1_tasks = len(df_ist[df_ist['Dienst'] == 'D1'])
         context_switches = d1_tasks / 1.5
         
         # 5. Recovery Potential
-        recoverable_min = waste_min + (leakage_min * 0.5)
+        recoverable_min = potenzial_min + (leakage_min * 0.5)
         fte_potential = recoverable_min / 480
+        recoverable_cost = (recoverable_min / 60) * KPI_Engine.HOURLY_RATE_CHF
         
-        # 6. Industrialisierungsgrad (UPDATED LOGIC FOR HIGH CONVENIENCE)
+        # 6. Industrialisierungsgrad
         prod_min = df_ist[df_ist['Typ'] == 'Prod']['Duration'].sum()
-        # Trigger-Wörter für Industrie-Küche
         montage_indicators = [
             "Montage", "Regenerieren", "Finish", "Beutel", "Päckli", 
             "Convenience", "Abfüllen", "Mischen", "Anrühren", "Portionieren", 
@@ -316,40 +339,48 @@ class KPI_Engine:
 
         # 8. Admin Burden
         admin_min = df_ist[df_ist['Typ'] == 'Admin']['Duration'].sum()
-        admin_ratio = (admin_min / total_min) * 100
+        admin_cost = (admin_min / 60) * KPI_Engine.HOURLY_RATE_CHF
         
         # 10. Service Intensity
         service_min = df_ist[df_ist['Typ'] == 'Service']['Duration'].sum()
         service_share = (service_min / total_min) * 100
 
-        # NEW 11-13 (Filling up to 15 useful KPIs)
+        # NEW 11-13
         logistics_min = df_ist[df_ist['Typ'] == 'Logistik']['Duration'].sum()
         logistics_share = (logistics_min / total_min) * 100
         
         coord_min = df_ist[df_ist['Typ'] == 'Coord']['Duration'].sum()
         coord_share = (coord_min / total_min) * 100
         
-        # Peak Staff (calculated simply)
-        peak_staff = 9 # Total headcount
-        
+        peak_staff = 9 
+
+        # FORMATTING LOGIC BASED ON MODE
+        def fmt(val, type='pct'):
+            if mode == 'money' and type == 'abs':
+                return f"{val:.0f} CHF"
+            elif type == 'abs_min':
+                return f"{val:.0f} CHF" if mode == 'money' else f"{val:.0f} Min"
+            else: # pct stays pct
+                return f"{val:.1f}%"
+
         # Dictionary of 15 Strategic KPIs (Ordered)
         kpis_list = [
-            ("Skill-Leakage", {"val": f"{leakage_pct:.1f}%", "sub": "Fachkraft-Verschwendung", "trend": "bad"}),
-            ("Parkinson Ratio (Muda)", {"val": f"{muda_pct:.1f}%", "sub": "Bezahlter Leerlauf", "trend": "bad"}),
-            ("Recovery Potenzial", {"val": f"{fte_potential:.2f} FTE", "sub": "Einspar-Möglichkeit", "trend": "good"}),
-            ("Kernzeit-Vakuum", {"val": f"{idle_band_min:.0f} Min", "sub": "Wartezeit Service", "trend": "bad"}),
+            ("Skill-Drift (Leakage)", {"val": fmt(leakage_cost if mode=='money' else leakage_pct, 'abs' if mode=='money' else 'pct'), "sub": "Fachkraft-Einsatz", "trend": "bad"}),
+            ("Potenzial (Muda)", {"val": fmt(muda_cost if mode=='money' else muda_pct, 'abs' if mode=='money' else 'pct'), "sub": "Nicht-Wertschöpfend", "trend": "bad"}),
+            ("Recovery Value", {"val": fmt(recoverable_cost, 'abs') if mode=='money' else f"{fte_potential:.2f} FTE", "sub": "Einspar-Möglichkeit", "trend": "good"}),
+            ("Kernzeit-Vakuum", {"val": fmt(idle_band_cost if mode=='money' else idle_band_min, 'abs_min'), "sub": "Wartezeit Service", "trend": "bad"}),
             ("Context-Switch Rate", {"val": f"{context_switches:.1f}x", "sub": "D1 Fragmentierung", "trend": "bad"}),
             
             ("Industrialisierungsgrad", {"val": f"{industrial_rate:.0f}%", "sub": "Convenience-Anteil", "trend": "neutral"}),
             ("Value-Add Ratio", {"val": f"{value_add_ratio:.1f}%", "sub": "Prod + Service", "trend": "good"}),
-            ("Admin Burden", {"val": f"{admin_min:.0f} Min", "sub": "Bürokratie-Last", "trend": "bad"}),
+            ("Admin Burden", {"val": fmt(admin_cost if mode=='money' else admin_min, 'abs_min'), "sub": "Bürokratie-Last", "trend": "bad"}),
             ("Logistics Drag", {"val": f"{logistics_share:.1f}%", "sub": "Transport/Reinigung", "trend": "neutral"}),
             ("Coordination Tax", {"val": f"{coord_share:.1f}%", "sub": "Absprachen/Meetings", "trend": "neutral"}),
             
             ("Liability Gap", {"val": "105 Min", "sub": "Risiko D1 Pause", "trend": "bad"}),
             ("Service Intensity", {"val": f"{service_share:.0f}%", "sub": "Patient Touchpoint", "trend": "good"}),
             ("Patient/Gastro Split", {"val": "62/38", "sub": "Ressourcen-Allokation", "trend": "neutral"}),
-            ("Process Cycle Eff.", {"val": f"{(value_add_min/(total_min-waste_min)*100):.1f}%", "sub": "Netto-Effizienz", "trend": "good"}),
+            ("Process Cycle Eff.", {"val": f"{(value_add_min/(total_min-potenzial_min)*100):.1f}%", "sub": "Netto-Effizienz", "trend": "good"}),
             ("Peak Staff Load", {"val": "9 Pax", "sub": "Max. Gleichzeitig", "trend": "neutral"}),
         ]
         return kpis_list
@@ -375,15 +406,20 @@ def main():
     dw = DataWarehouse()
     df_ist = dw.get_full_ist_data()
     
-    # KPIs Calculation
-    kpis_list = KPI_Engine.calculate_all(df_ist)
+    # --- HEADER ---
+    col_h1, col_h2 = st.columns([3, 1])
+    with col_h1:
+        st.markdown('<div class="main-header">WORKSPACE: AUDIT 2026</div>', unsafe_allow_html=True)
+    with col_h2:
+        # CVO Feature: Monetization Toggle
+        mode_select = st.radio("Display Mode:", ["⏱️ Zeit (Min)", "💰 Wert (CHF)"], horizontal=True, label_visibility="collapsed")
+        mode = 'money' if 'CHF' in mode_select else 'time'
 
-    # --- HEADER & KPI GRID (5x3) ---
-    st.markdown('<div class="main-header">WORKSPACE: AUDIT 2026</div>', unsafe_allow_html=True)
-    
+    # KPIs Calculation
+    kpis_list = KPI_Engine.calculate_all(df_ist, mode=mode)
+
+    # --- KPI GRID (5x3) ---
     st.markdown('<div class="cluster-header">Management Cockpit: 15 Core Metrics</div>', unsafe_allow_html=True)
-    
-    # Render 3 rows of 5 columns
     for row_idx in range(3):
         cols = st.columns(5)
         for col_idx in range(5):
@@ -402,51 +438,61 @@ def main():
             active = len(df_ist[(df_ist['Start_DT'] <= t) & (df_ist['End_DT'] > t)])
             load_data.append({"Zeit": f"{h:02d}:{m:02d}", "Staff": active})
     
-    # Clean Graph Look (Card)
     fig_load = px.area(pd.DataFrame(load_data), x="Zeit", y="Staff", line_shape="spline")
     fig_load.update_traces(line_color="#0F172A", fillcolor="rgba(15, 23, 42, 0.1)")
+    # COO Feature: Critical Zone Line
+    fig_load.add_hline(y=8, line_dash="dot", line_color="red", annotation_text="Congestion Zone (>8 FTE)", annotation_position="top right")
     fig_load.update_layout(plot_bgcolor="#FFFFFF", paper_bgcolor="#FFFFFF", height=280, margin=dict(l=10, r=10, t=10, b=10), yaxis_title="Aktive FTE")
     st.plotly_chart(fig_load, use_container_width=True)
 
     # --- EXPANDED ANALYSIS SECTION ---
     st.markdown('<div class="cluster-header">Zeit-Struktur & Prozess-Analyse (Deep Dive)</div>', unsafe_allow_html=True)
     
-    # Clean Tabs (No Emojis)
+    # UI/UX: Drill Down Filter
+    filter_col1, filter_col2 = st.columns([1, 4])
+    with filter_col1:
+        st.caption("🔍 Fokus-Filter")
+        all_types = list(df_ist['Typ'].unique())
+        selected_types = st.multiselect("Typ filtern", all_types, default=all_types, label_visibility="collapsed")
+    
+    df_filtered = df_ist[df_ist['Typ'].isin(selected_types)]
+
+    # Clean Tabs (Reframed Wording for CTO)
     tab1, tab2, tab3, tab4 = st.tabs([
-        "IST-Zustand (Gantt)", 
-        "Verschwendungs-Iso (Muda)", 
-        "Workload-Balance (Ressourcen-Mix)", 
-        "Aktivitäts-Struktur (Verteilung)"
+        "Gantt-Flow", 
+        "Potenzial-Analyse (Muda)", 
+        "Ressourcen-Balance", 
+        "Aktivitäts-Verteilung"
     ])
 
-    color_map = {"Prod": "#3B82F6", "Service": "#10B981", "Admin": "#F59E0B", "Logistik": "#64748B", "Waste": "#EF4444", "Coord": "#8B5CF6"}
+    color_map = {"Prod": "#3B82F6", "Service": "#10B981", "Admin": "#F59E0B", "Logistik": "#64748B", "Potenzial": "#EF4444", "Coord": "#8B5CF6"}
 
     with tab1:
-        fig1 = px.timeline(df_ist, x_start="Start_DT", x_end="End_DT", y="Dienst", color="Typ", hover_name="Task", color_discrete_map=color_map, height=650)
+        fig1 = px.timeline(df_filtered, x_start="Start_DT", x_end="End_DT", y="Dienst", color="Typ", hover_name="Task", color_discrete_map=color_map, height=650)
         fig1.update_yaxes(categoryorder="array", categoryarray=["H3","H2","H1","R2","R1","G2","S1","E1","D1"])
         fig1.update_layout(plot_bgcolor="#FFFFFF", paper_bgcolor="#FFFFFF", xaxis_title="Uhrzeit")
         st.plotly_chart(fig1, use_container_width=True)
 
     with tab2:
-        df_waste = df_ist[df_ist['Typ'] == 'Waste']
+        df_waste = df_ist[df_ist['Typ'] == 'Potenzial']
         if not df_waste.empty:
             fig2 = px.timeline(df_waste, x_start="Start_DT", x_end="End_DT", y="Dienst", hover_name="Task", color_discrete_sequence=["#EF4444"], height=400)
             fig2.update_yaxes(categoryorder="array", categoryarray=["H3","H2","H1","R2","R1","G2","S1","E1","D1"])
             fig2.update_layout(plot_bgcolor="#FFFFFF", paper_bgcolor="#FFFFFF", xaxis_title="Uhrzeit")
             st.plotly_chart(fig2, use_container_width=True)
         else:
-            st.info("Keine expliziten Waste-Blöcke identifiziert.")
+            st.info("Keine expliziten Potenzial-Blöcke identifiziert.")
             
     with tab3:
         st.caption("Verteilung der Arbeitszeit pro Mitarbeiter nach Tätigkeitstyp (in Minuten)")
-        df_grouped = df_ist.groupby(['Dienst', 'Typ'])['Duration'].sum().reset_index()
+        df_grouped = df_filtered.groupby(['Dienst', 'Typ'])['Duration'].sum().reset_index()
         fig3 = px.bar(df_grouped, x="Dienst", y="Duration", color="Typ", color_discrete_map=color_map, barmode='stack', height=500)
         fig3.update_layout(plot_bgcolor="#FFFFFF", paper_bgcolor="#FFFFFF", yaxis_title="Minuten")
         st.plotly_chart(fig3, use_container_width=True)
         
     with tab4:
         st.caption("Globale Verteilung der Ressourcen-Investition (Gesamtküche)")
-        df_pie = df_ist.groupby('Typ')['Duration'].sum().reset_index()
+        df_pie = df_filtered.groupby('Typ')['Duration'].sum().reset_index()
         fig4 = px.pie(df_pie, values='Duration', names='Typ', color='Typ', color_discrete_map=color_map, hole=0.4, height=500)
         fig4.update_traces(textinfo='percent+label')
         st.plotly_chart(fig4, use_container_width=True)
