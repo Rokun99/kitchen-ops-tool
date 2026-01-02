@@ -1,213 +1,396 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
 import plotly.graph_objects as go
-from datetime import datetime
+import plotly.express as px
+import json
+import google.generativeai as genai
+from datetime import datetime, timedelta
 
-# --- CONFIGURATION ---
+# --- CONFIGURATION & STYLING ---
 st.set_page_config(
-    page_title="Kitchen Intelligence | Ops Suite",
-    page_icon="🎯",
+    page_title="Workforce Analytics Platform",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# --- CUSTOM BRANDING & UX STYLING ---
+# Professional CSS Injection
 st.markdown("""
 <style>
-    /* Global Styles */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-    html, body, [class*="st-"] { font-family: 'Inter', sans-serif; }
+    /* Import Inter Font */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
     
-    /* Card Design */
-    .metric-card {
-        background: white;
-        padding: 24px;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
-        border: 1px solid #f0f0f0;
-        margin-bottom: 20px;
-    }
-    
-    /* Header Styling */
-    .main-header {
-        font-size: 2.2rem;
-        font-weight: 700;
+    html, body, [class*="st-"] {
+        font-family: 'Inter', sans-serif;
         color: #1e293b;
-        margin-bottom: 0.5rem;
     }
-    .sub-header {
-        font-size: 1rem;
+
+    /* Header Styling */
+    h1, h2, h3 {
+        font-weight: 600;
+        color: #0f172a;
+        letter-spacing: -0.025em;
+    }
+
+    /* Sidebar Styling */
+    [data-testid="stSidebar"] {
+        background-color: #f8fafc;
+        border-right: 1px solid #e2e8f0;
+    }
+
+    /* Button Styling - Minimalist */
+    .stButton > button {
+        background-color: #0f172a;
+        color: white;
+        border: 1px solid #0f172a;
+        border-radius: 6px;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        transition: all 0.2s;
+    }
+    .stButton > button:hover {
+        background-color: #1e293b;
+        border-color: #1e293b;
+    }
+    .stButton > button:active {
+        background-color: #334155;
+    }
+
+    /* Input Fields */
+    .stTextInput > div > div > input, .stTextArea > div > div > textarea {
+        background-color: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        color: #1e293b;
+    }
+
+    /* Tabs */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 24px;
+    }
+    .stTabs [data-baseweb="tab"] {
+        height: 50px;
+        white-space: pre-wrap;
+        background-color: transparent;
+        border-radius: 4px;
         color: #64748b;
-        margin-bottom: 2rem;
+        font-weight: 500;
+    }
+    .stTabs [aria-selected="true"] {
+        background-color: transparent;
+        color: #0f172a;
+        border-bottom: 2px solid #0f172a;
     }
     
-    /* Status Colors */
-    .stProgress > div > div > div > div { background-color: #3b82f6; }
+    /* Remove default Streamlit decorations */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
 
-# --- DATA ENGINE ---
-class KitchenDataManager:
+# --- AI LOGIC CLASS ---
+class GeminiHandler:
     def __init__(self):
-        # Daten mit deutschen Kategorien: Produktion, Gastronomie, Verwaltung, Logistik, Diätetik
-        self.raw_data = [
-            # D1 - Diätetik
-            {"Posten": "D1", "Start": "08:00", "Ende": "10:00", "Aufgabe": "Suppenküche & Diät-Vorbereitung", "Bereich": "Diätetik"},
-            {"Posten": "D1", "Start": "10:15", "Ende": "11:20", "Aufgabe": "Regenerieren & Instruktion Band", "Bereich": "Diätetik"},
-            {"Posten": "D1", "Start": "11:20", "Ende": "12:20", "Aufgabe": "Service ET & Band-Bereitschaft", "Bereich": "Diätetik"},
-            {"Posten": "D1", "Start": "12:20", "Ende": "12:45", "Aufgabe": "Abräumen & Lager-Sicherung", "Bereich": "Logistik"},
-            {"Posten": "D1", "Start": "14:30", "Ende": "15:50", "Aufgabe": "Produktionsprotokolle & PM", "Bereich": "Verwaltung"},
-            {"Posten": "D1", "Start": "15:50", "Ende": "18:05", "Aufgabe": "Service Abend & Bandkontrolle", "Bereich": "Diätetik"},
+        try:
+            # Check for API key in secrets
+            if "GEMINI_API_KEY" in st.secrets:
+                 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+                 self.model = genai.GenerativeModel('gemini-1.5-pro')
+            else:
+                 # Silent fail for UI cleanliness, handled in main logic
+                 self.model = None
+        except Exception:
+            self.model = None
+
+    def parse_schedule(self, text_content):
+        if not self.model: return []
+        
+        prompt = f"""
+        Analyze the submitted schedule text. 
+        Extract tasks into a valid JSON array.
+        
+        Schema per object:
+        - start_time (HH:mm)
+        - end_time (HH:mm)
+        - posten (string identifier)
+        - task_description (string)
+        - strategic_category: Choose one: 'Value Creation', 'Coordination', 'Logistics', 'Inefficiency'
+        - cognitive_load: (0.1 to 1.0) float
+        - handover_to: (string) Target posten identifier or empty string.
+
+        Input Text:
+        {text_content}
+        
+        Output only raw JSON.
+        """
+        try:
+            response = self.model.generate_content(prompt)
+            clean_json = response.text.replace("```json", "").replace("```", "").strip()
+            return json.loads(clean_json)
+        except Exception:
+            return []
+
+    def check_compliance(self, schedule_data, policy_text):
+        if not self.model: return "Service unavailable."
+        
+        prompt = f"""
+        Audit the schedule data against the policy text.
+        
+        Data: {json.dumps(schedule_data)}
+        Policy: {policy_text}
+        
+        Output format: Plain text list. Start lines with 'CRITICAL:', 'WARNING:', or 'PASS:'.
+        """
+        return self.model.generate_content(prompt).text
+
+    def get_chat_response(self, history, query, current_data):
+        if not self.model: return "Service unavailable."
+        
+        # Optimized context for token efficiency
+        context = f"Dataset Summary: {json.dumps(current_data[:15])}..."
+        full_query = f"{context}\n\nQuery: {query}\n\nTask: Provide a professional operational recommendation."
+        
+        gemini_history = []
+        for msg in history:
+             role = "user" if msg["role"] == "user" else "model"
+             gemini_history.append({"role": role, "parts": [msg["content"]]})
+
+        chat = self.model.start_chat(history=gemini_history)
+        return chat.send_message(full_query).text
+
+# --- VISUALIZATION CLASS ---
+class Visualizer:
+    @staticmethod
+    def get_color_map():
+        # Professional Corporate Palette
+        return {
+            'Value Creation': '#0f172a',  # Dark Slate
+            'Coordination': '#3b82f6',    # Blue
+            'Logistics': '#94a3b8',       # Grey
+            'Inefficiency': '#ef4444'     # Red (muted)
+        }
+
+    @staticmethod
+    def plot_sankey(df):
+        if df.empty or 'handover_to' not in df.columns: return None
+        
+        handover_df = df[df['handover_to'].notna() & (df['handover_to'] != "")]
+        if handover_df.empty: return None
+        
+        all_nodes = list(set(df['posten'].tolist() + handover_df['handover_to'].tolist()))
+        node_map = {name: i for i, name in enumerate(all_nodes)}
+        
+        fig = go.Figure(data=[go.Sankey(
+            node=dict(
+                pad=15, 
+                thickness=15, 
+                line=dict(color="white", width=0.5), 
+                label=all_nodes, 
+                color="#cbd5e1" # Light grey nodes
+            ),
+            link=dict(
+                source=[node_map[src] for src in handover_df['posten']],
+                target=[node_map[tgt] for tgt in handover_df['handover_to']],
+                value=[1] * len(handover_df),
+                color="#e2e8f0" # Very light flow lines
+            )
+        )])
+        fig.update_layout(
+            title_text="Workflow Handovers", 
+            font_family="Inter",
+            font_size=12, 
+            height=400,
+            template="plotly_white",
+            margin=dict(l=0, r=0, t=40, b=10)
+        )
+        return fig
+
+    @staticmethod
+    def plot_cognitive_heatmap(df):
+        if df.empty: return None
+        
+        hours = [f"{h:02d}" for h in range(5, 23)]
+        postens = sorted(df['posten'].unique())
+        
+        z_data = []
+        for p in postens:
+            row = []
+            p_df = df[df['posten'] == p]
+            for h in range(5, 23):
+                hour_str = f"{h:02d}"
+                tasks_in_hour = p_df[p_df['start_time'].astype(str).str.startswith(hour_str)]
+                load = tasks_in_hour['cognitive_load'].max() if not tasks_in_hour.empty else 0
+                row.append(load if not pd.isna(load) else 0)
+            z_data.append(row)
             
-            # E1 - Entremetier
-            {"Posten": "E1", "Start": "07:00", "Ende": "10:00", "Aufgabe": "Tages-Beilagen & MEP Folgetag", "Bereich": "Produktion"},
-            {"Posten": "E1", "Start": "10:15", "Ende": "12:30", "Aufgabe": "Wahlkost & Service Anrichten", "Bereich": "Produktion"},
-            {"Posten": "E1", "Start": "13:30", "Ende": "15:54", "Aufgabe": "MEP Abend & Postenreinigung", "Bereich": "Verwaltung"},
-
-            # G2 - Garde-Manger
-            {"Posten": "G2", "Start": "09:30", "Ende": "13:30", "Aufgabe": "Kalte Küche, Salate & Dessert", "Bereich": "Produktion"},
-            {"Posten": "G2", "Start": "14:15", "Ende": "18:00", "Aufgabe": "Buffet, MEP & Bandservice", "Bereich": "Produktion"},
-            {"Posten": "G2", "Start": "18:00", "Ende": "18:30", "Aufgabe": "Checklisten & Kontrollen", "Bereich": "Verwaltung"},
-
-            # H1 - Frühstück
-            {"Posten": "H1", "Start": "05:30", "Ende": "10:00", "Aufgabe": "Frühstücksservice & Band", "Bereich": "Gastronomie"},
-            {"Posten": "H1", "Start": "10:15", "Ende": "12:30", "Aufgabe": "Glacé & Band Mittag", "Bereich": "Gastronomie"},
-            {"Posten": "H1", "Start": "13:30", "Ende": "14:40", "Aufgabe": "Protokolle & MHD Prüfung", "Bereich": "Verwaltung"},
-
-            # H2 - Pâtisserie
-            {"Posten": "H2", "Start": "09:15", "Ende": "13:00", "Aufgabe": "Desserts Restaurant & Patienten", "Bereich": "Gastronomie"},
-            {"Posten": "H2", "Start": "14:15", "Ende": "18:00", "Aufgabe": "Zvieri & Abendservice", "Bereich": "Gastronomie"},
-
-            # R1 & R2 - Gastronomie
-            {"Posten": "R1", "Start": "06:30", "Ende": "10:00", "Aufgabe": "Warenannahme & Deklaration", "Bereich": "Logistik"},
-            {"Posten": "R1", "Start": "10:20", "Ende": "15:24", "Aufgabe": "Mittagsservice & Restaurant", "Bereich": "Gastronomie"},
-            {"Posten": "R2", "Start": "06:30", "Ende": "10:00", "Aufgabe": "Frühstück MEP & Salate", "Bereich": "Gastronomie"},
-            {"Posten": "R2", "Start": "10:20", "Ende": "15:24", "Aufgabe": "Mittagsservice & ReCircle", "Bereich": "Gastronomie"},
-
-            # S1 - Saucier
-            {"Posten": "S1", "Start": "07:00", "Ende": "10:00", "Aufgabe": "Fleischkomponenten & Saucen", "Bereich": "Produktion"},
-            {"Posten": "S1", "Start": "10:15", "Ende": "13:00", "Aufgabe": "Wahlkost & Band-Support", "Bereich": "Produktion"},
-            {"Posten": "S1", "Start": "13:30", "Ende": "15:54", "Aufgabe": "Produktionspläne & Hygiene", "Bereich": "Verwaltung"},
-        ]
-
-    def get_df(self):
-        df = pd.DataFrame(self.raw_data)
-        df['Start_DT'] = pd.to_datetime('2026-01-01 ' + df['Start'].str.replace('.', ':'))
-        df['End_DT'] = pd.to_datetime('2026-01-01 ' + df['Ende'].str.replace('.', ':'))
-        df['Minuten'] = (df['End_DT'] - df['Start_DT']).dt.total_seconds() / 60
-        return df
-
-# --- UI LOGIC ---
-def main():
-    dm = KitchenDataManager()
-    df = dm.get_df()
-
-    # --- SIDEBAR (MODERN) ---
-    with st.sidebar:
-        st.image("https://img.icons8.com/fluency/96/restaurant-menu.png", width=80)
-        st.title("Ops Filter")
-        st.markdown("---")
-        
-        alle_bereiche = sorted(df['Bereich'].unique())
-        selected_bereiche = st.multiselect("Fokus-Bereiche", alle_bereiche, default=alle_bereiche)
-        
-        st.markdown("---")
-        st.info("Diese Suite transformiert Prozessbeschriebe in strategische Kennzahlen.")
-
-    # --- MAIN CONTENT ---
-    st.markdown('<div class="main-header">Kitchen Intelligence Suite</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-header">Optimierung der Küchenorganisation & Prozesslandschaft</div>', unsafe_allow_html=True)
-
-    # Filtered Data
-    mask = df['Bereich'].isin(selected_bereiche)
-    f_df = df[mask]
-
-    # --- KPI ROW ---
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        st.markdown(f'<div class="metric-card"><small>Gesamt-Arbeitszeit</small><h3>{int(f_df["Minuten"].sum()/60)}h</h3></div>', unsafe_allow_html=True)
-    with col2:
-        prod_h = int(f_df[f_df["Bereich"] == "Produktion"]["Minuten"].sum()/60)
-        st.markdown(f'<div class="metric-card"><small>Produktions-Fokus</small><h3>{prod_h}h</h3></div>', unsafe_allow_html=True)
-    with col3:
-        gast_h = int(f_df[f_df["Bereich"] == "Gastronomie"]["Minuten"].sum()/60)
-        st.markdown(f'<div class="metric-card"><small>Gastronomie-Fokus</small><h3>{gast_h}h</h3></div>', unsafe_allow_html=True)
-    with col4:
-        admin_ratio = (f_df[f_df["Bereich"] == "Verwaltung"]["Minuten"].sum() / f_df["Minuten"].sum()) * 100
-        st.markdown(f'<div class="metric-card"><small>Verwaltungs-Anteil</small><h3>{admin_ratio:.1f}%</h3></div>', unsafe_allow_html=True)
-
-    # --- TABS ---
-    tab_gantt, tab_load, tab_strategy = st.tabs(["🕒 Operative Timeline", "📊 Belastungsprofil", "🚀 Strategie-Mapping"])
-
-    with tab_gantt:
-        st.subheader("Tagesablauf nach Posten")
-        fig = px.timeline(
-            f_df, x_start="Start_DT", x_end="End_DT", y="Posten", color="Bereich",
-            hover_name="Aufgabe",
-            color_discrete_map={
-                "Produktion": "#EF4444", "Gastronomie": "#3B82F6", 
-                "Diätetik": "#10B981", "Verwaltung": "#F59E0B", "Logistik": "#64748B"
-            },
-            category_orders={"Posten": sorted(f_df['Posten'].unique(), reverse=True)}
+        fig = px.imshow(
+            z_data, 
+            x=[f"{h}:00" for h in hours], 
+            y=postens, 
+            color_continuous_scale='Greys', # Professional Monochromatic
+            aspect="auto"
         )
         fig.update_layout(
-            xaxis_title="Uhrzeit", yaxis_title="",
-            plot_bgcolor="white", paper_bgcolor="white",
-            height=500, margin=dict(l=20, r=20, t=20, b=20),
-            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+            title="Resource Load Intensity", 
+            template="plotly_white",
+            font_family="Inter",
+            margin=dict(l=0, r=0, t=40, b=10)
         )
-        st.plotly_chart(fig, use_container_width=True)
+        return fig
 
-    with tab_load:
-        st.subheader("Ressourcen-Einsatz über den Tag")
-        # Generate load curve
-        load_data = []
-        for h in range(5, 20):
-            for m in [0, 30]:
-                check_time = datetime(2026, 1, 1, h, m)
-                active_count = len(f_df[(f_df['Start_DT'] <= check_time) & (f_df['End_DT'] > check_time)])
-                load_data.append({"Zeit": f"{h:02d}:{m:02d}", "Aktive_Posten": active_count})
+    @staticmethod
+    def plot_sunburst(df):
+        if df.empty: return None
         
-        load_df = pd.DataFrame(load_data)
-        fig_area = px.area(load_df, x="Zeit", y="Aktive_Posten", line_shape="spline",
-                           color_discrete_sequence=["#3B82F6"])
-        fig_area.update_layout(plot_bgcolor="white", xaxis_tickangle=-45)
-        st.plotly_chart(fig_area, use_container_width=True)
-        st.info("Insight: Die Grafik zeigt die personelle Dichte. Ideal zur Identifikation von 'Zimmerstunden' oder Personalengpässen beim Schöpfen.")
-
-    with tab_strategy:
-        st.subheader("Transformation: IST-Tätigkeiten zu SOLL-Struktur")
-        
-        # Sunburst for Strategy
-        fig_sun = px.sunburst(
-            f_df, path=['Bereich', 'Posten', 'Aufgabe'], values='Minuten',
-            color='Bereich',
-            color_discrete_map={
-                "Produktion": "#EF4444", "Gastronomie": "#3B82F6", 
-                "Diätetik": "#10B981", "Verwaltung": "#F59E0B", "Logistik": "#64748B"
-            }
+        fig = px.sunburst(
+            df, 
+            path=['strategic_category', 'posten', 'task_description'], 
+            values='cognitive_load', 
+            color='strategic_category',
+            color_discrete_map=Visualizer.get_color_map()
         )
-        fig_sun.update_layout(height=650)
-        st.plotly_chart(fig_sun, use_container_width=True)
+        fig.update_layout(
+            title="Strategic Task Distribution", 
+            template="plotly_white",
+            font_family="Inter",
+            margin=dict(l=0, r=0, t=40, b=10)
+        )
+        return fig
+
+# --- MAIN APPLICATION ---
+def main():
+    ai = GeminiHandler()
+    vis = Visualizer()
+    
+    # Session State Init
+    if 'schedule_data' not in st.session_state:
+        st.session_state.schedule_data = []
+    if 'chat_history' not in st.session_state:
+        st.session_state.chat_history = []
+
+    # --- SIDEBAR ---
+    with st.sidebar:
+        st.subheader("Data Import")
+        uploaded_file = st.file_uploader("Upload Schedule (PDF/TXT)", type=["txt", "pdf"])
         
-        # Recommendations
-        st.markdown("---")
-        c1, c2 = st.columns(2)
-        with c1:
-            st.warning("⚠️ **Potenzial: Fachfremde Aufgaben**")
-            waste = f_df[f_df['Bereich'].isin(['Verwaltung', 'Logistik'])].groupby('Posten')['Minuten'].sum().reset_index()
-            waste['Stunden'] = (waste['Minuten']/60).round(1)
-            st.write("Folgende Posten leisten hohen Verwaltungsaufwand:")
-            st.dataframe(waste[['Posten', 'Stunden']].sort_values('Stunden', ascending=False), hide_index=True)
+        st.write("") # Spacer
+        
+        if st.button("Process Data", use_container_width=True):
+            if uploaded_file and ai.model:
+                try:
+                    text = uploaded_file.read().decode("utf-8")
+                    with st.spinner("Processing..."):
+                        data = ai.parse_schedule(text)
+                        if data:
+                            st.session_state.schedule_data = data
+                            st.success("Import successful")
+                        else:
+                            st.error("Parsing failed")
+                except Exception:
+                    st.error("File error")
+            elif not ai.model:
+                st.error("API Key missing")
+        
+        st.write("") # Spacer
+        if st.button("Load Demo Dataset", use_container_width=True):
+            # Professional Dummy Data
+            st.session_state.schedule_data = [
+                {"start_time": "07:00", "end_time": "10:00", "posten": "S1", "task_description": "Sauce Production", "strategic_category": "Value Creation", "cognitive_load": 0.6, "handover_to": "G2"},
+                {"start_time": "09:00", "end_time": "11:00", "posten": "G2", "task_description": "Mise en Place", "strategic_category": "Value Creation", "cognitive_load": 0.4, "handover_to": ""},
+                {"start_time": "11:30", "end_time": "13:30", "posten": "S1", "task_description": "Lunch Service", "strategic_category": "Value Creation", "cognitive_load": 1.0, "handover_to": ""},
+                {"start_time": "06:30", "end_time": "09:00", "posten": "R1", "task_description": "Goods Receipt", "strategic_category": "Logistics", "cognitive_load": 0.3, "handover_to": "S1"},
+                {"start_time": "14:00", "end_time": "15:00", "posten": "D1", "task_description": "Documentation", "strategic_category": "Coordination", "cognitive_load": 0.5, "handover_to": ""},
+                {"start_time": "10:00", "end_time": "10:15", "posten": "All", "task_description": "Break", "strategic_category": "Inefficiency", "cognitive_load": 0.1, "handover_to": ""}
+            ]
+            st.success("Demo data loaded")
+
+    # --- MAIN CONTENT ---
+    st.title("Operations Intelligence")
+    st.markdown("Strategic workforce planning and process optimization.")
+    st.write("") # Margin
+
+    # Navigation Tabs
+    tab1, tab2, tab3, tab4 = st.tabs(["Analytics", "Compliance Audit", "Optimization Consultant", "Source Data"])
+
+    if st.session_state.schedule_data:
+        df = pd.DataFrame(st.session_state.schedule_data)
+
+        # TAB 1: ANALYTICS
+        with tab1:
+            col1, col2 = st.columns(2)
+            with col1:
+                st.plotly_chart(vis.plot_cognitive_heatmap(df), use_container_width=True)
+            with col2:
+                st.plotly_chart(vis.plot_sunburst(df), use_container_width=True)
             
-        with c2:
-            st.success("✅ **Strategisches Zielbild**")
-            st.markdown("""
-            1. **Zentralisierung Logistik:** R1/D1 entlasten durch dedizierte Warenannahme.
-            2. **Digitale Verwaltung:** Reduktion der manuellen Protokollzeit bei S1/E1/H1.
-            3. **Fokus Produktion:** Verschiebung von 10-15% der Zeit zurück in die Kulinarik.
-            """)
+            st.write("")
+            sankey = vis.plot_sankey(df)
+            if sankey:
+                st.plotly_chart(sankey, use_container_width=True)
+
+        # TAB 2: COMPLIANCE
+        with tab2:
+            st.subheader("Policy Validation")
+            policy = st.text_area(
+                "Defined Ruleset", 
+                value="R1 handles logistics only. S1 manages production. Mandatory break times apply.",
+                height=120
+            )
+            
+            if st.button("Run Audit"):
+                if ai.model:
+                    with st.spinner("Auditing..."):
+                        report = ai.check_compliance(st.session_state.schedule_data, policy)
+                        
+                        # Professional Formatting
+                        for line in report.split("\n"):
+                            line = line.strip()
+                            if "CRITICAL:" in line:
+                                st.error(line.replace("CRITICAL:", "").strip())
+                            elif "WARNING:" in line:
+                                st.warning(line.replace("WARNING:", "").strip())
+                            elif "PASS:" in line:
+                                st.success(line.replace("PASS:", "").strip())
+                            elif line:
+                                st.markdown(f"**{line}**")
+                else:
+                    st.error("System configuration error")
+
+        # TAB 3: CONSULTANT
+        with tab3:
+            st.subheader("Scenario Simulation")
+            
+            # Chat Container
+            chat_container = st.container()
+            with chat_container:
+                for msg in st.session_state.chat_history:
+                    with st.chat_message(msg["role"]):
+                        st.markdown(msg["content"])
+
+            # Input Area
+            if prompt := st.chat_input("Enter simulation parameters..."):
+                st.session_state.chat_history.append({"role": "user", "content": prompt})
+                with st.chat_message("user"): 
+                    st.markdown(prompt)
+                
+                with st.chat_message("assistant"):
+                    with st.spinner("Calculating..."):
+                        response = ai.get_chat_response(
+                            st.session_state.chat_history[:-1],
+                            prompt, 
+                            st.session_state.schedule_data
+                        )
+                        st.markdown(response)
+                        st.session_state.chat_history.append({"role": "assistant", "content": response})
+
+        # TAB 4: DATA
+        with tab4:
+            st.subheader("Structured Dataset")
+            st.dataframe(df, use_container_width=True, hide_index=True)
+
+    else:
+        # Empty State
+        st.info("No data available. Please import a schedule or load demo data.")
 
 if __name__ == "__main__":
     main()
