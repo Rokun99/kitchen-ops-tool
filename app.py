@@ -94,8 +94,8 @@ st.markdown(f"""
         min-height: 110px;
         transition: all 0.2s ease;
         box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-        display: flex;
-        flex-direction: column;
+        display: flex; 
+        flex-direction: column; 
         justify-content: space-between;
     }}
     
@@ -112,6 +112,9 @@ st.markdown(f"""
         text-transform: uppercase;
         letter-spacing: 0.05em;
         margin-bottom: 0.5rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }}
     
     .kpi-metric {{
@@ -184,6 +187,7 @@ class DataWarehouse:
     @staticmethod
     def get_full_ist_data():
         # DATEN EXAKT NACH DEN NEUKALKULATIONS-BERICHTEN
+        # Mit spezifischen Keywords für Convenience-Rating und Deep-Dive Metriken
         data = [
             # --- D1 DIÄTETIK ---
             {"Dienst": "D1", "Start": "08:00", "Ende": "08:25", "Task": "Admin: E-Mails/Mutationen", "Typ": "Admin"},
@@ -402,6 +406,36 @@ class KPI_Engine:
         
         peak_staff = 9 
 
+        # --- SPECIAL METRICS (USER REQUEST) ---
+        
+        # 16. R2 Inflation (Hidden Waste)
+        # Filter R2 tasks between 08:00 and 10:00
+        r2_gap_tasks = df_ist[(df_ist['Dienst'] == 'R2') & (df_ist['Start'] >= "08:00") & (df_ist['Ende'] <= "10:00")]
+        r2_gap_duration = r2_gap_tasks['Duration'].sum() # 120 min
+        # PDF says real work is ~40 min, so inflation is ~80 min
+        r2_inflation = max(0, r2_gap_duration - 40)
+        r2_inflation_cost = (r2_inflation / 60) * KPI_Engine.HOURLY_RATE_CHF
+
+        # 17. H1 Skill-Dilution
+        # Ratio of H1 time spent on "Dessert", "Salat", "Brei", "Rahm" vs Total H1
+        h1_df = df_ist[df_ist['Dienst'] == 'H1']
+        h1_total = h1_df['Duration'].sum()
+        h1_foreign = h1_df[h1_df['Task'].str.contains('Dessert|Salat|Brei|Rahm', case=False, na=False)]['Duration'].sum()
+        h1_dilution = (h1_foreign / h1_total * 100) if h1_total > 0 else 0
+
+        # 18. R1 Hygiene-Risk
+        # Time spent at ramp/changing
+        r1_df = df_ist[df_ist['Dienst'] == 'R1']
+        r1_risk = r1_df[r1_df['Task'].str.contains('Warenannahme|Verräumen|Hygiene', case=False, na=False)]['Duration'].sum()
+        r1_risk_cost = (r1_risk / 60) * KPI_Engine.HOURLY_RATE_CHF
+
+        # 19. G2 Capacity Gap
+        # Explicit idle time in afternoon
+        g2_df = df_ist[df_ist['Dienst'] == 'G2']
+        g2_gap = g2_df[g2_df['Task'].str.contains('Leerlauf', case=False, na=False)]['Duration'].sum()
+        g2_gap_cost = (g2_gap / 60) * KPI_Engine.HOURLY_RATE_CHF
+
+
         # FORMATTING LOGIC
         def fmt(val, type='pct'):
             if mode == 'money' and type == 'abs':
@@ -429,6 +463,12 @@ class KPI_Engine:
             ("Patient/Gastro Split", {"val": "62/38", "sub": "Ressourcen-Allokation", "trend": "neutral"}),
             ("Process Cycle Eff.", {"val": f"{(value_add_min/(total_min-potenzial_min)*100):.1f}%", "sub": "Netto-Effizienz", "trend": "good"}),
             ("Peak Staff Load", {"val": "9 Pax", "sub": "Max. Gleichzeitig", "trend": "neutral"}),
+
+            # NEW 4 Metrics
+            ("R2 Inflation (Hidden)", {"val": fmt(r2_inflation_cost if mode=='money' else r2_inflation, 'abs_min'), "sub": "Gedehnte Arbeit", "trend": "bad"}),
+            ("H1 Skill-Dilution", {"val": f"{h1_dilution:.0f}%", "sub": "Fremdaufgaben", "trend": "bad"}),
+            ("R1 Hygiene-Risk", {"val": fmt(r1_risk_cost if mode=='money' else r1_risk, 'abs_min'), "sub": "Zeit an Rampe", "trend": "bad"}),
+            ("G2 Capacity Gap", {"val": fmt(g2_gap_cost if mode=='money' else g2_gap, 'abs_min'), "sub": "PM Leerlauf", "trend": "bad"}),
         ]
         return kpis_list
 
@@ -457,7 +497,7 @@ def main():
         <div class="header-container">
             <div>
                 <h1 class="main-title">WORKSPACE: AUDIT 2026</h1>
-                <div class="sub-title">Enterprise Protected</div>
+                <div class="sub-title">Enterprise Security Architecture</div>
             </div>
         </div>
     """, unsafe_allow_html=True)
@@ -470,10 +510,11 @@ def main():
 
     kpis_list = KPI_Engine.calculate_all(df_ist, mode=mode)
 
-    # --- MANAGEMENT COCKPIT ---
-    st.markdown('<div class="section-label">Management Cockpit: 15 Core Metrics</div>', unsafe_allow_html=True)
+    # --- MANAGEMENT COCKPIT (4 Rows) ---
+    st.markdown('<div class="section-label">Management Cockpit: 19 Core Metrics</div>', unsafe_allow_html=True)
     
-    for row_idx in range(3):
+    # Updated to 4 rows to accommodate 19 metrics
+    for row_idx in range(4):
         cols = st.columns(5, gap="medium")
         for col_idx in range(5):
             index = row_idx * 5 + col_idx
