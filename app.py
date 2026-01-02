@@ -40,56 +40,74 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- AI HANDLER ---
+# --- AI HANDLER (ROBUST VERSION) ---
 class KitchenAI:
     def __init__(self):
-        try:
-            # Sicherstellen, dass der Key vorhanden ist
-            api_key = st.secrets.get("GEMINI_API_KEY")
-            if not api_key:
-                st.error("GEMINI_API_KEY fehlt in den Secrets.")
-                self.model = None
-                return
+        self.model = None
+        api_key = st.secrets.get("GEMINI_API_KEY")
+        
+        if not api_key:
+            st.error("🚨 ACHTUNG: 'GEMINI_API_KEY' fehlt in den Secrets (.streamlit/secrets.toml).")
+            return
 
+        try:
             genai.configure(api_key=api_key)
             
-            # Wir nutzen 'gemini-1.5-flash', da es eine höhere Verfügbarkeit hat 
-            # und für analytische Textaufgaben exzellent geeignet ist.
-            self.model = genai.GenerativeModel('gemini-1.5-flash')
+            # Liste der Modelle, die wir probieren (Fallback-Strategie)
+            models_to_try = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro']
+            
+            for model_name in models_to_try:
+                try:
+                    self.model = genai.GenerativeModel(model_name)
+                    # Test-Call um sicherzugehen, dass es klappt
+                    self.model.generate_content("Test")
+                    # Wenn kein Fehler kommt, haben wir ein Modell gefunden:
+                    print(f"Erfolg: Nutze Modell {model_name}")
+                    break 
+                except Exception:
+                    continue
+            
+            if not self.model:
+                st.error("❌ Kritischer Fehler: Kein verfügbares Gemini-Modell gefunden. Bitte API-Berechtigungen prüfen.")
+        
         except Exception as e:
-            st.error(f"Fehler bei der KI-Initialisierung: {e}")
-            self.model = None
+            st.error(f"Verbindungsfehler zu Google AI: {e}")
 
     def audit_processes(self, df):
         if not self.model: 
-            return "KI-Dienst nicht konfiguriert oder Initialisierung fehlgeschlagen."
+            return "KI-Dienst nicht verfügbar. Bitte API Key prüfen."
         
-        # Reduzierung des Kontexts auf das Wesentliche, um Token-Limits und Fehler zu vermeiden
-        context_data = df[['Dienst', 'Aufgabe', 'Typ', 'Minuten']].to_dict(orient='records')
+        # Daten verdichten für den Prompt
+        context_data = df[['Dienst', 'Aufgabe', 'Typ', 'Minuten']].head(30).to_dict(orient='records')
         
         prompt = f"""
-        Du bist ein Experte für Spital-Küchenlogistik und Betriebswirtschaft.
-        Analysiere folgende IST-Daten der Küchenprozesse:
+        Rolle: Senior Operations Manager einer Großküche.
+        Kontext: Wir strukturieren um von Einzel-Diensten zu 'Cucina' (Produktion) und 'Restaurazione' (Gast).
+        
+        Analysiere diese Dienst-Daten:
         {context_data}
 
-        Aufgabe:
-        1. Identifiziere Ineffizienzen (z.B. hohe Logistik-Anteile während der Kern-Produktionszeit).
-        2. Begründe fachlich, warum eine Optimierung der Dienstpläne (SOLL-Zustand) für die Patientensicherheit und Wirtschaftlichkeit notwendig ist.
-        3. Beziehe dich spezifisch auf die Crunch-Time (11:30 - 12:30 Uhr).
+        Aufgaben:
+        1. Finde 2 konkrete Beispiele, wo 'Logistik' oder 'Verwaltung' wertvolle Produktionszeit blockiert.
+        2. Bewerte die kritische Phase 11:30-12:30 (Crunch-Time).
+        3. Gib eine strategische Empfehlung zur Personalverschiebung.
 
-        Antworte präzise, professionell und in kurzen Absätzen. Vermeide Emojis.
+        Antworte kurz, knackig und business-orientiert (keine Aufzählungszeichen, Fließtext).
         """
         
         try:
             response = self.model.generate_content(prompt)
-            if response and response.text:
-                return response.text
-            else:
-                return "Die KI konnte keine Analyse generieren."
+            return response.text
         except Exception as e:
-            # Spezifische Behandlung für den NotFound Fehler
-            if "not found" in str(e).lower():
-                return "Fehler: Das KI-Modell wurde nicht gefunden. Bitte versuche 'gemini-1.5-flash' oder prüfe deine API-Berechtigungen."
-            return f"Fehler bei der KI-Analyse: {str(e)}"
+            return f"Fehler bei der Analyse: {str(e)}"
+
+    def rewrite_duty(self, data, instruction):
+        if not self.model: return "KI nicht verfügbar."
+        prompt = f"Daten: {data[:5]}... (Auszug). Anweisung: {instruction}. Schlage eine konkrete Änderung vor."
+        try:
+            return self.model.generate_content(prompt).text
+        except:
+            return "Konnte Anfrage nicht verarbeiten."
 
 # --- DATA ENGINE ---
 class KitchenDataManager:
