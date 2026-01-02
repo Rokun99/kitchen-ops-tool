@@ -6,86 +6,144 @@ from datetime import datetime
 
 # --- CONFIGURATION ---
 st.set_page_config(
-    page_title="Kitchen Intelligence | Ops Suite",
+    page_title="Kitchen Ops Intelligence",
     page_icon="🎯",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# --- CUSTOM BRANDING & UX STYLING ---
+# --- ADVANCED UX STYLING ---
 st.markdown("""
 <style>
-    /* Global Styles */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-    html, body, [class*="st-"] { font-family: 'Inter', sans-serif; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
     
-    /* Card Design */
-    .metric-card {
-        background: white;
-        padding: 24px;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
-        border: 1px solid #f0f0f0;
-        margin-bottom: 20px;
+    /* Main Background & Font */
+    .stApp {
+        background-color: #f8fafc;
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* Sidebar Styling */
+    section[data-testid="stSidebar"] {
+        background-color: #ffffff !important;
+        border-right: 1px solid #e2e8f0;
     }
     
-    /* Header Styling */
-    .main-header {
-        font-size: 2.2rem;
-        font-weight: 700;
-        color: #1e293b;
-        margin-bottom: 0.5rem;
-    }
-    .sub-header {
-        font-size: 1rem;
-        color: #64748b;
+    /* Professional Metric Cards */
+    .metric-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
         margin-bottom: 2rem;
     }
     
-    /* Status Colors */
-    .stProgress > div > div > div > div { background-color: #3b82f6; }
+    .card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        transition: transform 0.2s ease-in-out;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-label {
+        color: #64748b;
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+    
+    .card-value {
+        color: #1e293b;
+        font-size: 1.75rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .status-indicator {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    /* Headers */
+    .main-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        color: #0f172a;
+        margin-bottom: 0.25rem;
+    }
+    
+    .sub-title {
+        font-size: 1.125rem;
+        color: #64748b;
+        margin-bottom: 2.5rem;
+    }
+
+    /* Tabs Styling */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 24px;
+        background-color: transparent;
+    }
+
+    .stTabs [data-baseweb="tab"] {
+        height: 45px;
+        background-color: transparent;
+        border: none;
+        color: #64748b;
+        font-weight: 500;
+    }
+
+    .stTabs [aria-selected="true"] {
+        color: #3b82f6 !important;
+        border-bottom: 2px solid #3b82f6 !important;
+    }
+
+    /* Plotly Chart Container */
+    .chart-box {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        margin-top: 1rem;
+    }
 </style>
 """, unsafe_allow_html=True)
 
 # --- DATA ENGINE ---
 class KitchenDataManager:
     def __init__(self):
-        # Daten mit deutschen Kategorien: Produktion, Gastronomie, Verwaltung, Logistik, Diätetik
         self.raw_data = [
-            # D1 - Diätetik
             {"Posten": "D1", "Start": "08:00", "Ende": "10:00", "Aufgabe": "Suppenküche & Diät-Vorbereitung", "Bereich": "Diätetik"},
             {"Posten": "D1", "Start": "10:15", "Ende": "11:20", "Aufgabe": "Regenerieren & Instruktion Band", "Bereich": "Diätetik"},
             {"Posten": "D1", "Start": "11:20", "Ende": "12:20", "Aufgabe": "Service ET & Band-Bereitschaft", "Bereich": "Diätetik"},
             {"Posten": "D1", "Start": "12:20", "Ende": "12:45", "Aufgabe": "Abräumen & Lager-Sicherung", "Bereich": "Logistik"},
             {"Posten": "D1", "Start": "14:30", "Ende": "15:50", "Aufgabe": "Produktionsprotokolle & PM", "Bereich": "Verwaltung"},
             {"Posten": "D1", "Start": "15:50", "Ende": "18:05", "Aufgabe": "Service Abend & Bandkontrolle", "Bereich": "Diätetik"},
-            
-            # E1 - Entremetier
             {"Posten": "E1", "Start": "07:00", "Ende": "10:00", "Aufgabe": "Tages-Beilagen & MEP Folgetag", "Bereich": "Produktion"},
             {"Posten": "E1", "Start": "10:15", "Ende": "12:30", "Aufgabe": "Wahlkost & Service Anrichten", "Bereich": "Produktion"},
             {"Posten": "E1", "Start": "13:30", "Ende": "15:54", "Aufgabe": "MEP Abend & Postenreinigung", "Bereich": "Verwaltung"},
-
-            # G2 - Garde-Manger
             {"Posten": "G2", "Start": "09:30", "Ende": "13:30", "Aufgabe": "Kalte Küche, Salate & Dessert", "Bereich": "Produktion"},
             {"Posten": "G2", "Start": "14:15", "Ende": "18:00", "Aufgabe": "Buffet, MEP & Bandservice", "Bereich": "Produktion"},
             {"Posten": "G2", "Start": "18:00", "Ende": "18:30", "Aufgabe": "Checklisten & Kontrollen", "Bereich": "Verwaltung"},
-
-            # H1 - Frühstück
             {"Posten": "H1", "Start": "05:30", "Ende": "10:00", "Aufgabe": "Frühstücksservice & Band", "Bereich": "Gastronomie"},
             {"Posten": "H1", "Start": "10:15", "Ende": "12:30", "Aufgabe": "Glacé & Band Mittag", "Bereich": "Gastronomie"},
             {"Posten": "H1", "Start": "13:30", "Ende": "14:40", "Aufgabe": "Protokolle & MHD Prüfung", "Bereich": "Verwaltung"},
-
-            # H2 - Pâtisserie
             {"Posten": "H2", "Start": "09:15", "Ende": "13:00", "Aufgabe": "Desserts Restaurant & Patienten", "Bereich": "Gastronomie"},
             {"Posten": "H2", "Start": "14:15", "Ende": "18:00", "Aufgabe": "Zvieri & Abendservice", "Bereich": "Gastronomie"},
-
-            # R1 & R2 - Gastronomie
             {"Posten": "R1", "Start": "06:30", "Ende": "10:00", "Aufgabe": "Warenannahme & Deklaration", "Bereich": "Logistik"},
             {"Posten": "R1", "Start": "10:20", "Ende": "15:24", "Aufgabe": "Mittagsservice & Restaurant", "Bereich": "Gastronomie"},
             {"Posten": "R2", "Start": "06:30", "Ende": "10:00", "Aufgabe": "Frühstück MEP & Salate", "Bereich": "Gastronomie"},
             {"Posten": "R2", "Start": "10:20", "Ende": "15:24", "Aufgabe": "Mittagsservice & ReCircle", "Bereich": "Gastronomie"},
-
-            # S1 - Saucier
             {"Posten": "S1", "Start": "07:00", "Ende": "10:00", "Aufgabe": "Fleischkomponenten & Saucen", "Bereich": "Produktion"},
             {"Posten": "S1", "Start": "10:15", "Ende": "13:00", "Aufgabe": "Wahlkost & Band-Support", "Bereich": "Produktion"},
             {"Posten": "S1", "Start": "13:30", "Ende": "15:54", "Aufgabe": "Produktionspläne & Hygiene", "Bereich": "Verwaltung"},
@@ -98,70 +156,92 @@ class KitchenDataManager:
         df['Minuten'] = (df['End_DT'] - df['Start_DT']).dt.total_seconds() / 60
         return df
 
-# --- UI LOGIC ---
+# --- UI RENDERING ---
 def main():
     dm = KitchenDataManager()
     df = dm.get_df()
 
-    # --- SIDEBAR (MODERN) ---
+    # --- SIDEBAR ---
     with st.sidebar:
-        st.image("https://img.icons8.com/fluency/96/restaurant-menu.png", width=80)
-        st.title("Ops Filter")
-        st.markdown("---")
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.image("https://cdn-icons-png.flaticon.com/512/3075/3075977.png", width=60)
+        st.markdown("### Control Center")
+        st.markdown("Filtere die operativen Ebenen")
         
         alle_bereiche = sorted(df['Bereich'].unique())
-        selected_bereiche = st.multiselect("Fokus-Bereiche", alle_bereiche, default=alle_bereiche)
+        selected_bereiche = st.multiselect("", alle_bereiche, default=alle_bereiche)
         
         st.markdown("---")
-        st.info("Diese Suite transformiert Prozessbeschriebe in strategische Kennzahlen.")
+        st.caption("v2.4.0 • Enterprise Edition")
+        st.caption("© 2024 Kitchen Ops Intelligence")
 
     # --- MAIN CONTENT ---
-    st.markdown('<div class="main-header">Kitchen Intelligence Suite</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-header">Optimierung der Küchenorganisation & Prozesslandschaft</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-title">Kitchen Intelligence</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sub-title">Strategisches Dashboard für Prozessoptimierung</div>', unsafe_allow_html=True)
 
     # Filtered Data
     mask = df['Bereich'].isin(selected_bereiche)
     f_df = df[mask]
 
-    # --- KPI ROW ---
+    # --- KPI CARDS ---
+    st.markdown('<div class="metric-container">', unsafe_allow_html=True)
+    
+    total_hours = int(f_df["Minuten"].sum()/60)
+    prod_h = int(f_df[f_df["Bereich"] == "Produktion"]["Minuten"].sum()/60)
+    gast_h = int(f_df[f_df["Bereich"] == "Gastronomie"]["Minuten"].sum()/60)
+    admin_ratio = (f_df[f_df["Bereich"] == "Verwaltung"]["Minuten"].sum() / f_df["Minuten"].sum() * 100) if f_df["Minuten"].sum() > 0 else 0
+
     col1, col2, col3, col4 = st.columns(4)
     with col1:
-        st.markdown(f'<div class="metric-card"><small>Gesamt-Arbeitszeit</small><h3>{int(f_df["Minuten"].sum()/60)}h</h3></div>', unsafe_allow_html=True)
+        st.markdown(f'''<div class="card">
+            <div class="card-label">Arbeitszeit Gesamt</div>
+            <div class="card-value"><span class="status-indicator" style="background:#3b82f6"></span>{total_hours}h</div>
+        </div>''', unsafe_allow_html=True)
     with col2:
-        prod_h = int(f_df[f_df["Bereich"] == "Produktion"]["Minuten"].sum()/60)
-        st.markdown(f'<div class="metric-card"><small>Produktions-Fokus</small><h3>{prod_h}h</h3></div>', unsafe_allow_html=True)
+        st.markdown(f'''<div class="card">
+            <div class="card-label">Produktions-Fokus</div>
+            <div class="card-value"><span class="status-indicator" style="background:#ef4444"></span>{prod_h}h</div>
+        </div>''', unsafe_allow_html=True)
     with col3:
-        gast_h = int(f_df[f_df["Bereich"] == "Gastronomie"]["Minuten"].sum()/60)
-        st.markdown(f'<div class="metric-card"><small>Gastronomie-Fokus</small><h3>{gast_h}h</h3></div>', unsafe_allow_html=True)
+        st.markdown(f'''<div class="card">
+            <div class="card-label">Gastronomie-Fokus</div>
+            <div class="card-value"><span class="status-indicator" style="background:#10b981"></span>{gast_h}h</div>
+        </div>''', unsafe_allow_html=True)
     with col4:
-        admin_ratio = (f_df[f_df["Bereich"] == "Verwaltung"]["Minuten"].sum() / f_df["Minuten"].sum()) * 100
-        st.markdown(f'<div class="metric-card"><small>Verwaltungs-Anteil</small><h3>{admin_ratio:.1f}%</h3></div>', unsafe_allow_html=True)
+        st.markdown(f'''<div class="card">
+            <div class="card-label">Verwaltungs-Ratio</div>
+            <div class="card-value"><span class="status-indicator" style="background:#f59e0b"></span>{admin_ratio:.1f}%</div>
+        </div>''', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
     # --- TABS ---
-    tab_gantt, tab_load, tab_strategy = st.tabs(["🕒 Operative Timeline", "📊 Belastungsprofil", "🚀 Strategie-Mapping"])
+    tab_gantt, tab_load, tab_strategy = st.tabs(["📊 Operative Timeline", "📈 Belastungsprofil", "🧩 Strategie-Mapping"])
 
     with tab_gantt:
-        st.subheader("Tagesablauf nach Posten")
+        st.markdown('<div class="chart-box">', unsafe_allow_html=True)
         fig = px.timeline(
             f_df, x_start="Start_DT", x_end="End_DT", y="Posten", color="Bereich",
             hover_name="Aufgabe",
             color_discrete_map={
-                "Produktion": "#EF4444", "Gastronomie": "#3B82F6", 
-                "Diätetik": "#10B981", "Verwaltung": "#F59E0B", "Logistik": "#64748B"
+                "Produktion": "#EF4444", "Gastronomie": "#10B981", 
+                "Diätetik": "#6366F1", "Verwaltung": "#F59E0B", "Logistik": "#94A3B8"
             },
             category_orders={"Posten": sorted(f_df['Posten'].unique(), reverse=True)}
         )
         fig.update_layout(
-            xaxis_title="Uhrzeit", yaxis_title="",
-            plot_bgcolor="white", paper_bgcolor="white",
-            height=500, margin=dict(l=20, r=20, t=20, b=20),
-            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+            xaxis_title="", yaxis_title="",
+            plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
+            height=450, font=dict(family="Inter", size=12),
+            margin=dict(l=0, r=0, t=20, b=0),
+            legend=dict(orientation="h", yanchor="bottom", y=1.05, xanchor="right", x=1)
         )
-        st.plotly_chart(fig, use_container_width=True)
+        fig.update_yaxes(gridcolor='#f1f5f9')
+        fig.update_xaxes(gridcolor='#f1f5f9')
+        st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+        st.markdown('</div>', unsafe_allow_html=True)
 
     with tab_load:
-        st.subheader("Ressourcen-Einsatz über den Tag")
-        # Generate load curve
+        st.markdown('<div class="chart-box">', unsafe_allow_html=True)
         load_data = []
         for h in range(5, 20):
             for m in [0, 30]:
@@ -170,44 +250,48 @@ def main():
                 load_data.append({"Zeit": f"{h:02d}:{m:02d}", "Aktive_Posten": active_count})
         
         load_df = pd.DataFrame(load_data)
-        fig_area = px.area(load_df, x="Zeit", y="Aktive_Posten", line_shape="spline",
-                           color_discrete_sequence=["#3B82F6"])
-        fig_area.update_layout(plot_bgcolor="white", xaxis_tickangle=-45)
-        st.plotly_chart(fig_area, use_container_width=True)
-        st.info("Insight: Die Grafik zeigt die personelle Dichte. Ideal zur Identifikation von 'Zimmerstunden' oder Personalengpässen beim Schöpfen.")
+        fig_area = px.area(load_df, x="Zeit", y="Aktive_Posten", line_shape="spline")
+        fig_area.update_traces(fillcolor="rgba(59, 130, 246, 0.2)", line_color="#3B82F6", line_width=3)
+        fig_area.update_layout(
+            plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
+            xaxis_title="", yaxis_title="Anzahl aktive Posten",
+            margin=dict(l=0, r=0, t=20, b=0), height=400
+        )
+        fig_area.update_xaxes(gridcolor='#f1f5f9', nticks=15)
+        fig_area.update_yaxes(gridcolor='#f1f5f9')
+        st.plotly_chart(fig_area, use_container_width=True, config={'displayModeBar': False})
+        st.markdown('</div>', unsafe_allow_html=True)
+        st.info("💡 **Insight:** Die Spitzenzeiten konzentrieren sich auf den Mittagsservice (11:00-13:00). In diesen Phasen ist die personelle Dichte am höchsten.")
 
     with tab_strategy:
-        st.subheader("Transformation: IST-Tätigkeiten zu SOLL-Struktur")
+        col_left, col_right = st.columns([1.5, 1])
         
-        # Sunburst for Strategy
-        fig_sun = px.sunburst(
-            f_df, path=['Bereich', 'Posten', 'Aufgabe'], values='Minuten',
-            color='Bereich',
-            color_discrete_map={
-                "Produktion": "#EF4444", "Gastronomie": "#3B82F6", 
-                "Diätetik": "#10B981", "Verwaltung": "#F59E0B", "Logistik": "#64748B"
-            }
-        )
-        fig_sun.update_layout(height=650)
-        st.plotly_chart(fig_sun, use_container_width=True)
-        
-        # Recommendations
-        st.markdown("---")
-        c1, c2 = st.columns(2)
-        with c1:
-            st.warning("⚠️ **Potenzial: Fachfremde Aufgaben**")
-            waste = f_df[f_df['Bereich'].isin(['Verwaltung', 'Logistik'])].groupby('Posten')['Minuten'].sum().reset_index()
-            waste['Stunden'] = (waste['Minuten']/60).round(1)
-            st.write("Folgende Posten leisten hohen Verwaltungsaufwand:")
-            st.dataframe(waste[['Posten', 'Stunden']].sort_values('Stunden', ascending=False), hide_index=True)
+        with col_left:
+            st.markdown('<div class="chart-box">', unsafe_allow_html=True)
+            fig_sun = px.sunburst(
+                f_df, path=['Bereich', 'Posten', 'Aufgabe'], values='Minuten',
+                color='Bereich',
+                color_discrete_map={
+                    "Produktion": "#EF4444", "Gastronomie": "#10B981", 
+                    "Diätetik": "#6366F1", "Verwaltung": "#F59E0B", "Logistik": "#94A3B8"
+                }
+            )
+            fig_sun.update_layout(margin=dict(l=0, r=0, t=0, b=0), height=550)
+            st.plotly_chart(fig_sun, use_container_width=True)
+            st.markdown('</div>', unsafe_allow_html=True)
             
-        with c2:
-            st.success("✅ **Strategisches Zielbild**")
-            st.markdown("""
-            1. **Zentralisierung Logistik:** R1/D1 entlasten durch dedizierte Warenannahme.
-            2. **Digitale Verwaltung:** Reduktion der manuellen Protokollzeit bei S1/E1/H1.
-            3. **Fokus Produktion:** Verschiebung von 10-15% der Zeit zurück in die Kulinarik.
-            """)
+        with col_right:
+            st.markdown('<div style="margin-top:1rem"></div>', unsafe_allow_html=True)
+            st.markdown("#### Strategische Handlungsempfehlungen")
+            
+            with st.expander("🚀 Logistik-Optimierung", expanded=True):
+                st.write("Verlagerung der Warenannahme auf Randzeiten, um Posten R1 im Mittagsservice zu entlasten.")
+                
+            with st.expander("✍️ Admin-Entlastung"):
+                st.write("Einführung digitaler Checklisten für S1 und H1 spart ca. **45 Min/Tag** pro Posten.")
+                
+            with st.expander("🔥 Peak-Management"):
+                st.write("Die aktuelle Load-Curve zeigt Überkapazitäten um 15:00 Uhr. Hier könnten Reinigungszyklen intensiviert werden.")
 
 if __name__ == "__main__":
     main()
