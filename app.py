@@ -269,7 +269,7 @@ class DataWarehouse:
             {"Dienst": "R2", "Start": "13:30", "Ende": "14:00", "Task": "Service: Food Rescue (Verkauf)", "Typ": "Service"},
             {"Dienst": "R2", "Start": "14:00", "Ende": "14:30", "Task": "Logistik: Fritteuse aus/Reinigung", "Typ": "Logistik"},
 
-            # --- H1 FRÜHSTÜCK ---
+            # --- H1 FRÜHSTÜCK (UPDATED with full shift until 14:40) ---
             {"Dienst": "H1", "Start": "05:30", "Ende": "06:00", "Task": "Prod: Birchermüsli/Brei (Mischen/Convenience)", "Typ": "Prod"},
             {"Dienst": "H1", "Start": "06:00", "Ende": "06:30", "Task": "Prod: Rahm/Dessert Vorb. (Maschine)", "Typ": "Prod"},
             {"Dienst": "H1", "Start": "06:30", "Ende": "06:50", "Task": "Service: Band-Setup", "Typ": "Service"},
@@ -280,6 +280,11 @@ class DataWarehouse:
             {"Dienst": "H1", "Start": "10:15", "Ende": "10:45", "Task": "Prod: Glacé portionieren (System)", "Typ": "Prod"},
             {"Dienst": "H1", "Start": "10:45", "Ende": "11:25", "Task": "Prod: Käse schneiden (Maschine/Fertig)", "Typ": "Prod"},
             {"Dienst": "H1", "Start": "11:25", "Ende": "12:30", "Task": "Service: Band Mittagsservice", "Typ": "Service"},
+            {"Dienst": "H1", "Start": "12:30", "Ende": "12:45", "Task": "Logistik: Material versorgen (Nach Mittag)", "Typ": "Logistik"},
+            # 12:45 - 13:30 Pause
+            {"Dienst": "H1", "Start": "13:30", "Ende": "14:00", "Task": "Prod: Menüsalat Abend (Vorbereitung)", "Typ": "Prod"},
+            {"Dienst": "H1", "Start": "14:00", "Ende": "14:20", "Task": "Admin: Posten-Protokoll Folgetag", "Typ": "Admin"},
+            {"Dienst": "H1", "Start": "14:20", "Ende": "14:40", "Task": "Logistik/Admin: Milchfrigor Kontrolle & Bestellung", "Typ": "Admin"},
 
             # --- H2 PÄTISSERIE ---
             {"Dienst": "H2", "Start": "09:15", "Ende": "09:30", "Task": "Prod: Basis-Massen (Convenience/Pulver)", "Typ": "Prod"},
@@ -435,6 +440,13 @@ class KPI_Engine:
         g2_gap = g2_df[g2_df['Task'].str.contains('Leerlauf', case=False, na=False)]['Duration'].sum()
         g2_gap_cost = (g2_gap / 60) * KPI_Engine.HOURLY_RATE_CHF
 
+        # 20. Structural Redundancy
+        # Audit Findings:
+        # - G2 & H3 parallel at evening band (60 min overlap where 1 person suffices)
+        # - R1 & R2 parallel Setup/Photos (30 min overlap)
+        # - H1 doing Desserts (60 min) while H2 is the Pâtissier
+        redundancy_min = 150 
+        redundancy_cost = (redundancy_min / 60) * KPI_Engine.HOURLY_RATE_CHF
 
         # FORMATTING LOGIC
         def fmt(val, type='pct'):
@@ -609,7 +621,9 @@ def main():
     with tab3:
         df_grouped = df_filtered.groupby(['Dienst', 'Typ'])['Duration'].sum().reset_index()
         fig3 = px.bar(df_grouped, x="Dienst", y="Duration", color="Typ", color_discrete_map=color_map, barmode='stack', height=500)
-        fig3.update_layout(yaxis_title="Minuten")
+        fig3.update_layout(yaxis_title="Minuten (Soll: 504 Min)")
+        # Add Reference Line for 8.4h Workday
+        fig3.add_hline(y=504, line_dash="dot", line_color="#94A3B8", annotation_text="Standard Day (8.4h)", annotation_position="top right")
         st.plotly_chart(clean_chart_layout(fig3), use_container_width=True, config={'displayModeBar': False})
         
     with tab4:
