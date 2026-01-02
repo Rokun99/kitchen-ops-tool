@@ -505,7 +505,7 @@ def main():
         <div class="header-container">
             <div>
                 <h1 class="main-title">WORKSPACE: AUDIT 2026</h1>
-                <div class="sub-title">Kitchen Intelligence Master-Suite v2.4 (High-End)</div>
+                <div class="sub-title">Enterprise Security Architecture</div>
             </div>
         </div>
     """, unsafe_allow_html=True)
@@ -513,7 +513,7 @@ def main():
     # Controls (integrated, not sidebar)
     col_ctrl1, col_ctrl2 = st.columns([4, 1])
     with col_ctrl2:
-        mode_select = st.radio("Unit:", ["⏱️ Zeit (Min)", "💰 Wert (CHF)"], horizontal=True, label_visibility="collapsed")
+        mode_select = st.radio("Unit:", ["Zeit (Min)", "Wert (CHF)"], horizontal=True, label_visibility="collapsed")
         mode = 'money' if 'CHF' in mode_select else 'time'
 
     kpis_list = KPI_Engine.calculate_all(df_ist, mode=mode)
@@ -559,7 +559,7 @@ def main():
         st.plotly_chart(fig_load, use_container_width=True, config={'displayModeBar': False})
 
     # --- DEEP DIVE ANALYTICS ---
-    st.markdown('<div class="section-label">Prozess-Analyse (Deep Dive)</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-label">Prozess-Analyse</div>', unsafe_allow_html=True)
     
     # Filter
     filter_col, _ = st.columns([2, 3])
