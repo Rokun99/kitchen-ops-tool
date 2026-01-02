@@ -39,46 +39,57 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- AI HANDLER ---
-# --- AI HANDLER (ROBUST VERSION) ---
+# --- AI HANDLER (FIXED VERSION) ---
 class KitchenAI:
     def __init__(self):
         self.model = None
         api_key = st.secrets.get("GEMINI_API_KEY")
         
         if not api_key:
-            st.error("🚨 ACHTUNG: 'GEMINI_API_KEY' fehlt in den Secrets (.streamlit/secrets.toml).")
+            st.error("🚨 ACHTUNG: 'GEMINI_API_KEY' fehlt in den Secrets.")
             return
 
         try:
             genai.configure(api_key=api_key)
             
-            # Liste der Modelle, die wir probieren (Fallback-Strategie)
-            models_to_try = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-pro']
+            # KUGELSICHERE MODELL-LISTE
+            # Wir probieren alle aktuellen Bezeichnungen durch, bis eine funktioniert.
+            models_to_try = [
+                'gemini-1.5-flash',          # Schnellstes, aktuelles Modell
+                'models/gemini-1.5-flash',   # Alternative Schreibweise
+                'gemini-1.5-pro',            # Stärkstes Modell
+                'models/gemini-1.5-pro',     # Alternative Schreibweise
+                'gemini-1.5-flash-latest',   # Neueste Version
+                'gemini-1.0-pro',            # Älteres Modell (Fallback)
+                'models/gemini-1.0-pro'
+            ]
             
             for model_name in models_to_try:
                 try:
-                    self.model = genai.GenerativeModel(model_name)
-                    # Test-Call um sicherzugehen, dass es klappt
-                    self.model.generate_content("Test")
-                    # Wenn kein Fehler kommt, haben wir ein Modell gefunden:
-                    print(f"Erfolg: Nutze Modell {model_name}")
-                    break 
-                except Exception:
+                    # Wir testen, ob das Modell antwortet
+                    test_model = genai.GenerativeModel(model_name)
+                    # Ein minimaler Test-Aufruf (kostet fast nichts)
+                    response = test_model.generate_content("Hi")
+                    if response:
+                        self.model = test_model
+                        # Optional: Zeige im Log, welches Modell gewonnen hat
+                        print(f"✅ Verbunden mit: {model_name}")
+                        break 
+                except Exception as e:
+                    # Wenn dieses Modell fehlschlägt, probieren wir das nächste
                     continue
             
             if not self.model:
-                st.error("❌ Kritischer Fehler: Kein verfügbares Gemini-Modell gefunden. Bitte API-Berechtigungen prüfen.")
+                st.error("❌ Kritischer Fehler: Kein kompatibles Gemini-Modell für Ihren API-Key gefunden. Bitte prüfen Sie, ob Sie im Google AI Studio Zugriff auf 'Gemini 1.5 Flash' haben.")
         
         except Exception as e:
             st.error(f"Verbindungsfehler zu Google AI: {e}")
 
     def audit_processes(self, df):
-        if not self.model: 
-            return "KI-Dienst nicht verfügbar. Bitte API Key prüfen."
+        if not self.model: return "KI-Dienst nicht verfügbar."
         
-        # Daten verdichten für den Prompt
-        context_data = df[['Dienst', 'Aufgabe', 'Typ', 'Minuten']].head(30).to_dict(orient='records')
+        # Daten verdichten
+        context_data = df[['Dienst', 'Aufgabe', 'Typ', 'Minuten']].head(40).to_dict(orient='records')
         
         prompt = f"""
         Rolle: Senior Operations Manager einer Großküche.
@@ -88,26 +99,24 @@ class KitchenAI:
         {context_data}
 
         Aufgaben:
-        1. Finde 2 konkrete Beispiele, wo 'Logistik' oder 'Verwaltung' wertvolle Produktionszeit blockiert.
-        2. Bewerte die kritische Phase 11:30-12:30 (Crunch-Time).
-        3. Gib eine strategische Empfehlung zur Personalverschiebung.
+        1. Finde Ineffizienzen in der 'Crunch-Time' (11:30-12:30).
+        2. Wo machen Fachkräfte (Cucina) fälschlicherweise Logistik?
+        3. Gib eine kurze strategische Empfehlung.
 
-        Antworte kurz, knackig und business-orientiert (keine Aufzählungszeichen, Fließtext).
+        Antworte kurz und professionell.
         """
-        
         try:
-            response = self.model.generate_content(prompt)
-            return response.text
+            return self.model.generate_content(prompt).text
         except Exception as e:
             return f"Fehler bei der Analyse: {str(e)}"
 
     def rewrite_duty(self, data, instruction):
         if not self.model: return "KI nicht verfügbar."
-        prompt = f"Daten: {data[:5]}... (Auszug). Anweisung: {instruction}. Schlage eine konkrete Änderung vor."
+        prompt = f"Daten-Auszug: {data[:5]}. Anweisung: {instruction}. Schlage Änderung vor."
         try:
             return self.model.generate_content(prompt).text
         except:
-            return "Konnte Anfrage nicht verarbeiten."
+            return "Fehler bei der Generierung."
 
 # --- DATA ENGINE ---
 class KitchenDataManager:
