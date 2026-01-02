@@ -368,13 +368,17 @@ class KPI_Engine:
         recoverable_cost = (recoverable_min / 60) * KPI_Engine.HOURLY_RATE_CHF
         
         # 6. Industrialisierungsgrad
-        prod_min = df_ist[df_ist['Typ'] == 'Prod']['Duration'].sum()
+        prod_df = df_ist[df_ist['Typ'] == 'Prod']
+        prod_min = prod_df['Duration'].sum()
+        
         montage_indicators = [
             "Montage", "Regenerieren", "Finish", "Beutel", "Päckli", 
             "Convenience", "Abfüllen", "Mischen", "Anrühren", "Portionieren", 
             "Basis", "System", "Dämpfen", "Fertig", "Vorbereitung", "Maschine"
         ]
-        montage_min = df_ist[df_ist['Task'].str.contains('|'.join(montage_indicators), case=False, na=False)]['Duration'].sum()
+        
+        # Only count duration if it is a production task
+        montage_min = prod_df[prod_df['Task'].str.contains('|'.join(montage_indicators), case=False, na=False)]['Duration'].sum()
         industrial_rate = (montage_min / prod_min * 100) if prod_min > 0 else 0
         
         # 7. Value-Add Ratio
@@ -461,7 +465,7 @@ def main():
     # Controls (integrated, not sidebar)
     col_ctrl1, col_ctrl2 = st.columns([4, 1])
     with col_ctrl2:
-        mode_select = st.radio("Unit:", ["⏱️ Zeit (Min)", "💰 Wert (CHF)"], horizontal=True, label_visibility="collapsed")
+        mode_select = st.radio("Unit:", ["Zeit (Min)", "Wert (CHF)"], horizontal=True, label_visibility="collapsed")
         mode = 'money' if 'CHF' in mode_select else 'time'
 
     kpis_list = KPI_Engine.calculate_all(df_ist, mode=mode)
@@ -506,7 +510,7 @@ def main():
         st.plotly_chart(fig_load, use_container_width=True, config={'displayModeBar': False})
 
     # --- DEEP DIVE ANALYTICS ---
-    st.markdown('<div class="section-label">Prozess-Analyse (Deep Dive)</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-label">Prozess-Analyse</div>', unsafe_allow_html=True)
     
     # Filter
     filter_col, _ = st.columns([2, 3])
