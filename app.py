@@ -411,36 +411,31 @@ class KPI_Engine:
         
         peak_staff = 9 
 
-        # --- SPECIAL METRICS (USER REQUEST) ---
+        # --- SPECIAL METRICS ---
         
-        # 16. R2 Inflation (Hidden Waste)
-        # Filter R2 tasks between 08:00 and 10:00
+        # 16. R2 Inflation
         r2_gap_tasks = df_ist[(df_ist['Dienst'] == 'R2') & (df_ist['Start'] >= "08:00") & (df_ist['Ende'] <= "10:00")]
         r2_gap_duration = r2_gap_tasks['Duration'].sum() # 120 min
-        # PDF says real work is ~40 min, so inflation is ~80 min
         r2_inflation = max(0, r2_gap_duration - 40)
         r2_inflation_cost = (r2_inflation / 60) * KPI_Engine.HOURLY_RATE_CHF
 
         # 17. H1 Skill-Dilution
-        # Ratio of H1 time spent on "Dessert", "Salat", "Brei", "Rahm" vs Total H1
         h1_df = df_ist[df_ist['Dienst'] == 'H1']
         h1_total = h1_df['Duration'].sum()
         h1_foreign = h1_df[h1_df['Task'].str.contains('Dessert|Salat|Brei|Rahm', case=False, na=False)]['Duration'].sum()
         h1_dilution = (h1_foreign / h1_total * 100) if h1_total > 0 else 0
 
         # 18. R1 Hygiene-Risk
-        # Time spent at ramp/changing
         r1_df = df_ist[df_ist['Dienst'] == 'R1']
         r1_risk = r1_df[r1_df['Task'].str.contains('Warenannahme|Verräumen|Hygiene', case=False, na=False)]['Duration'].sum()
         r1_risk_cost = (r1_risk / 60) * KPI_Engine.HOURLY_RATE_CHF
 
         # 19. G2 Capacity Gap
-        # Explicit idle time in afternoon
         g2_df = df_ist[df_ist['Dienst'] == 'G2']
         g2_gap = g2_df[g2_df['Task'].str.contains('Leerlauf', case=False, na=False)]['Duration'].sum()
         g2_gap_cost = (g2_gap / 60) * KPI_Engine.HOURLY_RATE_CHF
 
-        # 20. Structural Redundancy
+        # 20. Structural Redundancy (New 20th Metric)
         # Audit Findings:
         # - G2 & H3 parallel at evening band (60 min overlap where 1 person suffices)
         # - R1 & R2 parallel Setup/Photos (30 min overlap)
@@ -476,11 +471,12 @@ class KPI_Engine:
             ("Process Cycle Eff.", {"val": f"{(value_add_min/(total_min-potenzial_min)*100):.1f}%", "sub": "Netto-Effizienz", "trend": "good"}),
             ("Peak Staff Load", {"val": "9 Pax", "sub": "Max. Gleichzeitig", "trend": "neutral"}),
 
-            # NEW 4 Metrics
+            # NEW 5 Metrics (Deep Dive)
             ("R2 Inflation (Hidden)", {"val": fmt(r2_inflation_cost if mode=='money' else r2_inflation, 'abs_min'), "sub": "Gedehnte Arbeit", "trend": "bad"}),
             ("H1 Skill-Dilution", {"val": f"{h1_dilution:.0f}%", "sub": "Fremdaufgaben", "trend": "bad"}),
             ("R1 Hygiene-Risk", {"val": fmt(r1_risk_cost if mode=='money' else r1_risk, 'abs_min'), "sub": "Zeit an Rampe", "trend": "bad"}),
             ("G2 Capacity Gap", {"val": fmt(g2_gap_cost if mode=='money' else g2_gap, 'abs_min'), "sub": "PM Leerlauf", "trend": "bad"}),
+            ("Structural Redundancy", {"val": fmt(redundancy_cost if mode=='money' else redundancy_min, 'abs_min'), "sub": "Doppelspurigkeiten", "trend": "bad"}),
         ]
         return kpis_list
 
@@ -509,7 +505,7 @@ def main():
         <div class="header-container">
             <div>
                 <h1 class="main-title">WORKSPACE: AUDIT 2026</h1>
-                <div class="sub-title">Enterprise Security Architecture</div>
+                <div class="sub-title">Kitchen Intelligence Master-Suite v2.4 (High-End)</div>
             </div>
         </div>
     """, unsafe_allow_html=True)
@@ -517,15 +513,15 @@ def main():
     # Controls (integrated, not sidebar)
     col_ctrl1, col_ctrl2 = st.columns([4, 1])
     with col_ctrl2:
-        mode_select = st.radio("Unit:", ["Zeit (Min)", "Wert (CHF)"], horizontal=True, label_visibility="collapsed")
+        mode_select = st.radio("Unit:", ["⏱️ Zeit (Min)", "💰 Wert (CHF)"], horizontal=True, label_visibility="collapsed")
         mode = 'money' if 'CHF' in mode_select else 'time'
 
     kpis_list = KPI_Engine.calculate_all(df_ist, mode=mode)
 
     # --- MANAGEMENT COCKPIT (4 Rows) ---
-    st.markdown('<div class="section-label">Management Cockpit: 19 Core Metrics</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-label">Management Cockpit: 20 Core Metrics</div>', unsafe_allow_html=True)
     
-    # Updated to 4 rows to accommodate 19 metrics
+    # Updated to 4 rows to accommodate 20 metrics
     for row_idx in range(4):
         cols = st.columns(5, gap="medium")
         for col_idx in range(5):
@@ -563,7 +559,7 @@ def main():
         st.plotly_chart(fig_load, use_container_width=True, config={'displayModeBar': False})
 
     # --- DEEP DIVE ANALYTICS ---
-    st.markdown('<div class="section-label">Prozess-Analyse</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-label">Prozess-Analyse (Deep Dive)</div>', unsafe_allow_html=True)
     
     # Filter
     filter_col, _ = st.columns([2, 3])
