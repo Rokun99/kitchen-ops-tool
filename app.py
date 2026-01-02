@@ -4,141 +4,186 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime, timedelta
 
-# --- 1. CONFIGURATION & STATE OF THE ART STYLING ---
+# --- 1. CONFIGURATION & HIGH END STYLING ---
 st.set_page_config(
     page_title="WORKSPACE: AUDIT 2026",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# Custom CSS for High-End Dashboard Look & Clean Overlay
-st.markdown("""
+# COLOR PALETTE (Strategic/Profi)
+COLORS = {
+    "bg": "#F8FAFC",        # Slate 50
+    "card": "#FFFFFF",      # White
+    "text_main": "#0F172A", # Slate 900
+    "text_sub": "#64748B",  # Slate 500
+    "accent": "#6366F1",    # Indigo 500
+    "success": "#10B981",   # Emerald 500
+    "danger": "#F43F5E",    # Rose 500
+    "warning": "#F59E0B",   # Amber 500
+    "neutral": "#94A3B8",   # Slate 400
+    "border": "#E2E8F0"     # Slate 200
+}
+
+# Custom CSS for Minimalist/Profi Look
+st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
     
-    html, body, [class*="st-"] { 
+    html, body, [class*="st-"] {{ 
         font-family: 'Inter', sans-serif; 
-        color: #1E293B; 
-        background-color: #F8FAFC; 
-    }
+        color: {COLORS['text_main']}; 
+        background-color: {COLORS['bg']}; 
+    }}
     
-    /* Header Styling */
-    .main-header { 
-        font-size: 28px; 
-        font-weight: 800; 
-        color: #0F172A; 
-        border-bottom: 2px solid #CBD5E1; 
-        padding-bottom: 15px; 
-        margin-bottom: 20px;
-        letter-spacing: -0.5px;
+    /* Clean Header */
+    .header-container {{
+        padding-bottom: 2rem;
+        margin-bottom: 2rem;
+        border-bottom: 1px solid {COLORS['border']};
         display: flex;
         justify-content: space-between;
         align-items: center;
-    }
+    }}
     
-    .cluster-header { 
-        font-size: 13px; 
-        font-weight: 700; 
-        color: #475569; 
-        text-transform: uppercase; 
-        letter-spacing: 1.2px; 
-        margin-top: 35px; 
-        margin-bottom: 15px; 
-        border-left: 4px solid #3B82F6; 
-        padding-left: 12px;
-    }
+    .main-title {{
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: -0.025em;
+        color: {COLORS['text_main']};
+        margin: 0;
+    }}
     
-    /* KPI Card Design - Grid Optimized */
-    .kpi-card-wrapper {
-        background-color: #FFFFFF; 
-        border: 1px solid #E2E8F0; 
-        border-radius: 8px; 
-        padding: 16px; 
-        height: 125px; 
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); 
-        display: flex; 
-        flex-direction: column; 
+    .sub-title {{
+        font-size: 0.875rem;
+        color: {COLORS['text_sub']};
+        font-weight: 400;
+        margin-top: 0.25rem;
+    }}
+
+    /* Section Headers */
+    .section-label {{
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: {COLORS['text_sub']};
+        margin-top: 3rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }}
+    
+    .section-label::before {{
+        content: '';
+        display: block;
+        width: 12px;
+        height: 2px;
+        background-color: {COLORS['accent']};
+        border-radius: 2px;
+    }}
+    
+    /* KPI Cards - Modern Minimalist */
+    .kpi-card {{
+        background-color: {COLORS['card']};
+        border: 1px solid {COLORS['border']};
+        border-radius: 12px;
+        padding: 1.25rem;
+        height: 100%;
+        min-height: 110px;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
         justify-content: space-between;
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
+    }}
     
-    .kpi-card-wrapper:hover {
+    .kpi-card:hover {{
         transform: translateY(-2px);
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        border-color: #94A3B8;
-    }
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+        border-color: {COLORS['accent']};
+    }}
 
-    .kpi-title { 
-        font-size: 11px; 
-        font-weight: 700; 
-        text-transform: uppercase; 
-        color: #64748B; 
-        letter-spacing: 0.5px;
-        margin-bottom: 4px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    
-    .kpi-value { 
-        font-size: 22px; 
-        font-weight: 800; 
-        color: #0F172A; 
-        margin: 2px 0;
-    }
-    
-    .kpi-sub { 
-        font-size: 11px; 
-        color: #64748B; 
-        font-weight: 500;
-        line-height: 1.4;
-    }
-    
-    .trend-bad { color: #DC2626; background-color: #FEF2F2; padding: 1px 6px; border-radius: 4px; font-weight: 600;}
-    .trend-good { color: #059669; background-color: #ECFDF5; padding: 1px 6px; border-radius: 4px; font-weight: 600;}
-    .trend-neutral { color: #475569; background-color: #F8FAFC; padding: 1px 6px; border-radius: 4px; font-weight: 600; border: 1px solid #E2E8F0;}
-
-    /* Tab Overlay Effect - Clean Cards */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
-    }
-    .stTabs [data-baseweb="tab"] {
-        background-color: transparent;
-        border-radius: 4px;
-        padding: 4px 16px;
+    .kpi-label {{
+        font-size: 0.75rem;
         font-weight: 600;
-        font-size: 14px;
-    }
-    .stTabs [aria-selected="true"] {
-        background-color: #FFFFFF;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        color: #3B82F6;
-    }
-
-    .stPlotlyChart {
-        background-color: #FFFFFF;
-        border-radius: 8px;
-        padding: 15px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.03);
-        border: 1px solid #E2E8F0;
-    }
+        color: {COLORS['text_sub']};
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.5rem;
+    }}
     
-    /* Radio Button Group Styling */
-    div[role="radiogroup"] {
-        background-color: #FFFFFF;
-        padding: 5px;
+    .kpi-metric {{
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: {COLORS['text_main']};
+        letter-spacing: -0.05em;
+        line-height: 1.1;
+    }}
+    
+    .kpi-context {{
+        font-size: 0.75rem;
+        color: {COLORS['neutral']};
+        margin-top: 0.5rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+    }}
+
+    /* Tags for Trends */
+    .tag {{
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: 600;
+    }}
+    .tag-bad {{ background: #FEF2F2; color: {COLORS['danger']}; }}
+    .tag-good {{ background: #ECFDF5; color: {COLORS['success']}; }}
+    .tag-neutral {{ background: #F1F5F9; color: {COLORS['text_sub']}; }}
+
+    /* Tabs Override - Cleaner */
+    .stTabs [data-baseweb="tab-list"] {{
+        gap: 2rem;
+        border-bottom: 1px solid {COLORS['border']};
+        padding-bottom: 0px;
+    }}
+    .stTabs [data-baseweb="tab"] {{
+        background-color: transparent !important;
+        border: none !important;
+        padding: 0.75rem 0 !important;
+        font-weight: 500;
+        color: {COLORS['text_sub']};
+    }}
+    .stTabs [aria-selected="true"] {{
+        color: {COLORS['accent']} !important;
+        border-bottom: 2px solid {COLORS['accent']} !important;
+    }}
+
+    /* Input Widgets Polish */
+    div[data-baseweb="select"] > div {{
+        background-color: {COLORS['card']};
+        border-color: {COLORS['border']};
         border-radius: 8px;
-        border: 1px solid #E2E8F0;
-        display: inline-flex;
-    }
+    }}
+    
+    /* Plotly Charts Container */
+    .chart-container {{
+        background-color: {COLORS['card']};
+        border-radius: 12px;
+        border: 1px solid {COLORS['border']};
+        padding: 1rem;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+    }}
 </style>
 """, unsafe_allow_html=True)
 
-# --- 2. DATA ENGINE: THE COMPLETE CULINARY REPOSITORY (FULL AUDIT) ---
+# --- 2. DATA ENGINE ---
 class DataWarehouse:
     @staticmethod
     def get_full_ist_data():
-        # DATEN EXAKT NACH DEN NEUKALKULATIONS-BERICHTEN (ALLE 9 DIENSTE)
+        # DATEN EXAKT NACH DEN NEUKALKULATIONS-BERICHTEN
         data = [
             # --- D1 DIÄTETIK ---
             {"Dienst": "D1", "Start": "08:00", "Ende": "08:25", "Task": "Admin: E-Mails/Mutationen", "Typ": "Admin"},
@@ -166,7 +211,7 @@ class DataWarehouse:
             {"Dienst": "E1", "Start": "09:45", "Ende": "10:00", "Task": "Logistik: Bereitstellung Gastro", "Typ": "Logistik"},
             {"Dienst": "E1", "Start": "10:15", "Ende": "10:45", "Task": "Prod: Wahlkost Spezial (System)", "Typ": "Prod"},
             {"Dienst": "E1", "Start": "10:45", "Ende": "11:20", "Task": "Prod: Regenerieren Band (High-Convenience)", "Typ": "Prod"},
-            {"Dienst": "E1", "Start": "11:20", "Ende": "12:30", "Task": "Potenzial: 70-Min-Falle (Bereitschaft/Warten)", "Typ": "Potenzial"}, # Renamed from Waste
+            {"Dienst": "E1", "Start": "11:20", "Ende": "12:30", "Task": "Potenzial: 70-Min-Falle (Bereitschaft/Warten)", "Typ": "Potenzial"},
             {"Dienst": "E1", "Start": "12:30", "Ende": "12:45", "Task": "Logistik: Transport Reste Restaurant", "Typ": "Logistik"},
             {"Dienst": "E1", "Start": "12:45", "Ende": "13:00", "Task": "Logistik: Reinigung Clean-as-you-go", "Typ": "Logistik"},
             {"Dienst": "E1", "Start": "13:30", "Ende": "14:00", "Task": "Prod: Wahlkost MEP (Vorbereitung)", "Typ": "Prod"},
@@ -287,25 +332,24 @@ class DataWarehouse:
         df['Duration'] = (df['End_DT'] - df['Start_DT']).dt.total_seconds() / 60
         return df
 
-# --- 3. ANALYTICAL ENGINE: KPI FACTORY (EXPANDED TO 15 & MONETIZED) ---
+# --- 3. ANALYTICAL ENGINE: KPI FACTORY ---
 class KPI_Engine:
-    HOURLY_RATE_CHF = 55.0 # Mischkalkulation Personalaufwand inkl. NK
+    HOURLY_RATE_CHF = 55.0 
 
     @staticmethod
     def calculate_all(df_ist, mode='time'):
         total_min = df_ist['Duration'].sum()
         if total_min == 0: return {}
 
-        # Change "Waste" references to "Potenzial" internally for mapping
         potenzial_min = df_ist[df_ist['Typ'] == 'Potenzial']['Duration'].sum()
         skilled_dienste = ['D1', 'S1', 'E1', 'G2', 'R1']
         
-        # 1. Skill-Drift (ehem. Leakage)
+        # 1. Skill-Drift
         leakage_min = df_ist[(df_ist['Dienst'].isin(skilled_dienste)) & (df_ist['Typ'].isin(['Logistik', 'Potenzial']))]['Duration'].sum()
         leakage_pct = (leakage_min / total_min) * 100
         leakage_cost = (leakage_min / 60) * KPI_Engine.HOURLY_RATE_CHF
         
-        # 2. Potenzial Ratio (ehem. Muda)
+        # 2. Potenzial Ratio
         muda_pct = (potenzial_min / total_min) * 100
         muda_cost = (potenzial_min / 60) * KPI_Engine.HOURLY_RATE_CHF
         
@@ -354,16 +398,15 @@ class KPI_Engine:
         
         peak_staff = 9 
 
-        # FORMATTING LOGIC BASED ON MODE
+        # FORMATTING LOGIC
         def fmt(val, type='pct'):
             if mode == 'money' and type == 'abs':
-                return f"{val:.0f} CHF"
+                return f"{val:,.0f} CHF".replace(",", "'")
             elif type == 'abs_min':
-                return f"{val:.0f} CHF" if mode == 'money' else f"{val:.0f} Min"
-            else: # pct stays pct
+                return f"{val:,.0f} CHF".replace(",", "'") if mode == 'money' else f"{val:.0f} Min"
+            else: 
                 return f"{val:.1f}%"
 
-        # Dictionary of 15 Strategic KPIs (Ordered)
         kpis_list = [
             ("Skill-Drift (Leakage)", {"val": fmt(leakage_cost if mode=='money' else leakage_pct, 'abs' if mode=='money' else 'pct'), "sub": "Fachkraft-Einsatz", "trend": "bad"}),
             ("Potenzial (Muda)", {"val": fmt(muda_cost if mode=='money' else muda_pct, 'abs' if mode=='money' else 'pct'), "sub": "Nicht-Wertschöpfend", "trend": "bad"}),
@@ -387,15 +430,14 @@ class KPI_Engine:
 
 # --- 4. RENDERER ---
 def render_kpi_card(title, data):
-    trend_class = f"trend-{data['trend']}"
+    trend_color = data['trend']
     html = f"""
-    <div class="kpi-card-wrapper">
-        <div>
-            <div class="kpi-title">{title}</div>
-            <div class="kpi-value">{data['val']}</div>
-        </div>
-        <div>
-            <div class="kpi-sub"><span class="{trend_class}">{data['trend'].upper()}</span> {data['sub']}</div>
+    <div class="kpi-card">
+        <div class="kpi-label">{title}</div>
+        <div class="kpi-metric">{data['val']}</div>
+        <div class="kpi-context">
+            <span class="tag tag-{trend_color}">{data['trend'].upper()}</span>
+            <span>{data['sub']}</span>
         </div>
     </div>
     """
@@ -407,21 +449,28 @@ def main():
     df_ist = dw.get_full_ist_data()
     
     # --- HEADER ---
-    col_h1, col_h2 = st.columns([3, 1])
-    with col_h1:
-        st.markdown('<div class="main-header">WORKSPACE: AUDIT 2026</div>', unsafe_allow_html=True)
-    with col_h2:
-        # CVO Feature: Monetization Toggle
-        mode_select = st.radio("Display Mode:", ["⏱️ Zeit (Min)", "💰 Wert (CHF)"], horizontal=True, label_visibility="collapsed")
+    st.markdown("""
+        <div class="header-container">
+            <div>
+                <h1 class="main-title">WORKSPACE: AUDIT 2026</h1>
+                <div class="sub-title">Kitchen Intelligence Master-Suite v2.4 (High-End)</div>
+            </div>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    # Controls (integrated, not sidebar)
+    col_ctrl1, col_ctrl2 = st.columns([4, 1])
+    with col_ctrl2:
+        mode_select = st.radio("Unit:", ["⏱️ Zeit (Min)", "💰 Wert (CHF)"], horizontal=True, label_visibility="collapsed")
         mode = 'money' if 'CHF' in mode_select else 'time'
 
-    # KPIs Calculation
     kpis_list = KPI_Engine.calculate_all(df_ist, mode=mode)
 
-    # --- KPI GRID (5x3) ---
-    st.markdown('<div class="cluster-header">Management Cockpit: 15 Core Metrics</div>', unsafe_allow_html=True)
+    # --- MANAGEMENT COCKPIT ---
+    st.markdown('<div class="section-label">Management Cockpit: 15 Core Metrics</div>', unsafe_allow_html=True)
+    
     for row_idx in range(3):
-        cols = st.columns(5)
+        cols = st.columns(5, gap="medium")
         for col_idx in range(5):
             index = row_idx * 5 + col_idx
             if index < len(kpis_list):
@@ -429,8 +478,9 @@ def main():
                 with cols[col_idx]:
                     render_kpi_card(kpi_name, kpi_data)
 
-    # --- LOAD CURVE ---
-    st.markdown('<div class="cluster-header">Personal-Einsatzprofil am Band (15-Minuten Auflösung)</div>', unsafe_allow_html=True)
+    # --- LOAD PROFILE ---
+    st.markdown('<div class="section-label">Personal-Einsatzprofil (Staffing Load)</div>', unsafe_allow_html=True)
+    
     load_data = []
     for h in range(5, 20):
         for m in [0, 15, 30, 45]:
@@ -438,64 +488,91 @@ def main():
             active = len(df_ist[(df_ist['Start_DT'] <= t) & (df_ist['End_DT'] > t)])
             load_data.append({"Zeit": f"{h:02d}:{m:02d}", "Staff": active})
     
-    fig_load = px.area(pd.DataFrame(load_data), x="Zeit", y="Staff", line_shape="spline")
-    fig_load.update_traces(line_color="#0F172A", fillcolor="rgba(15, 23, 42, 0.1)")
-    # COO Feature: Critical Zone Line
-    fig_load.add_hline(y=8, line_dash="dot", line_color="red", annotation_text="Congestion Zone (>8 FTE)", annotation_position="top right")
-    fig_load.update_layout(plot_bgcolor="#FFFFFF", paper_bgcolor="#FFFFFF", height=280, margin=dict(l=10, r=10, t=10, b=10), yaxis_title="Aktive FTE")
-    st.plotly_chart(fig_load, use_container_width=True)
+    with st.container():
+        # Clean Plotly Chart
+        fig_load = px.area(pd.DataFrame(load_data), x="Zeit", y="Staff", line_shape="spline")
+        fig_load.update_traces(line_color="#0F172A", fillcolor="rgba(15, 23, 42, 0.05)")
+        fig_load.update_layout(
+            plot_bgcolor="white", 
+            paper_bgcolor="white", 
+            margin=dict(l=20, r=20, t=20, b=20),
+            height=250,
+            xaxis=dict(showgrid=False, title=None, linecolor='#E2E8F0'),
+            yaxis=dict(showgrid=True, gridcolor='#F1F5F9', title="Active FTE", range=[0, 10]),
+            hovermode="x unified"
+        )
+        # Critical Zone Line
+        fig_load.add_hline(y=8, line_dash="dot", line_color="#EF4444", annotation_text="Congestion Zone", annotation_position="top right", annotation_font_color="#EF4444")
+        st.plotly_chart(fig_load, use_container_width=True, config={'displayModeBar': False})
 
-    # --- EXPANDED ANALYSIS SECTION ---
-    st.markdown('<div class="cluster-header">Zeit-Struktur & Prozess-Analyse (Deep Dive)</div>', unsafe_allow_html=True)
+    # --- DEEP DIVE ANALYTICS ---
+    st.markdown('<div class="section-label">Prozess-Analyse (Deep Dive)</div>', unsafe_allow_html=True)
     
-    # UI/UX: Drill Down Filter
-    filter_col1, filter_col2 = st.columns([1, 4])
-    with filter_col1:
-        st.caption("🔍 Fokus-Filter")
+    # Filter
+    filter_col, _ = st.columns([2, 3])
+    with filter_col:
         all_types = list(df_ist['Typ'].unique())
-        selected_types = st.multiselect("Typ filtern", all_types, default=all_types, label_visibility="collapsed")
+        selected_types = st.multiselect("Fokus-Filter (Typen)", all_types, default=all_types, label_visibility="collapsed", placeholder="Filter Tasks...")
     
     df_filtered = df_ist[df_ist['Typ'].isin(selected_types)]
 
-    # Clean Tabs (Reframed Wording for CTO)
+    # Clean Tabs
     tab1, tab2, tab3, tab4 = st.tabs([
         "Gantt-Flow", 
-        "Potenzial-Analyse (Muda)", 
+        "Potenzial-Analyse", 
         "Ressourcen-Balance", 
         "Aktivitäts-Verteilung"
     ])
 
-    color_map = {"Prod": "#3B82F6", "Service": "#10B981", "Admin": "#F59E0B", "Logistik": "#64748B", "Potenzial": "#EF4444", "Coord": "#8B5CF6"}
+    # Modern Palette for Charts
+    color_map = {
+        "Prod": "#3B82F6",      # Blue
+        "Service": "#10B981",   # Emerald
+        "Admin": "#F59E0B",     # Amber
+        "Logistik": "#64748B",  # Slate
+        "Potenzial": "#F43F5E", # Rose
+        "Coord": "#8B5CF6"      # Violet
+    }
+
+    def clean_chart_layout(fig):
+        fig.update_layout(
+            plot_bgcolor="white", 
+            paper_bgcolor="white", 
+            margin=dict(l=10, r=10, t=30, b=20),
+            xaxis=dict(showgrid=True, gridcolor='#F1F5F9', title=None),
+            yaxis=dict(showgrid=False, title=None),
+            font=dict(family="Inter", color="#64748B"),
+            hoverlabel=dict(bgcolor="white", font_size=12, font_family="Inter"),
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, title=None)
+        )
+        return fig
 
     with tab1:
-        fig1 = px.timeline(df_filtered, x_start="Start_DT", x_end="End_DT", y="Dienst", color="Typ", hover_name="Task", color_discrete_map=color_map, height=650)
+        fig1 = px.timeline(df_filtered, x_start="Start_DT", x_end="End_DT", y="Dienst", color="Typ", hover_name="Task", color_discrete_map=color_map, height=600)
         fig1.update_yaxes(categoryorder="array", categoryarray=["H3","H2","H1","R2","R1","G2","S1","E1","D1"])
-        fig1.update_layout(plot_bgcolor="#FFFFFF", paper_bgcolor="#FFFFFF", xaxis_title="Uhrzeit")
-        st.plotly_chart(fig1, use_container_width=True)
+        st.plotly_chart(clean_chart_layout(fig1), use_container_width=True, config={'displayModeBar': False})
 
     with tab2:
         df_waste = df_ist[df_ist['Typ'] == 'Potenzial']
         if not df_waste.empty:
-            fig2 = px.timeline(df_waste, x_start="Start_DT", x_end="End_DT", y="Dienst", hover_name="Task", color_discrete_sequence=["#EF4444"], height=400)
+            fig2 = px.timeline(df_waste, x_start="Start_DT", x_end="End_DT", y="Dienst", hover_name="Task", color_discrete_sequence=["#F43F5E"], height=400)
             fig2.update_yaxes(categoryorder="array", categoryarray=["H3","H2","H1","R2","R1","G2","S1","E1","D1"])
-            fig2.update_layout(plot_bgcolor="#FFFFFF", paper_bgcolor="#FFFFFF", xaxis_title="Uhrzeit")
-            st.plotly_chart(fig2, use_container_width=True)
+            st.plotly_chart(clean_chart_layout(fig2), use_container_width=True, config={'displayModeBar': False})
         else:
             st.info("Keine expliziten Potenzial-Blöcke identifiziert.")
             
     with tab3:
-        st.caption("Verteilung der Arbeitszeit pro Mitarbeiter nach Tätigkeitstyp (in Minuten)")
         df_grouped = df_filtered.groupby(['Dienst', 'Typ'])['Duration'].sum().reset_index()
         fig3 = px.bar(df_grouped, x="Dienst", y="Duration", color="Typ", color_discrete_map=color_map, barmode='stack', height=500)
-        fig3.update_layout(plot_bgcolor="#FFFFFF", paper_bgcolor="#FFFFFF", yaxis_title="Minuten")
-        st.plotly_chart(fig3, use_container_width=True)
+        fig3.update_layout(yaxis_title="Minuten")
+        st.plotly_chart(clean_chart_layout(fig3), use_container_width=True, config={'displayModeBar': False})
         
     with tab4:
-        st.caption("Globale Verteilung der Ressourcen-Investition (Gesamtküche)")
         df_pie = df_filtered.groupby('Typ')['Duration'].sum().reset_index()
-        fig4 = px.pie(df_pie, values='Duration', names='Typ', color='Typ', color_discrete_map=color_map, hole=0.4, height=500)
-        fig4.update_traces(textinfo='percent+label')
-        st.plotly_chart(fig4, use_container_width=True)
+        fig4 = px.pie(df_pie, values='Duration', names='Typ', color='Typ', color_discrete_map=color_map, hole=0.6, height=500)
+        fig4.update_traces(textinfo='percent+label', textfont_size=13)
+        fig4.update_layout(showlegend=False, annotations=[dict(text='Total', x=0.5, y=0.5, font_size=20, showarrow=False)])
+        st.plotly_chart(clean_chart_layout(fig4), use_container_width=True, config={'displayModeBar': False})
 
 if __name__ == "__main__":
     main()
