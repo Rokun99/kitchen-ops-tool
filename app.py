@@ -457,7 +457,7 @@ def main():
         <div class="header-container">
             <div>
                 <h1 class="main-title">WORKSPACE: AUDIT 2026</h1>
-                <div class="sub-title">Kitchen Intelligence Master-Suite v2.4 (High-End)</div>
+                <div class="sub-title">Enterprise Protected</div>
             </div>
         </div>
     """, unsafe_allow_html=True)
