@@ -280,10 +280,30 @@ class KPI_Engine:
         recoverable_min = waste_min + (leakage_min * 0.5)
         fte_potential = recoverable_min / 480
         
-        # 6. Industrialisierungsgrad
+        # 6. Industrialisierungsgrad (UPDATED LOGIC)
+        # Basis: Gesamte Produktionszeit (Typ = 'Prod')
         prod_min = df_ist[df_ist['Typ'] == 'Prod']['Duration'].sum()
-        montage_indicators = ["Montage", "Regenerieren", "Finish", "Beutel", "Päckli"]
+        
+        # Erweiterte Liste für High-Convenience Erkennung
+        # Diese Begriffe indizieren "Industrielle Montage" statt "Handwerkliches Kochen"
+        montage_indicators = [
+            "Montage",       # z.B. Wähen/Sandwiches
+            "Regenerieren",  # Aufwärmen von fertigen Komponenten
+            "Finish",        # Nur noch Anrichten
+            "Beutel",        # Salate aus dem Beutel
+            "Päckli",        # Saucen/Suppen aus Pulver
+            "Convenience",   # Genereller Marker
+            "Abfüllen",      # Dessert-Massen
+            "Mischen",       # Birchermüesli
+            "Anrühren",      # Pulver anrühren
+            "Portionieren",  # Eis/Käse
+            "Basis"          # Basis-Produkte
+        ]
+        
+        # Filtert alle Tasks, die eines der Keywords enthalten (case-insensitive)
         montage_min = df_ist[df_ist['Task'].str.contains('|'.join(montage_indicators), case=False, na=False)]['Duration'].sum()
+        
+        # Berechnung des Prozentsatzes (Schutz vor Division durch Null)
         industrial_rate = (montage_min / prod_min * 100) if prod_min > 0 else 0
         
         # 7. Value-Add Ratio
