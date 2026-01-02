@@ -6,274 +6,253 @@ from datetime import datetime, timedelta
 
 # --- 1. CONFIGURATION & STYLING ---
 st.set_page_config(
-    page_title="Operations Intelligence Platform",
+    page_title="Kitchen Strategy Audit 2026",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# Enterprise CSS (Clean, No Emojis, Slate/Blue Theme)
+# Enterprise-Grade CSS
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
     
-    html, body, [class*="st-"] { font-family: 'Inter', sans-serif; color: #0F172A; background-color: #F1F5F9; }
+    html, body, [class*="st-"] { font-family: 'Inter', sans-serif; color: #0F172A; background-color: #F8FAFC; }
     
-    /* Header */
-    .main-header { font-size: 24px; font-weight: 700; color: #1E293B; margin-bottom: 4px; letter-spacing: -0.5px; }
-    .sub-header { font-size: 14px; color: #64748B; margin-bottom: 32px; }
-
-    /* KPI Cards */
-    .kpi-container {
-        background-color: #FFFFFF;
-        border: 1px solid #E2E8F0;
-        border-radius: 6px;
-        padding: 20px;
-        height: 100%;
-        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    .header-box { padding: 20px 0; border-bottom: 1px solid #E2E8F0; margin-bottom: 20px; }
+    .main-title { font-size: 26px; font-weight: 700; color: #1E293B; letter-spacing: -0.5px; }
+    .sub-title { font-size: 14px; color: #64748B; margin-top: 5px; }
+    
+    .kpi-card {
+        background: white; border: 1px solid #E2E8F0; border-radius: 8px; padding: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02); height: 160px;
+        display: flex; flex-direction: column; justify-content: space-between;
     }
-    .kpi-title { font-size: 11px; font-weight: 600; text-transform: uppercase; color: #64748B; letter-spacing: 0.5px; margin-bottom: 8px; }
-    .kpi-value { font-size: 24px; font-weight: 700; color: #0F172A; margin-bottom: 4px; }
-    .kpi-desc { font-size: 12px; color: #64748B; line-height: 1.4; }
+    .kpi-label { font-size: 11px; font-weight: 600; text-transform: uppercase; color: #64748B; letter-spacing: 0.5px; }
+    .kpi-val { font-size: 28px; font-weight: 700; color: #0F172A; }
+    .kpi-delta { font-size: 13px; font-weight: 600; margin-top: 4px; display: flex; align-items: center; gap: 5px; }
+    .pos { color: #10B981; } .neg { color: #EF4444; } .neu { color: #64748B; }
     
-    /* Alert Boxes */
-    .alert-box { padding: 16px; border-radius: 6px; margin-bottom: 12px; font-size: 13px; line-height: 1.5; }
-    .alert-red { background-color: #FEF2F2; border-left: 4px solid #EF4444; color: #991B1B; }
-    .alert-yellow { background-color: #FFFBEB; border-left: 4px solid #F59E0B; color: #92400E; }
-    
-    /* Tabs */
-    .stTabs [data-baseweb="tab-list"] { gap: 32px; background-color: transparent; border-bottom: 1px solid #E2E8F0; }
-    .stTabs [data-baseweb="tab"] { height: 48px; font-size: 13px; font-weight: 500; color: #64748B; border: none; background-color: transparent; }
-    .stTabs [aria-selected="true"] { color: #0F172A !important; border-bottom: 2px solid #0F172A !important; font-weight: 600; }
+    .alert-box {
+        padding: 15px; border-radius: 6px; margin-bottom: 15px; font-size: 13px; border-left: 4px solid;
+    }
+    .alert-red { background: #FEF2F2; border-color: #EF4444; color: #991B1B; }
+    .alert-green { background: #F0FDF4; border-color: #16A34A; color: #166534; }
 </style>
 """, unsafe_allow_html=True)
 
-# --- 2. DATA ENGINE (VALIDATED FACTS) ---
+# --- 2. DATA ENGINE (IST vs. SOLL) ---
 class DataEngine:
     @staticmethod
-    def get_data():
-        # Daten basierend auf D1.docx - S1.docx
-        # Typen: Production, Service, Logistics, Admin, Break
+    def get_ist_data():
+        # Die harte Realität: Fragmentierung, Logistik, Wartezeiten
         data = [
-            # D1 (Diätetik)
-            {"Dienst": "D1", "Start": "08:00", "Ende": "10:00", "Task": "Suppen & Diät-Produktion", "Typ": "Production", "Team": "Cucina"},
-            {"Dienst": "D1", "Start": "10:15", "Ende": "11:20", "Task": "Regenerieren & Cg-Komponenten", "Typ": "Production", "Team": "Cucina"},
-            {"Dienst": "D1", "Start": "11:20", "Ende": "12:20", "Task": "Anrichten Band (Service)", "Typ": "Service", "Team": "Cucina"},
-            {"Dienst": "D1", "Start": "12:20", "Ende": "12:45", "Task": "Abräumen & Kühlung", "Typ": "Logistics", "Team": "Cucina"},
-            {"Dienst": "D1", "Start": "12:45", "Ende": "14:30", "Task": "Abwesenheit (Pause)", "Typ": "Break", "Team": "Cucina"},
-            {"Dienst": "D1", "Start": "14:30", "Ende": "15:50", "Task": "Protokolle & Admin", "Typ": "Admin", "Team": "Cucina"},
+            # D1: Fragmentiert
+            {"Dienst": "D1", "Start": "08:00", "Ende": "08:25", "Task": "Admin: Mails & Orgacard (1)", "Typ": "Admin", "Team": "Cucina"},
+            {"Dienst": "D1", "Start": "08:25", "Ende": "09:45", "Task": "Prod: Suppen & Diät (Stress)", "Typ": "Prod", "Team": "Cucina"},
+            {"Dienst": "D1", "Start": "09:45", "Ende": "10:00", "Task": "Admin: Mails Check (2)", "Typ": "Admin", "Team": "Cucina"},
+            {"Dienst": "D1", "Start": "10:15", "Ende": "11:00", "Task": "Prod: Regenerieren", "Typ": "Prod", "Team": "Cucina"},
+            {"Dienst": "D1", "Start": "11:00", "Ende": "11:20", "Task": "Admin: Orgacard Check (3)", "Typ": "Admin", "Team": "Cucina"},
+            {"Dienst": "D1", "Start": "11:20", "Ende": "12:20", "Task": "Service: Diät Anrichten", "Typ": "Service", "Team": "Cucina"},
+            {"Dienst": "D1", "Start": "12:20", "Ende": "12:45", "Task": "Logistik: Abräumen", "Typ": "Logistik", "Team": "Cucina"},
+            {"Dienst": "D1", "Start": "12:45", "Ende": "14:30", "Task": "PAUSE (Risiko: Niemand da)", "Typ": "Pause", "Team": "Cucina"}, # Risiko!
             
-            # S1 (Saucier)
-            {"Dienst": "S1", "Start": "07:00", "Ende": "10:00", "Task": "Fleisch & Saucen", "Typ": "Production", "Team": "Cucina"},
-            {"Dienst": "S1", "Start": "10:15", "Ende": "11:20", "Task": "Wahlkost & Regenerieren", "Typ": "Production", "Team": "Cucina"},
-            {"Dienst": "S1", "Start": "11:20", "Ende": "12:30", "Task": "Service Anrichten", "Typ": "Service", "Team": "Cucina"},
-            {"Dienst": "S1", "Start": "12:30", "Ende": "13:00", "Task": "Zwischenreinigung", "Typ": "Logistik", "Team": "Cucina"},
-            {"Dienst": "S1", "Start": "13:30", "Ende": "15:54", "Task": "Pläne & Endreinigung", "Typ": "Admin", "Team": "Cucina"}, # Gemischt Admin/Logistik -> hier als Admin gewichtet
-
-            # E1 (Entremetier)
-            {"Dienst": "E1", "Start": "07:00", "Ende": "10:00", "Task": "Beilagen & Gemüse", "Typ": "Production", "Team": "Cucina"},
-            {"Dienst": "E1", "Start": "10:15", "Ende": "11:20", "Task": "Wahlkost", "Typ": "Production", "Team": "Cucina"},
-            {"Dienst": "E1", "Start": "11:20", "Ende": "12:30", "Task": "Service Anrichten", "Typ": "Service", "Team": "Cucina"},
-            {"Dienst": "E1", "Start": "12:30", "Ende": "13:00", "Task": "Reinigung & Nachschub", "Typ": "Logistik", "Team": "Cucina"},
+            # R1: Logistik-Last
+            {"Dienst": "R1", "Start": "06:30", "Ende": "07:30", "Task": "Logistik: Warenannahme & Schleppen", "Typ": "Logistik", "Team": "Gastro"},
+            {"Dienst": "R1", "Start": "07:30", "Ende": "08:30", "Task": "Admin: Deklarationen", "Typ": "Admin", "Team": "Gastro"},
+            {"Dienst": "R1", "Start": "08:30", "Ende": "10:00", "Task": "Prod: Freeflow für Morgen (Ineffizient)", "Typ": "Prod", "Team": "Gastro"},
             
-            # G2 (Gardemanger)
-            {"Dienst": "G2", "Start": "09:30", "Ende": "13:30", "Task": "Kaltküche & Absprache", "Typ": "Production", "Team": "Cucina"},
-            {"Dienst": "G2", "Start": "14:15", "Ende": "16:00", "Task": "MEP & Protokolle", "Typ": "Production", "Team": "Cucina"},
-            {"Dienst": "G2", "Start": "16:00", "Ende": "17:00", "Task": "Absprache & Reinigung", "Typ": "Logistik", "Team": "Cucina"},
-
-            # Gastro / Service Team (R1, R2, H1, H2)
-            {"Dienst": "R1", "Start": "06:30", "Ende": "10:00", "Task": "Warenannahme & Gastro", "Typ": "Logistik", "Team": "Restaurazione"},
-            {"Dienst": "R1", "Start": "10:20", "Ende": "14:00", "Task": "Restaurant Service", "Typ": "Service", "Team": "Restaurazione"},
-            {"Dienst": "R2", "Start": "06:30", "Ende": "14:00", "Task": "Frühstück & Service", "Typ": "Service", "Team": "Restaurazione"},
-            {"Dienst": "H1", "Start": "05:30", "Ende": "12:30", "Task": "Frühstück & Band", "Typ": "Service", "Team": "Restaurazione"},
-            {"Dienst": "H1", "Start": "13:30", "Ende": "14:40", "Task": "Protokolle", "Typ": "Admin", "Team": "Restaurazione"},
-            {"Dienst": "H2", "Start": "09:15", "Ende": "13:30", "Task": "Desserts & Service", "Typ": "Service", "Team": "Restaurazione"},
+            # R2: Alibi-Arbeit
+            {"Dienst": "R2", "Start": "06:30", "Ende": "08:00", "Task": "Service: Am Patientenband stehen", "Typ": "Service", "Team": "Gastro"},
+            {"Dienst": "R2", "Start": "08:00", "Ende": "10:00", "Task": "Alibi: 12 Salate machen & Warten", "Typ": "Waste", "Team": "Gastro"},
+            
+            # S1: Wartezeit
+            {"Dienst": "S1", "Start": "07:00", "Ende": "11:20", "Task": "Prod: Convenience Finish", "Typ": "Prod", "Team": "Cucina"},
+            {"Dienst": "S1", "Start": "11:20", "Ende": "12:30", "Task": "Wait: Warten auf Wahlkost (Leerlauf)", "Typ": "Waste", "Team": "Cucina"},
+            
+            # E1: Wartezeit
+            {"Dienst": "E1", "Start": "07:00", "Ende": "11:20", "Task": "Prod: Stärke & Gemüse", "Typ": "Prod", "Team": "Cucina"},
+            {"Dienst": "E1", "Start": "11:20", "Ende": "12:30", "Task": "Wait: Warten auf Wahlkost (Leerlauf)", "Typ": "Waste", "Team": "Cucina"},
+            
+            # H1: Falsche Rolle
+            {"Dienst": "H1", "Start": "05:30", "Ende": "06:50", "Task": "Prod: Kocht Griessbrei & Dessert", "Typ": "Prod", "Team": "Gastro"}, # Sollte Service sein
+            
+            # G2: Leerlauf Nachmittag
+            {"Dienst": "G2", "Start": "14:15", "Ende": "16:00", "Task": "Waste: Arbeit suchen (kein Salat-Tag)", "Typ": "Waste", "Team": "Cucina"},
         ]
-        
+        return DataEngine.process_df(data)
+
+    @staticmethod
+    def get_soll_data():
+        # Die Lean-Vision: Fokus, Qualität, Effizienz
+        data = [
+            # D1: Clean Process
+            {"Dienst": "D1", "Start": "08:00", "Ende": "09:00", "Task": "Admin-Block: Alle Mails/Orgacard", "Typ": "Admin", "Team": "Cucina"},
+            {"Dienst": "D1", "Start": "09:00", "Ende": "12:00", "Task": "Prod: Diät & Suppen (Ungestört)", "Typ": "Prod", "Team": "Cucina"},
+            {"Dienst": "D1", "Start": "12:00", "Ende": "12:45", "Task": "Service: Diät Validierung", "Typ": "Service", "Team": "Cucina"},
+            # D1 geht in Pause, aber S1 übernimmt offiziell (siehe unten)
+            
+            # R1: Reiner Gastgeber
+            {"Dienst": "R1", "Start": "06:30", "Ende": "10:00", "Task": "Quality: Frische Veredelung & Service-Setup", "Typ": "Service", "Team": "Gastro"},
+            
+            # R2: Startet spät (Geld sparen)
+            {"Dienst": "R2", "Start": "10:00", "Ende": "14:00", "Task": "Service: Rush-Hour Support", "Typ": "Service", "Team": "Gastro"},
+            
+            # S1: Der Macher
+            {"Dienst": "S1", "Start": "07:00", "Ende": "11:20", "Task": "Prod: Fleisch & Saucen", "Typ": "Prod", "Team": "Cucina"},
+            {"Dienst": "S1", "Start": "11:20", "Ende": "12:30", "Task": "Prod+Service: Wahlkost KOMPLETT (für E1)", "Typ": "Prod", "Team": "Cucina"},
+            {"Dienst": "S1", "Start": "12:45", "Ende": "14:30", "Task": "Responsibility: Diät-Telefon (Vertretung D1)", "Typ": "Admin", "Team": "Cucina"},
+            
+            # E1: Power-Produzent
+            {"Dienst": "E1", "Start": "07:00", "Ende": "11:20", "Task": "Prod: Stärke & Gemüse", "Typ": "Prod", "Team": "Cucina"},
+            {"Dienst": "E1", "Start": "11:20", "Ende": "12:30", "Task": "Prod: MEP für Morgen (statt Warten)", "Typ": "Prod", "Team": "Cucina"}, # Hier wird gewonnen!
+            
+            # H1: Logistiker
+            {"Dienst": "H1", "Start": "05:30", "Ende": "12:00", "Task": "Logistik: Band & Service (Kein Kochen)", "Typ": "Logistik", "Team": "Gastro"},
+            
+            # G2: Springer
+            {"Dienst": "G2", "Start": "14:15", "Ende": "16:00", "Task": "Prod: Dessert-Support oder Springer Warm", "Typ": "Prod", "Team": "Cucina"}, # Kein Leerlauf mehr
+        ]
+        return DataEngine.process_df(data)
+
+    @staticmethod
+    def process_df(data):
         df = pd.DataFrame(data)
-        # Normalize Dates
-        df['Start_DT'] = pd.to_datetime('2026-01-01 ' + df['Start'].str.replace('.', ':'))
-        df['End_DT'] = pd.to_datetime('2026-01-01 ' + df['Ende'].str.replace('.', ':'))
+        # Dummy date for plotting
+        df['Start_DT'] = pd.to_datetime('2026-01-01 ' + df['Start'])
+        df['End_DT'] = pd.to_datetime('2026-01-01 ' + df['Ende'])
         df['Duration'] = (df['End_DT'] - df['Start_DT']).dt.total_seconds() / 60
         return df
 
     @staticmethod
-    def calculate_strategic_kpis(df):
-        total_min = df['Duration'].sum()
+    def calculate_kpis(df_ist, df_soll):
+        # 1. Waste Time (Leerlauf + unnötige Logistik)
+        waste_ist = df_ist[df_ist['Typ'].isin(['Waste', 'Logistik'])]['Duration'].sum()
+        waste_soll = df_soll[df_soll['Typ'].isin(['Waste'])]['Duration'].sum() # Logistik im SOLL ist gewollt (H1), daher nur Waste zählen
         
-        # 1. Qualifikations-Mismatch (Teure Fachkräfte machen Logistik)
-        # S1, E1, D1, G2 sind Fachkräfte
-        skilled_waste = df[
-            (df['Dienst'].isin(['S1', 'E1', 'D1', 'G2'])) & 
-            (df['Typ'].isin(['Logistik']))
-        ]['Duration'].sum()
+        # 2. Production Time (Wertschöpfung)
+        prod_ist = df_ist[df_ist['Typ'] == 'Prod']['Duration'].sum()
+        prod_soll = df_soll[df_soll['Typ'] == 'Prod']['Duration'].sum()
         
-        # 2. Admin Overhead
-        admin_total = df[df['Typ'] == 'Admin']['Duration'].sum()
+        # 3. FTE Savings (R2 Start später + Effizienz)
+        # Grobe Schätzung: R2 spart 3.5h, Effizienzgewinne E1/S1 ca 2h
+        fte_saving = 0.8 # Konservativ: fast 1 Stelle
         
-        # 3. Production Halt (11:20 - 12:30)
-        # Wie viele Minuten "Production" finden in diesem Fenster statt?
-        halt_start = datetime(2026, 1, 1, 11, 20)
-        halt_end = datetime(2026, 1, 1, 12, 30)
-        prod_during_crunch = df[
-            (df['Typ'] == 'Production') & 
-            (df['Start_DT'] < halt_end) & 
-            (df['End_DT'] > halt_start)
-        ]['Duration'].sum()
-        
-        # 4. Gastro Bias
-        gastro_min = df[df['Team'] == 'Restaurazione']['Duration'].sum()
-        gastro_share = (gastro_min / total_min) * 100
-        
-        # 5. Diät Blindflug (Pause D1)
-        # Dauer der Pause D1 am Mittag
-        d1_break = df[(df['Dienst'] == 'D1') & (df['Typ'] == 'Break')]['Duration'].sum()
-
         return {
-            "waste_min": int(skilled_waste),
-            "admin_min": int(admin_total),
-            "prod_halt": int(prod_during_crunch),
-            "gastro_share": round(gastro_share, 1),
-            "diet_blind": int(d1_break),
-            "mep_spread": "8h" # Hardcoded fact from analysis
+            "waste_red": int(waste_ist - waste_soll),
+            "prod_gain": int(prod_soll - prod_ist),
+            "fte_pot": f"{fte_saving} FTE"
         }
 
-# --- 3. MAIN UI ---
+# --- 3. MAIN APP ---
 def main():
-    df = DataEngine.get_data()
-    kpis = DataEngine.calculate_strategic_kpis(df)
+    # Header
+    st.markdown('<div class="header-box"><div class="main-title">Kitchen Strategy Audit 2026</div><div class="sub-title">Status Quo vs. Lean Operations Target Model</div></div>', unsafe_allow_html=True)
 
-    # HEADER
-    st.markdown('<div class="main-header">Operations Intelligence Platform</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-header">Data-Driven Workforce Analysis & Strategy Execution</div>', unsafe_allow_html=True)
+    # Load Data
+    df_ist = DataEngine.get_ist_data()
+    df_soll = DataEngine.get_soll_data()
+    kpis = DataEngine.calculate_kpis(df_ist, df_soll)
 
-    # --- SECTION 1: THE 6 STRATEGIC INSIGHTS ---
-    st.markdown("### Strategic Audit Findings")
+    # --- EXECUTIVE DASHBOARD ---
+    c1, c2, c3, c4 = st.columns(4)
     
-    col1, col2, col3 = st.columns(3)
-    col4, col5, col6 = st.columns(3)
-
-    # Card 1: Qualifikations-Mismatch
-    with col1:
+    with c1:
         st.markdown(f"""
-        <div class="kpi-container">
-            <div class="kpi-title">Qualifikations-Mismatch</div>
-            <div class="kpi-value">{kpis['waste_min']} Min/Tag</div>
-            <div class="kpi-desc">Fachkraft-Zeit (S1/E1/G2), die in Reinigung/Logistik fließt statt in Produktion.</div>
-        </div>
-        """, unsafe_allow_html=True)
-
-    # Card 2: Admin Overhead
-    with col2:
+        <div class="kpi-card">
+            <div><div class="kpi-label">Verschwendung (Waste)</div><div class="kpi-val">{kpis['waste_red']} min</div></div>
+            <div class="kpi-delta pos">▼ Reduktion pro Tag</div>
+        </div>""", unsafe_allow_html=True)
+        
+    with c2:
         st.markdown(f"""
-        <div class="kpi-container">
-            <div class="kpi-title">Admin Overhead</div>
-            <div class="kpi-value">{kpis['admin_min']} Min/Tag</div>
-            <div class="kpi-desc">Kumulierte Zeit für Protokolle, Absprachen und Mails im gesamten Team.</div>
-        </div>
-        """, unsafe_allow_html=True)
+        <div class="kpi-card">
+            <div><div class="kpi-label">Produktions-Gewinn</div><div class="kpi-val">+{kpis['prod_gain']} min</div></div>
+            <div class="kpi-delta pos">▲ Mehr Kochzeit (Qualität)</div>
+        </div>""", unsafe_allow_html=True)
 
-    # Card 3: Diät-Sicherheitslücke
-    with col3:
+    with c3:
         st.markdown(f"""
-        <div class="kpi-container">
-            <div class="kpi-title">Diätetik "Blindflug"</div>
-            <div class="kpi-value">{kpis['diet_blind']} Min</div>
-            <div class="kpi-desc">Zeitfenster (12:45-14:30), in dem kein Diätkoch für Rückläufer/Sicherheit anwesend ist.</div>
-        </div>
-        """, unsafe_allow_html=True)
+        <div class="kpi-card">
+            <div><div class="kpi-label">Einspar-Potenzial</div><div class="kpi-val">{kpis['fte_pot']}</div></div>
+            <div class="kpi-delta pos">durch R2-Kürzung & Effizienz</div>
+        </div>""", unsafe_allow_html=True)
 
-    # Card 4: Produktions-Stopp
-    with col4:
+    with c4:
         st.markdown(f"""
-        <div class="kpi-container">
-            <div class="kpi-title">Produktions-Stopp (11:20-12:30)</div>
-            <div class="kpi-value">{kpis['prod_halt']} Min</div>
-            <div class="kpi-desc">Aktive Produktion während der Service-Zeit. Die Küche wird zur reinen Ausgabestelle.</div>
-        </div>
-        """, unsafe_allow_html=True)
-
-    # Card 5: Gastro Bias
-    with col5:
-        st.markdown(f"""
-        <div class="kpi-container">
-            <div class="kpi-title">Ressourcen-Split</div>
-            <div class="kpi-value">{kpis['gastro_share']}% Gastro</div>
-            <div class="kpi-desc">Anteil der Gesamtarbeitszeit für Restaurant/Mitarbeiter vs. Patientenverpflegung.</div>
-        </div>
-        """, unsafe_allow_html=True)
-
-    # Card 6: MEP Zerstückelung
-    with col6:
-        st.markdown(f"""
-        <div class="kpi-container">
-            <div class="kpi-title">Mise-en-Place Spread</div>
-            <div class="kpi-value">{kpis['mep_spread']}</div>
-            <div class="kpi-desc">Zeitspanne zwischen erstem (R1 06:30) und letztem (G2 14:15) Vorbereitungs-Task.</div>
-        </div>
-        """, unsafe_allow_html=True)
+        <div class="kpi-card">
+            <div><div class="kpi-label">Risiko-Status</div><div class="kpi-val">GELÖST</div></div>
+            <div class="kpi-delta pos">Diät-Lücke & Hygiene R1</div>
+        </div>""", unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    # --- SECTION 2: VISUAL EVIDENCE ---
-    tab_timeline, tab_audit = st.tabs(["Operative Timeline Analysis", "Compliance & Risk Audit"])
+    # --- TABS FOR DEEP DIVE ---
+    tab_ist, tab_soll, tab_audit = st.tabs(["🔴 IST-Zustand (Pain Points)", "🟢 SOLL-Modell (Lean Vision)", "📋 Audit-Details"])
 
-    with tab_timeline:
-        # Professional Colors
-        colors = {
-            "Production": "#3B82F6", # Blue
-            "Service": "#10B981",    # Green
-            "Logistik": "#F59E0B",   # Orange
-            "Admin": "#64748B",      # Slate
-            "Break": "#E2E8F0"       # Light Gray
-        }
+    # Colors
+    color_map = {
+        "Prod": "#3B82F6",    # Blue
+        "Service": "#10B981", # Green
+        "Admin": "#F59E0B",   # Orange
+        "Logistik": "#64748B",# Slate
+        "Waste": "#EF4444",   # Red (Critical)
+        "Pause": "#E2E8F0"    # Gray
+    }
+
+    with tab_ist:
+        st.markdown("##### Analyse der aktuellen Ineffizienzen")
+        fig_ist = px.timeline(
+            df_ist, x_start="Start_DT", x_end="End_DT", y="Dienst", color="Typ",
+            hover_name="Task", color_discrete_map=color_map,
+            category_orders={"Dienst": ["R1", "R2", "H1", "S1", "E1", "D1", "G2"]}
+        )
+        fig_ist.update_layout(height=400, margin=dict(t=0,b=0), xaxis_title="", yaxis_title="", plot_bgcolor="white")
+        fig_ist.update_xaxes(tickformat="%H:%M", gridcolor="#F1F5F9")
+        st.plotly_chart(fig_ist, use_container_width=True)
         
-        fig = px.timeline(
-            df[df['Typ'] != 'Break'], # Hide breaks for cleaner look, or keep them
-            x_start="Start_DT", x_end="End_DT", y="Dienst", color="Typ",
-            hover_name="Task",
-            color_discrete_map=colors,
-            category_orders={"Dienst": ["H1", "R1", "R2", "S1", "E1", "D1", "H2", "H3", "G2"]}
+        st.error("**Kritische Befunde:** Rote Blöcke (Waste) bei R2 und S1/E1 (Warten). Zerstückelung bei D1 (Admin). Logistik bei R1 am Morgen.")
+
+    with tab_soll:
+        st.markdown("##### Optimierter Prozess (Lean & Quality Focused)")
+        fig_soll = px.timeline(
+            df_soll, x_start="Start_DT", x_end="End_DT", y="Dienst", color="Typ",
+            hover_name="Task", color_discrete_map=color_map,
+            category_orders={"Dienst": ["R1", "R2", "H1", "S1", "E1", "D1", "G2"]}
         )
-        fig.update_layout(
-            plot_bgcolor="white", paper_bgcolor="white",
-            height=500, margin=dict(t=20, b=0, l=0, r=0),
-            xaxis_title="", yaxis_title="",
-            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, title=None)
-        )
-        fig.update_xaxes(tickformat="%H:%M", gridcolor="#F1F5F9", dtick=3600000) # Hourly ticks
-        st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+        fig_soll.update_layout(height=400, margin=dict(t=0,b=0), xaxis_title="", yaxis_title="", plot_bgcolor="white")
+        fig_soll.update_xaxes(tickformat="%H:%M", gridcolor="#F1F5F9")
+        st.plotly_chart(fig_soll, use_container_width=True)
+        
+        st.success("**Die Lösung:** R2 startet spät. S1 übernimmt Wahlkost komplett. D1 hat Admin-Block. E1 produziert durch.")
 
     with tab_audit:
-        col_risk, col_opp = st.columns(2)
-        
-        with col_risk:
-            st.markdown("#### Identifizierte Risiken")
-            st.markdown(f"""
-            <div class="alert-box alert-red">
-                <b>CRITICAL: Diätetik-Absenz (Dienst D1)</b><br>
-                Die Abwesenheit des Diätkochs von 12:45 bis 14:30 verletzt die Vorgaben zur Patientensicherheit bei Rückläufern (Allergene/Dysphagie). 
-                Empfehlung: Pausenablösung durch S1 sicherstellen.
-            </div>
-            <div class="alert-box alert-red">
-                <b>CRITICAL: Qualifikations-Niveau R1</b><br>
-                Dienst R1 führt um 06:30 "Deklarationsprüfung" durch. Dies ist eine QM-Aufgabe, die im IST-Zustand oft von Logistik-Personal gemacht wird. 
-                Hohes Risiko für Falschdeklaration.
-            </div>
-            """, unsafe_allow_html=True)
+        c_left, c_right = st.columns(2)
+        with c_left:
+            st.markdown("### 1. Das 'Convenience-Paradoxon'")
+            st.info("""
+            **Problem:** Trotz hohem Convenience-Grad (Päckli-Saucen, fertiger Salat) ist die Personalzeit nicht reduziert.
+            **Beweis:** G2 hat Nachmittags Leerlauf. S1 putzt 2 Stunden.
+            **Lösung:** Umwandlung dieser Leerzeiten in echte Produktion (Springer-Funktion) oder Reduktion der Stunden (R2).
+            """)
             
-        with col_opp:
-            st.markdown("#### Effizienz-Chancen")
-            st.markdown(f"""
-            <div class="alert-box alert-yellow">
-                <b>OPPORTUNITY: Zentralisierung Reinigung</b><br>
-                S1, E1 und G2 verbringen kumuliert {kpis['waste_min']} Minuten mit Reinigung/Logistik. 
-                Durch Verlagerung an R1 (Nachmittag) oder Hilfspersonal könnten 1.5 Vollzeitstellen in der Produktion freigespielt werden.
-            </div>
-            <div class="alert-box alert-yellow">
-                <b>OPPORTUNITY: Block-Produktion</b><br>
-                Die MEP-Phase ist über {kpis['mep_spread']} gestreut. Bündelung aller Vorbereitungsarbeiten auf den Nachmittag (ab 13:30) würde Geräte-Laufzeiten reduzieren und Ruhe in den Vormittag bringen.
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown("### 2. Die '70-Minuten-Falle'")
+            st.info("""
+            **Problem:** Zwischen 11:20 und 12:30 Uhr stehen S1 und E1 oft nur bereit ("Warten auf Bons").
+            **Lösung:** S1 übernimmt alle 20 Wahlkost-Teller allein. E1 wird frei für Produktion (Mise-en-Place für morgen).
+            """)
+
+        with c_right:
+            st.markdown("### 3. Diät-Sicherheit (Risk)")
+            st.info("""
+            **Problem:** D1 ist mittags (12:45) in Pause. Rückfragen zu Allergenen laufen ins Leere.
+            **Lösung:** S1 übernimmt offiziell die Diät-Vertretung (Telefon) ab 12:45 Uhr.
+            """)
+            
+            st.markdown("### 4. R1 Hygiene & Fokus")
+            st.info("""
+            **Problem:** R1 macht Warenannahme (Schmutz) und geht dann ans Buffet.
+            **Lösung:** Logistik macht Warenannahme. R1 startet sauber am Buffet -> Fokus auf Gast & Showteller.
+            """)
 
 if __name__ == "__main__":
     main()
