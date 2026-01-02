@@ -247,6 +247,10 @@ class DataWarehouse:
 
     @staticmethod
     def process(data):
+        # ERROR FIX: Handle empty data gracefully
+        if not data:
+            return pd.DataFrame(columns=['Dienst', 'Start', 'Ende', 'Task', 'Typ', 'Start_DT', 'End_DT', 'Duration'])
+            
         df = pd.DataFrame(data)
         df['Start_DT'] = pd.to_datetime('2026-01-01 ' + df['Start'])
         df['End_DT'] = pd.to_datetime('2026-01-01 ' + df['Ende'])
@@ -258,6 +262,11 @@ class KPI_Engine:
     @staticmethod
     def calculate_all(df_ist):
         total_min = df_ist['Duration'].sum()
+        
+        # ERROR FIX: Avoid ZeroDivisionError if dataframe is empty
+        if total_min == 0:
+            return {}
+
         waste_min = df_ist[df_ist['Typ'] == 'Waste']['Duration'].sum()
         
         # Skill-Groups
@@ -343,13 +352,18 @@ def render_kpi_card(title, data, is_top3=False):
 
 # --- 5. MAIN APPLICATION ---
 def main():
+    # ERROR FIX: Load Data First to avoid dummy call
+    dw = DataWarehouse()
+    df_ist = dw.get_full_ist_data()
+    
+    # Calculate KPIs once (can reuse for keys and display)
+    kpis = KPI_Engine.calculate_all(df_ist)
+    all_kpi_keys = list(kpis.keys())
+
     # Sidebar Navigation & Settings
     with st.sidebar:
         st.header("⚙️ Cockpit Konfiguration")
         st.write("Wählen Sie die strategischen Schwerpunkte.")
-        
-        # KPI Selection
-        all_kpi_keys = list(KPI_Engine.calculate_all(DataWarehouse.process([])).keys()) # Dummy call to get keys
         
         default_top3 = ["Skill-Leakage", "Parkinson Ratio (Muda)", "Recovery Potenzial"]
         selected_top3 = st.multiselect("📌 Top 3 Focus KPIs (Front)", options=all_kpi_keys, default=default_top3, max_selections=3)
@@ -360,10 +374,6 @@ def main():
     # Main Content
     st.markdown('<div class="main-header">KITCHEN INTELLIGENCE SUITE: DEEP AUDIT 2026</div>', unsafe_allow_html=True)
     
-    dw = DataWarehouse()
-    df_ist = dw.get_full_ist_data()
-    kpis = KPI_Engine.calculate_all(df_ist)
-
     # --- TOP 3 SECTION ---
     st.markdown('<div class="cluster-header">Executive Board: Critical Drivers</div>', unsafe_allow_html=True)
     cols_top = st.columns(3)
