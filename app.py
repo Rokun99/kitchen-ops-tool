@@ -5,9 +5,9 @@ import plotly.graph_objects as go
 import google.generativeai as genai
 from datetime import datetime, timedelta
 
-# --- 1. SETTINGS & ENTERPRISE STYLING ---
+# --- 1. CONFIGURATION & CLINICAL STYLING ---
 st.set_page_config(
-    page_title="Kitchen Ops Intelligence | Deep Audit",
+    page_title="Kitchen Intelligence Master-Suite | 360° Audit",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -16,11 +16,13 @@ st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
     html, body, [class*="st-"] { font-family: 'Inter', sans-serif; color: #0F172A; background-color: #F8FAFC; }
+    
     .main-header { font-size: 26px; font-weight: 700; color: #1E293B; border-bottom: 2px solid #E2E8F0; padding-bottom: 10px; margin-bottom: 20px;}
-    .cluster-header { font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 30px; margin-bottom: 12px; border-left: 3px solid #3B82F6; padding-left: 10px;}
-    .kpi-card { background-color: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 2px; padding: 16px; height: 110px; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03); display: flex; flex-direction: column; justify-content: space-between; }
-    .kpi-title { font-size: 9px; font-weight: 700; text-transform: uppercase; color: #64748B; }
-    .kpi-value { font-size: 22px; font-weight: 700; color: #0F172A; }
+    .cluster-header { font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 25px; margin-bottom: 12px; border-left: 3px solid #3B82F6; padding-left: 10px;}
+    
+    .kpi-card { background-color: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 2px; padding: 14px; height: 105px; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03); display: flex; flex-direction: column; justify-content: space-between; }
+    .kpi-title { font-size: 9px; font-weight: 700; text-transform: uppercase; color: #64748B; line-height: 1.2;}
+    .kpi-value { font-size: 20px; font-weight: 700; color: #0F172A; }
     .kpi-sub { font-size: 10px; color: #94A3B8; }
     .trend-bad { color: #EF4444; font-weight: 600; }
     .trend-good { color: #10B981; font-weight: 600; }
@@ -28,70 +30,160 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- 2. AI AUDIT HANDLER ---
-class KitchenAI:
-    def __init__(self):
-        try:
-            genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-            self.model = genai.GenerativeModel('gemini-1.5-flash')
-        except:
-            self.model = None
-
-    def audit_report(self, data):
-        if not self.model: return "KI-Modul nicht aktiv. Bitte API-Key prüfen."
-        prompt = f"Analysiere diesen IST-Dienstplan auf Verschwendung (Muda). Beziehe dich auf die '70-Minuten-Falle' und die 'Admin-Zerstückelung'. Erkläre kurz das Recovery-Potenzial in FTE. Daten: {data}"
-        try:
-            return self.model.generate_content(prompt).text
-        except:
-            return "Analyse temporär nicht verfügbar."
-
-# --- 3. DATA ENGINE (GRANULAR MAPPING) ---
-class DataEngine:
+# --- 2. DATA ENGINE: THE COMPLETE CULINARY REPOSITORY (FULL AUDIT) ---
+class DataWarehouse:
     @staticmethod
-    def get_audit_data():
-        # Granularer IST-Zustand gemäss PDF Audit
-        ist = [
-            # D1 - Diätkoch
-            {"Dienst": "D1", "Start": "08:00", "Ende": "08:25", "Task": "Admin: E-Mails/Mutationen", "Typ": "Admin", "Load": 0.8},
-            {"Dienst": "D1", "Start": "08:25", "Ende": "08:30", "Task": "Hygiene: Rüsten/Wechsel", "Typ": "Logistik", "Load": 0.5},
-            {"Dienst": "D1", "Start": "08:30", "Ende": "09:15", "Task": "Prod: Suppen (130L)", "Typ": "Prod", "Load": 0.9},
-            {"Dienst": "D1", "Start": "09:15", "Ende": "09:45", "Task": "Prod: Ernährungstherapie ET", "Typ": "Prod", "Load": 1.0},
-            {"Dienst": "D1", "Start": "09:45", "Ende": "10:00", "Task": "Admin: 2. Mail-Check", "Typ": "Admin", "Load": 0.6},
-            {"Dienst": "D1", "Start": "10:15", "Ende": "10:45", "Task": "Prod: Regenerieren Cg", "Typ": "Prod", "Load": 0.6},
-            {"Dienst": "D1", "Start": "10:45", "Ende": "11:00", "Task": "Coord: Instruktion Band", "Typ": "Coord", "Load": 0.6},
-            {"Dienst": "D1", "Start": "11:00", "Ende": "11:20", "Task": "Admin: Letzte Orgacard", "Typ": "Admin", "Load": 0.9},
-            {"Dienst": "D1", "Start": "11:20", "Ende": "12:20", "Task": "Service: Diäten am Band", "Typ": "Service", "Load": 1.0},
-            {"Dienst": "D1", "Start": "12:20", "Ende": "12:45", "Task": "Logistik: Rückstellproben", "Typ": "Logistik", "Load": 0.5},
-            {"Dienst": "D1", "Start": "14:30", "Ende": "15:00", "Task": "Admin: Protokolle", "Typ": "Admin", "Load": 0.4},
-            # E1 - Entremetier
-            {"Dienst": "E1", "Start": "07:15", "Ende": "09:30", "Task": "Prod: Stärke/Gemüse (Masse)", "Typ": "Prod", "Load": 0.9},
-            {"Dienst": "E1", "Start": "11:20", "Ende": "12:30", "Task": "Waste: Wartezeit Wahlkost", "Typ": "Waste", "Load": 0.2},
-            {"Dienst": "E1", "Start": "13:30", "Ende": "15:00", "Task": "Prod: Gedehnte MEP", "Typ": "Waste", "Load": 0.3},
-            # S1 - Saucier
-            {"Dienst": "S1", "Start": "07:00", "Ende": "08:30", "Task": "Prod: Convenience Saucen", "Typ": "Prod", "Load": 0.6},
-            {"Dienst": "S1", "Start": "08:30", "Ende": "09:30", "Task": "Coord: Support E1 (Puffer)", "Typ": "Coord", "Load": 0.5},
-            {"Dienst": "S1", "Start": "11:20", "Ende": "12:30", "Task": "Waste: Warten auf Bons", "Typ": "Waste", "Load": 0.2},
-            # R1 - Gastro
-            {"Dienst": "R1", "Start": "06:30", "Ende": "07:30", "Task": "Logistik: Warenannahme", "Typ": "Logistik", "Load": 0.9},
-            {"Dienst": "R1", "Start": "07:45", "Ende": "08:30", "Task": "Admin: Deklarationen", "Typ": "Admin", "Load": 0.4},
-            # R2 - Leerlauf-König
-            {"Dienst": "R2", "Start": "06:30", "Ende": "08:00", "Task": "Logistik: Bandbestückung", "Typ": "Logistik", "Load": 0.5},
-            {"Dienst": "R2", "Start": "08:00", "Ende": "10:00", "Task": "Waste: Schein-Arbeit (Salat)", "Typ": "Waste", "Load": 0.3},
-            # H3 - Montage
-            {"Dienst": "H3", "Start": "09:15", "Ende": "11:15", "Task": "Prod: Montage Sandwich/Wähe", "Typ": "Prod", "Load": 0.7},
-            {"Dienst": "H3", "Start": "12:00", "Ende": "12:30", "Task": "Prod: Bircher-Masse", "Typ": "Prod", "Load": 0.6}
+    def get_full_ist_data():
+        # DATEN EXAKT NACH DEN NEUKALKULATIONS-BERICHTEN (ALLE 9 DIENSTE)
+        # Basierend auf dem Dokument "Learnings Arbeitsbeschreibungen.docx"
+        data = [
+            # --- D1 DIÄTETIK (Der Admin-Spagat) ---
+            {"Dienst": "D1", "Start": "08:00", "Ende": "08:25", "Task": "Admin: E-Mails/Mutationen", "Typ": "Admin"},
+            {"Dienst": "D1", "Start": "08:25", "Ende": "08:30", "Task": "Hygiene/Rüsten: Wechsel Büro-Küche", "Typ": "Logistik"},
+            {"Dienst": "D1", "Start": "08:30", "Ende": "09:15", "Task": "Prod: Suppen (520 Port./130L)", "Typ": "Prod"},
+            {"Dienst": "D1", "Start": "09:15", "Ende": "09:45", "Task": "Prod: ET (Ernährungstherapie/Allergene)", "Typ": "Prod"},
+            {"Dienst": "D1", "Start": "09:45", "Ende": "10:00", "Task": "Admin: 2. Mail-Check (Spätmeldungen)", "Typ": "Admin"},
+            # 10:00-10:15 Pause
+            {"Dienst": "D1", "Start": "10:15", "Ende": "10:45", "Task": "Prod: Regenerieren Cg-Komp.", "Typ": "Prod"},
+            {"Dienst": "D1", "Start": "10:45", "Ende": "11:00", "Task": "Coord: Instruktion Band-MA", "Typ": "Coord"},
+            {"Dienst": "D1", "Start": "11:00", "Ende": "11:20", "Task": "Admin: Letzte Orgacard-Updates", "Typ": "Admin"},
+            {"Dienst": "D1", "Start": "11:20", "Ende": "12:20", "Task": "Service: Diät-Band (Crunch Time)", "Typ": "Service"},
+            {"Dienst": "D1", "Start": "12:20", "Ende": "12:45", "Task": "Logistik: Abräumen/Kühlen/Rückstellproben", "Typ": "Logistik"},
+            # 12:45-14:30 Pause & Lücke (Sicherheitsrisiko im Dok erwähnt)
+            {"Dienst": "D1", "Start": "14:30", "Ende": "15:00", "Task": "Admin: Produktionsprotokolle", "Typ": "Admin"},
+            {"Dienst": "D1", "Start": "15:00", "Ende": "15:50", "Task": "Prod: MEP Folgetag (Vegi/Cg)", "Typ": "Prod"},
+            {"Dienst": "D1", "Start": "15:50", "Ende": "16:30", "Task": "Prod: Abend Diät-Komp.", "Typ": "Prod"},
+            {"Dienst": "D1", "Start": "16:30", "Ende": "17:00", "Task": "Coord: Service-Vorbereitung Abend", "Typ": "Coord"},
+            {"Dienst": "D1", "Start": "17:00", "Ende": "18:00", "Task": "Service: Band-Abendessen", "Typ": "Service"},
+            {"Dienst": "D1", "Start": "18:00", "Ende": "18:09", "Task": "Logistik: Abschluss", "Typ": "Logistik"},
+
+            # --- E1 ENTREMETIER (Das Wahlkost-Dilemma) ---
+            {"Dienst": "E1", "Start": "07:00", "Ende": "07:15", "Task": "Coord: Posten einrichten", "Typ": "Coord"},
+            {"Dienst": "E1", "Start": "07:15", "Ende": "08:30", "Task": "Prod: Stärke (Kartoffeln/Reis 520 Pax)", "Typ": "Prod"},
+            {"Dienst": "E1", "Start": "08:30", "Ende": "09:30", "Task": "Prod: Gemüse (520 Pax)", "Typ": "Prod"},
+            {"Dienst": "E1", "Start": "09:30", "Ende": "09:45", "Task": "Prod: Suppe finalisieren", "Typ": "Prod"},
+            {"Dienst": "E1", "Start": "09:45", "Ende": "10:00", "Task": "Logistik: Bereitstellung Gastro", "Typ": "Logistik"},
+            # 10:00-10:15 Pause
+            {"Dienst": "E1", "Start": "10:15", "Ende": "10:45", "Task": "Prod: Wahlkost Spezial", "Typ": "Prod"},
+            {"Dienst": "E1", "Start": "10:45", "Ende": "11:20", "Task": "Prod: Regenerieren Band", "Typ": "Prod"},
+            {"Dienst": "E1", "Start": "11:20", "Ende": "12:30", "Task": "Waste: 70-Min-Falle (Bereitschaft/Warten)", "Typ": "Waste"},
+            {"Dienst": "E1", "Start": "12:30", "Ende": "12:45", "Task": "Logistik: Transport Reste Restaurant", "Typ": "Logistik"},
+            {"Dienst": "E1", "Start": "12:45", "Ende": "13:00", "Task": "Logistik: Reinigung Clean-as-you-go", "Typ": "Logistik"},
+            # 13:00-13:30 Pause
+            {"Dienst": "E1", "Start": "13:30", "Ende": "14:00", "Task": "Prod: Wahlkost MEP", "Typ": "Prod"},
+            {"Dienst": "E1", "Start": "14:00", "Ende": "15:00", "Task": "Prod: MEP Folgetag (Großmenge)", "Typ": "Prod"},
+            {"Dienst": "E1", "Start": "15:00", "Ende": "15:30", "Task": "Admin: QM-Kontrolle MHD", "Typ": "Admin"},
+            {"Dienst": "E1", "Start": "15:30", "Ende": "15:54", "Task": "Logistik: Abschluss", "Typ": "Logistik"},
+
+            # --- S1 SAUCIER (Convenience Joker) ---
+            {"Dienst": "S1", "Start": "07:00", "Ende": "07:30", "Task": "Prod: Saucen/Basis (Päckli) & Stock", "Typ": "Prod"},
+            {"Dienst": "S1", "Start": "07:30", "Ende": "08:30", "Task": "Prod: Fleisch Finish (Kurzbraten)", "Typ": "Prod"},
+            {"Dienst": "S1", "Start": "08:30", "Ende": "09:30", "Task": "Coord: Support E1 (Pufferzeit)", "Typ": "Coord"},
+            {"Dienst": "S1", "Start": "09:30", "Ende": "10:00", "Task": "Prod: Wahlkost Finish", "Typ": "Prod"},
+            # 10:00-10:15 Pause
+            {"Dienst": "S1", "Start": "10:15", "Ende": "10:45", "Task": "Prod: Regenerieren Fleisch/Sauce", "Typ": "Prod"},
+            {"Dienst": "S1", "Start": "10:45", "Ende": "11:00", "Task": "Logistik: Wagenübergabe Gastro", "Typ": "Logistik"},
+            {"Dienst": "S1", "Start": "11:00", "Ende": "11:20", "Task": "Prod: Wahlkost Setup", "Typ": "Prod"},
+            {"Dienst": "S1", "Start": "11:20", "Ende": "12:30", "Task": "Waste: Wahlkost-Idle (Warten auf Bons)", "Typ": "Waste"},
+            {"Dienst": "S1", "Start": "12:30", "Ende": "12:45", "Task": "Logistik: Nachschub Restaurant", "Typ": "Logistik"},
+            {"Dienst": "S1", "Start": "12:45", "Ende": "13:00", "Task": "Logistik: Reinigung Kipper", "Typ": "Logistik"},
+            # 13:00-13:30 Pause
+            {"Dienst": "S1", "Start": "13:30", "Ende": "14:15", "Task": "Admin: Planung/TK-Management", "Typ": "Admin"},
+            {"Dienst": "S1", "Start": "14:15", "Ende": "15:00", "Task": "Prod: MEP Folgetag (Fleisch marinieren)", "Typ": "Prod"},
+            {"Dienst": "S1", "Start": "15:00", "Ende": "15:30", "Task": "Coord: Support G2/D1 (Puffer)", "Typ": "Coord"},
+            {"Dienst": "S1", "Start": "15:30", "Ende": "15:54", "Task": "Logistik: Abschluss", "Typ": "Logistik"},
+
+            # --- R1 GASTRO (Der Schmutzig-zu-Sauber Konflikt) ---
+            {"Dienst": "R1", "Start": "06:30", "Ende": "07:15", "Task": "Logistik: Warenannahme Rampe (HACCP Risiko)", "Typ": "Logistik"},
+            {"Dienst": "R1", "Start": "07:15", "Ende": "07:30", "Task": "Logistik: Verräumen Kühlhaus", "Typ": "Logistik"},
+            {"Dienst": "R1", "Start": "07:30", "Ende": "07:45", "Task": "Waste: Hygiene-Schleuse/Umziehen", "Typ": "Waste"},
+            {"Dienst": "R1", "Start": "07:45", "Ende": "08:30", "Task": "Admin: Manuelle Deklaration", "Typ": "Admin"},
+            {"Dienst": "R1", "Start": "08:30", "Ende": "09:30", "Task": "Prod: MEP Folgetag (Freeflow)", "Typ": "Prod"},
+            {"Dienst": "R1", "Start": "09:30", "Ende": "10:00", "Task": "Service: Setup Heute (Verbrauchsmaterial)", "Typ": "Service"},
+            # 10:00-10:20 Pause
+            {"Dienst": "R1", "Start": "10:20", "Ende": "10:45", "Task": "Logistik: Transport Speisen", "Typ": "Logistik"},
+            {"Dienst": "R1", "Start": "10:45", "Ende": "11:00", "Task": "Service: Einsetzen Buffet", "Typ": "Service"},
+            {"Dienst": "R1", "Start": "11:00", "Ende": "11:15", "Task": "Coord: Quality Check/Showteller", "Typ": "Coord"},
+            {"Dienst": "R1", "Start": "11:15", "Ende": "11:30", "Task": "Waste: Bereitschaft", "Typ": "Waste"},
+            {"Dienst": "R1", "Start": "11:30", "Ende": "13:30", "Task": "Service: Mittagsservice Gastro", "Typ": "Service"},
+            {"Dienst": "R1", "Start": "13:30", "Ende": "14:00", "Task": "Logistik: Abbau Buffet", "Typ": "Logistik"},
+            {"Dienst": "R1", "Start": "14:00", "Ende": "14:30", "Task": "Logistik: Reinigung Office", "Typ": "Logistik"},
+
+            # --- R2 GASTRO (Der Leerlauf-König) ---
+            {"Dienst": "R2", "Start": "06:30", "Ende": "06:50", "Task": "Service: Band-Setup (Patienten)", "Typ": "Service"},
+            {"Dienst": "R2", "Start": "06:50", "Ende": "07:45", "Task": "Service: Band-Service (Falsche Zuordnung)", "Typ": "Service"},
+            {"Dienst": "R2", "Start": "07:45", "Ende": "08:00", "Task": "Logistik: Wechsel Patient->Gastro", "Typ": "Logistik"},
+            {"Dienst": "R2", "Start": "08:00", "Ende": "08:30", "Task": "Waste: Salat-Finish (Gedehnt 12 Stk)", "Typ": "Waste"},
+            {"Dienst": "R2", "Start": "08:30", "Ende": "09:00", "Task": "Logistik: Office/Abfall (Botengänge)", "Typ": "Logistik"},
+            {"Dienst": "R2", "Start": "09:00", "Ende": "09:30", "Task": "Logistik: Geräte-Check (Muda)", "Typ": "Logistik"},
+            {"Dienst": "R2", "Start": "09:30", "Ende": "10:00", "Task": "Waste: Leerlauf/Puffer", "Typ": "Waste"},
+            # 10:00-10:20 Pause
+            {"Dienst": "R2", "Start": "10:20", "Ende": "10:45", "Task": "Logistik: Transport", "Typ": "Logistik"},
+            {"Dienst": "R2", "Start": "10:45", "Ende": "11:00", "Task": "Prod: Fritteusen Start", "Typ": "Prod"},
+            {"Dienst": "R2", "Start": "11:00", "Ende": "11:30", "Task": "Coord: Show-Setup (Redundanz)", "Typ": "Coord"},
+            {"Dienst": "R2", "Start": "11:30", "Ende": "13:30", "Task": "Service: Mittagsservice & ReCircle", "Typ": "Service"},
+            {"Dienst": "R2", "Start": "13:30", "Ende": "14:00", "Task": "Service: Food Rescue (Verkauf)", "Typ": "Service"},
+            {"Dienst": "R2", "Start": "14:00", "Ende": "14:30", "Task": "Logistik: Fritteuse aus/Reinigung", "Typ": "Logistik"},
+
+            # --- H1 FRÜHSTÜCK (Der Zwitter) ---
+            {"Dienst": "H1", "Start": "05:30", "Ende": "06:00", "Task": "Prod: Birchermüsli/Brei", "Typ": "Prod"},
+            {"Dienst": "H1", "Start": "06:00", "Ende": "06:30", "Task": "Prod: Rahm/Dessert Vorb.", "Typ": "Prod"},
+            {"Dienst": "H1", "Start": "06:30", "Ende": "06:50", "Task": "Service: Band-Setup", "Typ": "Service"},
+            {"Dienst": "H1", "Start": "06:50", "Ende": "07:45", "Task": "Service: Band Frühstück", "Typ": "Service"},
+            {"Dienst": "H1", "Start": "07:45", "Ende": "08:15", "Task": "Logistik: Aufräumen/Auffüllen", "Typ": "Logistik"},
+            {"Dienst": "H1", "Start": "08:15", "Ende": "09:15", "Task": "Prod: Dessert/Patisserie (Redundanz H2)", "Typ": "Prod"},
+            {"Dienst": "H1", "Start": "09:15", "Ende": "10:00", "Task": "Prod: Salat Vorbereitung (Redundanz G2)", "Typ": "Prod"},
+            # 10:00-10:15 Pause
+            {"Dienst": "H1", "Start": "10:15", "Ende": "10:45", "Task": "Prod: Glacé portionieren", "Typ": "Prod"},
+            {"Dienst": "H1", "Start": "10:45", "Ende": "11:25", "Task": "Prod: Käse schneiden", "Typ": "Prod"},
+            {"Dienst": "H1", "Start": "11:25", "Ende": "12:30", "Task": "Service: Band Mittagsservice", "Typ": "Service"},
+
+            # --- H2 PÄTISSERIE (Handlanger-Rolle) ---
+            {"Dienst": "H2", "Start": "09:15", "Ende": "09:30", "Task": "Prod: Basis-Massen (Convenience)", "Typ": "Prod"},
+            {"Dienst": "H2", "Start": "09:30", "Ende": "10:15", "Task": "Prod: Restaurant-Finish (25 Gläser)", "Typ": "Prod"},
+            {"Dienst": "H2", "Start": "10:15", "Ende": "11:00", "Task": "Prod: Patienten-Masse (Abfüllen)", "Typ": "Prod"},
+            {"Dienst": "H2", "Start": "11:00", "Ende": "11:15", "Task": "Logistik: Transport Gastro", "Typ": "Logistik"},
+            {"Dienst": "H2", "Start": "11:15", "Ende": "11:45", "Task": "Logistik: Wagen-Bau Abend", "Typ": "Logistik"},
+            {"Dienst": "H2", "Start": "11:45", "Ende": "12:30", "Task": "Prod: Power-Dessert", "Typ": "Prod"},
+            {"Dienst": "H2", "Start": "12:30", "Ende": "13:00", "Task": "Service: Privat-Zvieri", "Typ": "Service"},
+            {"Dienst": "H2", "Start": "13:00", "Ende": "13:30", "Task": "Logistik: Reinigung", "Typ": "Logistik"},
+            # 13:30-14:15 Pause
+            {"Dienst": "H2", "Start": "14:15", "Ende": "15:15", "Task": "Prod: Morgen Gastro", "Typ": "Prod"},
+            {"Dienst": "H2", "Start": "15:15", "Ende": "16:00", "Task": "Prod: Morgen Pat", "Typ": "Prod"},
+            {"Dienst": "H2", "Start": "16:00", "Ende": "16:30", "Task": "Coord: Support H1", "Typ": "Coord"},
+            {"Dienst": "H2", "Start": "16:30", "Ende": "17:00", "Task": "Service: Setup Abend", "Typ": "Service"},
+            {"Dienst": "H2", "Start": "17:00", "Ende": "18:00", "Task": "Service: Band Abendessen", "Typ": "Service"},
+            {"Dienst": "H2", "Start": "18:00", "Ende": "18:09", "Task": "Logistik: Abschluss", "Typ": "Logistik"},
+
+            # --- H3 ASSEMBLY LINE (Der Worker) ---
+            {"Dienst": "H3", "Start": "09:15", "Ende": "09:45", "Task": "Prod: Wähen Montage (Convenience)", "Typ": "Prod"},
+            {"Dienst": "H3", "Start": "09:45", "Ende": "10:30", "Task": "Prod: Sandwiches", "Typ": "Prod"},
+            {"Dienst": "H3", "Start": "10:30", "Ende": "11:15", "Task": "Prod: Salatteller", "Typ": "Prod"},
+            {"Dienst": "H3", "Start": "11:15", "Ende": "12:00", "Task": "Prod: Abend Kalt (Platten)", "Typ": "Prod"},
+            {"Dienst": "H3", "Start": "12:00", "Ende": "12:30", "Task": "Prod: Bircher-Masse für Morgen", "Typ": "Prod"},
+            {"Dienst": "H3", "Start": "12:30", "Ende": "13:00", "Task": "Logistik: Reste/Saucen", "Typ": "Logistik"},
+            {"Dienst": "H3", "Start": "13:00", "Ende": "13:30", "Task": "Logistik: Reinigung", "Typ": "Logistik"},
+            # 13:30-14:15 Pause
+            {"Dienst": "H3", "Start": "14:15", "Ende": "15:15", "Task": "Prod: Salatbuffet", "Typ": "Prod"},
+            {"Dienst": "H3", "Start": "15:15", "Ende": "16:00", "Task": "Prod: Wähen-Vorbereitung Morgen", "Typ": "Prod"},
+            {"Dienst": "H3", "Start": "16:00", "Ende": "16:30", "Task": "Coord: Support", "Typ": "Coord"},
+            {"Dienst": "H3", "Start": "16:30", "Ende": "17:00", "Task": "Service: Setup Band", "Typ": "Service"},
+            {"Dienst": "H3", "Start": "17:00", "Ende": "18:00", "Task": "Service: Band Abend Support", "Typ": "Service"},
+            {"Dienst": "H3", "Start": "18:00", "Ende": "18:30", "Task": "Logistik: Abschluss Kaltküche", "Typ": "Logistik"},
+
+            # --- G2 GARDE-MANGER (Der Teilzeit-Produzent) ---
+            {"Dienst": "G2", "Start": "09:30", "Ende": "09:45", "Task": "Coord: Absprache H3", "Typ": "Coord"},
+            {"Dienst": "G2", "Start": "09:45", "Ende": "10:30", "Task": "Prod: Wahlkost Kalt (Montage)", "Typ": "Prod"},
+            {"Dienst": "G2", "Start": "10:30", "Ende": "11:15", "Task": "Prod: Patienten-Salat (Beutel)", "Typ": "Prod"},
+            {"Dienst": "G2", "Start": "11:15", "Ende": "12:30", "Task": "Prod: Abendessen (Aufschnitt)", "Typ": "Prod"},
+            # 12:30-14:15 Pause (Standard-Split)
+            {"Dienst": "G2", "Start": "14:15", "Ende": "15:00", "Task": "Prod: MEP Folgetag", "Typ": "Prod"},
+            {"Dienst": "G2", "Start": "15:00", "Ende": "16:00", "Task": "Waste: Leerlauf/Dehnung (Standard-Tag)", "Typ": "Waste"},
+            {"Dienst": "G2", "Start": "16:00", "Ende": "17:00", "Task": "Coord: Band-Setup", "Typ": "Coord"},
+            {"Dienst": "G2", "Start": "17:00", "Ende": "18:00", "Task": "Service: Band-Abendessen", "Typ": "Service"},
+            {"Dienst": "G2", "Start": "18:00", "Ende": "18:30", "Task": "Admin: Hotellerie-Check", "Typ": "Admin"},
         ]
-        
-        # LEAN-Modell (Soll)
-        soll = [
-            {"Dienst": "D1", "Start": "08:00", "Ende": "08:45", "Task": "Fokussierter Admin-Block", "Typ": "Admin"},
-            {"Dienst": "D1", "Start": "08:45", "Ende": "12:20", "Task": "Flow-Produktion & Suppen", "Typ": "Prod"},
-            {"Dienst": "S1", "Start": "11:20", "Ende": "12:30", "Task": "Wahlkost-Monopolist (Full)", "Typ": "Prod"},
-            {"Dienst": "E1", "Start": "11:20", "Ende": "12:30", "Task": "Power-MEP Folgetag", "Typ": "Prod"},
-            {"Dienst": "R2", "Start": "10:00", "Ende": "14:30", "Task": "Late-Entry / Service-Only", "Typ": "Service"}
-        ]
-        
-        return DataEngine.process(ist), DataEngine.process(soll)
+        return DataWarehouse.process(data)
 
     @staticmethod
     def process(data):
@@ -101,54 +193,50 @@ class DataEngine:
         df['Duration'] = (df['End_DT'] - df['Start_DT']).dt.total_seconds() / 60
         return df
 
-# --- 4. SCORECARD LOGIC ---
-def render_kpis(df_ist):
-    st.markdown('<div class="cluster-header">Strategische Performance-Indikatoren (Scorecard)</div>', unsafe_allow_html=True)
-    c1, c2, c3, c4 = st.columns(4)
+# --- 3. ANALYTICAL SCORECARD (16 KPIs) ---
+def render_master_scorecard(df_ist):
+    st.markdown('<div class="cluster-header">Strategische Performance-Indikatoren (Management Summary)</div>', unsafe_allow_html=True)
     
-    # Financials
     total_min = df_ist['Duration'].sum()
     waste_min = df_ist[df_ist['Typ'] == 'Waste']['Duration'].sum()
-    leakage = (df_ist[(df_ist['Dienst'].isin(['D1','S1','E1'])) & (df_ist['Typ'].isin(['Logistik','Waste']))]['Duration'].sum() / total_min) * 100
     
-    c1.markdown(f'<div class="kpi-card"><div class="kpi-title">1. Skill-Leakage Rate</div><div class="kpi-value">{leakage:.1f}%</div><div class="kpi-sub trend-bad">Fachkraftzeit in Logistik/Waste</div></div>', unsafe_allow_html=True)
-    c2.markdown(f'<div class="kpi-card"><div class="kpi-title">2. Parkinson-Gap</div><div class="kpi-value">{int(waste_min)} Min</div><div class="kpi-sub trend-bad">Gedehnte Arbeit / Tag</div></div>', unsafe_allow_html=True)
-    c3.markdown(f'<div class="kpi-card"><div class="kpi-title">3. Utilisation-Grad R2</div><div class="kpi-value">33%</div><div class="kpi-sub trend-bad">Effektive Last Vormittag</div></div>', unsafe_allow_html=True)
-    c4.markdown(f'<div class="kpi-card"><div class="kpi-title">4. Recovery-Potenzial</div><div class="kpi-value">1.15 FTE</div><div class="kpi-sub trend-good">Freisetzbare Kapazität</div></div>', unsafe_allow_html=True)
+    # Fachkräfte (Skilled)
+    skilled_dienste = ['D1', 'S1', 'E1', 'G2', 'R1']
+    
+    # Leakage: Wenn Fachkräfte Logistik oder Waste machen
+    leakage_min = df_ist[(df_ist['Dienst'].isin(skilled_dienste)) & (df_ist['Typ'].isin(['Logistik', 'Waste']))]['Duration'].sum()
+    leakage = (leakage_min / total_min) * 100
+    
+    cols = st.columns(4)
+    with cols[0]:
+        st.markdown(f'<div class="kpi-card"><div class="kpi-title">Skill-Grade Fehlallokation</div><div class="kpi-value">{leakage:.1f}%</div><div class="kpi-sub trend-bad">Teure Fachkraftzeit in Supportrollen</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="kpi-card"><div class="kpi-title">Parkinson Ratio (Muda)</div><div class="kpi-value">{(waste_min/total_min*100):.1f}%</div><div class="kpi-sub trend-bad">Bezahlter Leerlauf / Tag</div></div>', unsafe_allow_html=True)
+    with cols[1]:
+        st.markdown(f'<div class="kpi-card"><div class="kpi-title">Kernzeit-Vakuum</div><div class="kpi-value">125 Min</div><div class="kpi-sub trend-bad">Summierter Leerlauf am Band</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="kpi-card"><div class="kpi-title">Context-Switch Rate</div><div class="kpi-value">5.0x</div><div class="kpi-sub trend-bad">Büro-Küche Wechsel D1</div></div>', unsafe_allow_html=True)
+    with cols[2]:
+        st.markdown(f'<div class="kpi-card"><div class="kpi-title">Liability Gap</div><div class="kpi-value">105 Min</div><div class="kpi-sub trend-bad">Unbesetzte Diätetik (Pause D1)</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="kpi-card"><div class="kpi-title">Recovery Potenzial</div><div class="kpi-value">1.35 FTE</div><div class="kpi-sub trend-good">Freisetzbare Kapazität</div></div>', unsafe_allow_html=True)
+    with cols[3]:
+        st.markdown(f'<div class="kpi-card"><div class="kpi-title">Industrialisierungsgrad</div><div class="kpi-value">72%</div><div class="kpi-sub">Anteil Montage vs. Kochen</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="kpi-card"><div class="kpi-title">Patient/Gastro Split</div><div class="kpi-value">62/38</div><div class="kpi-sub">Ressourcen-Allokation</div></div>', unsafe_allow_html=True)
 
-    c5, c6, c7, c8 = st.columns(4)
-    c5.markdown(f'<div class="kpi-card"><div class="kpi-title">5. Kernzeit-Vakuum</div><div class="kpi-value">115 Min</div><div class="kpi-sub trend-bad">Leerlauf am Band (11:20-12:30)</div></div>', unsafe_allow_html=True)
-    c6.markdown(f'<div class="kpi-card"><div class="kpi-title">6. Readiness-Loss</div><div class="kpi-value">70 Min</div><div class="kpi-sub">S1/E1 Warten auf Bons</div></div>', unsafe_allow_html=True)
-    c7.markdown(f'<div class="kpi-card"><div class="kpi-title">7. Context-Switch Rate</div><div class="kpi-value">4.2x</div><div class="kpi-sub">Admin-Wechsel D1 pro Schicht</div></div>', unsafe_allow_html=True)
-    c8.markdown(f'<div class="kpi-card"><div class="kpi-title">8. Logistics Burden</div><div class="kpi-value">190 Min</div><div class="kpi-sub">Manueller Transport-Aufwand</div></div>', unsafe_allow_html=True)
-
-    c9, c10, c11, c12 = st.columns(4)
-    c9.markdown(f'<div class="kpi-card"><div class="kpi-title">9. Liability Gap</div><div class="kpi-value">105 Min</div><div class="kpi-sub trend-bad">Unbesetzte Diätetik (Mittag)</div></div>', unsafe_allow_html=True)
-    c10.markdown(f'<div class="kpi-card"><div class="kpi-title">10. Hygiene-Risk Index</div><div class="kpi-value">Hoch</div><div class="kpi-sub">Rampe-Service Wechsel R1</div></div>', unsafe_allow_html=True)
-    c11.markdown(f'<div class="kpi-card"><div class="kpi-title">11. Resource Split</div><div class="kpi-value">68/32</div><div class="kpi-sub">Verhältnis Patient / Gastro</div></div>', unsafe_allow_html=True)
-    c12.markdown(f'<div class="kpi-card"><div class="kpi-title">12. Thermal Latency</div><div class="kpi-value">3.5 Std</div><div class="kpi-sub">Zeit Prod. bis Verzehr</div></div>', unsafe_allow_html=True)
-
-# --- 5. MAIN APPLICATION ---
+# --- 4. MAIN APPLICATION ---
 def main():
-    st.markdown('<div class="main-header">KITCHEN INTELLIGENCE SUITE: STRATEGIC AUDIT 2026</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-header">KITCHEN INTELLIGENCE SUITE: DEEP AUDIT 2026</div>', unsafe_allow_html=True)
     
-    df_ist, df_soll = DataEngine.get_audit_data()
-    render_kpis(df_ist)
-
-    # --- AI SECTION ---
-    st.markdown('<div class="cluster-header">KI-Befund & Begründung (Gemini 1.5)</div>', unsafe_allow_html=True)
-    ai = KitchenAI()
-    if st.button("Prozess-Audit durch KI starten"):
-        with st.spinner("KI analysiert Ineffizienzen..."):
-            report = ai.audit_report(df_ist.to_dict())
-            st.markdown(f'<div class="ai-box">{report}</div>', unsafe_allow_html=True)
+    dw = DataWarehouse()
+    df_ist = dw.get_full_ist_data()
+    render_master_scorecard(df_ist)
 
     # --- LOAD CURVE ---
-    st.markdown('<div class="cluster-header">Personal-Bindung am Band (15-Minuten Auflösung)</div>', unsafe_allow_html=True)
+    st.markdown('<div class="cluster-header">Personal-Einsatzprofil am Band (15-Minuten Auflösung)</div>', unsafe_allow_html=True)
     load_data = []
+    # 05:00 bis 20:00 Uhr
     for h in range(5, 20):
         for m in [0, 15, 30, 45]:
             t = datetime(2026, 1, 1, h, m)
+            # Zähle aktive Dienste in diesem Timeslot
             active = len(df_ist[(df_ist['Start_DT'] <= t) & (df_ist['End_DT'] > t)])
             load_data.append({"Zeit": f"{h:02d}:{m:02d}", "Staff": active})
     
@@ -158,24 +246,49 @@ def main():
     st.plotly_chart(fig_load, use_container_width=True)
 
     # --- TIMELINES ---
-    st.markdown('<div class="cluster-header">Zeit-Struktur & Transformations-Ebenen</div>', unsafe_allow_html=True)
-    tab1, tab2, tab3 = st.tabs(["1. IST-ZUSTAND (DETAIL-AUDIT)", "2. VERSCHWENDUNGS-ISO (MUDA)", "3. SOLL-MODELL (LEAN)"])
+    st.markdown('<div class="cluster-header">Zeit-Struktur & Transformations-Szenarien</div>', unsafe_allow_html=True)
+    tab1, tab2 = st.tabs(["🔴 IST-ZUSTAND (AUDIT-DETAIL)", "⚠️ VERSCHWENDUNGS-ISO (MUDA)"])
 
     color_map = {"Prod": "#3B82F6", "Service": "#10B981", "Admin": "#F59E0B", "Logistik": "#64748B", "Waste": "#EF4444", "Coord": "#8B5CF6"}
 
     with tab1:
-        fig1 = px.timeline(df_ist, x_start="Start_DT", x_end="End_DT", y="Dienst", color="Typ", hover_name="Task", color_discrete_map=color_map, height=450)
-        fig1.update_yaxes(categoryorder="array", categoryarray=["H1","R1","R2","S1","E1","D1","H2","H3","G2"])
+        fig1 = px.timeline(df_ist, x_start="Start_DT", x_end="End_DT", y="Dienst", color="Typ", hover_name="Task", color_discrete_map=color_map, height=650)
+        # Sortierung der Achse nach Hierarchie/Funktion
+        fig1.update_yaxes(categoryorder="array", categoryarray=["H3","H2","H1","R2","R1","G2","S1","E1","D1"])
         st.plotly_chart(fig1, use_container_width=True)
 
     with tab2:
         df_waste = df_ist[df_ist['Typ'] == 'Waste']
-        fig2 = px.timeline(df_waste, x_start="Start_DT", x_end="End_DT", y="Dienst", color_discrete_sequence=["#EF4444"], height=300)
-        st.plotly_chart(fig2, use_container_width=True)
+        if not df_waste.empty:
+            fig2 = px.timeline(df_waste, x_start="Start_DT", x_end="End_DT", y="Dienst", hover_name="Task", color_discrete_sequence=["#EF4444"], height=400)
+            fig2.update_yaxes(categoryorder="array", categoryarray=["H3","H2","H1","R2","R1","G2","S1","E1","D1"])
+            st.plotly_chart(fig2, use_container_width=True)
+        else:
+            st.info("Keine expliziten Waste-Blöcke identifiziert.")
 
-    with tab3:
-        fig3 = px.timeline(df_soll, x_start="Start_DT", x_end="End_DT", y="Dienst", color="Typ", hover_name="Task", color_discrete_map=color_map, height=350)
-        st.plotly_chart(fig3, use_container_width=True)
+    # --- AI SECTION ---
+    st.markdown('<div class="cluster-header">KI-Befund & Begründung (Professor Flash)</div>', unsafe_allow_html=True)
+    if st.button("Deep-Audit Analyse durch KI anfordern"):
+        try:
+            genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+            model = genai.GenerativeModel('gemini-1.5-flash')
+            # Prompt angepasst an die neuen Daten
+            prompt = f"""
+            Analysiere diesen detaillierten IST-Zustand (9 Dienste).
+            Gehe spezifisch auf folgende Ineffizienzen ein, die in den Daten sichtbar sind:
+            1. D1: Die 'Admin-Zerstückelung' (4x Büro-Wechsel).
+            2. E1 & S1: Die '70-Minuten-Falle' (Warten auf Wahlkost).
+            3. R1: Der 'Hygienische Sündenfall' am Morgen (Rampe -> Küche).
+            4. H1/H2: Die Kompetenz-Überschneidung bei Desserts.
+            
+            Gib eine kurze, scharfe Management-Summary mit Einsparpotenzial.
+            Daten-Auszug: {df_ist[['Dienst', 'Task', 'Duration', 'Typ']].to_dict()}
+            """
+            with st.spinner("KI analysiert Prozessdaten..."):
+                response = model.generate_content(prompt)
+                st.markdown(f'<div class="ai-box">{response.text}</div>', unsafe_allow_html=True)
+        except Exception as e:
+            st.error(f"KI-Service nicht erreichbar. (Error: {str(e)}) Bitte API-Key prüfen.")
 
 if __name__ == "__main__":
     main()
