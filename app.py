@@ -186,147 +186,182 @@ st.markdown(f"""
 class DataWarehouse:
     @staticmethod
     def get_full_ist_data():
-        # DATEN EXAKT NACH DEN NEUKALKULATIONS-BERICHTEN
-        # Mit spezifischen Keywords für Convenience-Rating und Deep-Dive Metriken
+        # DATEN EXAKT NACH DEN DIENSTPLÄNEN & "LEARNINGS"
+        # Lücken wurden basierend auf den Dokumenten und logischen Schätzungen gefüllt.
         data = [
-            # --- D1 DIÄTETIK ---
-            {"Dienst": "D1", "Start": "08:00", "Ende": "08:25", "Task": "Admin: E-Mails/Mutationen", "Typ": "Admin"},
+            # ==========================
+            # D1 DIÄTETIK (08:00 - 18:09)
+            # ==========================
+            {"Dienst": "D1", "Start": "08:00", "Ende": "08:25", "Task": "Admin: E-Mails/Mutationen/Diätpläne", "Typ": "Admin"},
             {"Dienst": "D1", "Start": "08:25", "Ende": "08:30", "Task": "Hygiene/Rüsten: Wechsel Büro-Küche", "Typ": "Logistik"},
             {"Dienst": "D1", "Start": "08:30", "Ende": "09:15", "Task": "Prod: Suppen (Basis/Convenience 520 Port.)", "Typ": "Prod"},
             {"Dienst": "D1", "Start": "09:15", "Ende": "09:45", "Task": "Prod: ET (System-Ableitung/Allergene)", "Typ": "Prod"},
             {"Dienst": "D1", "Start": "09:45", "Ende": "10:00", "Task": "Admin: 2. Mail-Check (Spätmeldungen)", "Typ": "Admin"},
+            # 10:00 Pause
             {"Dienst": "D1", "Start": "10:15", "Ende": "10:45", "Task": "Prod: Regenerieren Cg-Komp. (High-Convenience)", "Typ": "Prod"},
-            {"Dienst": "D1", "Start": "10:45", "Ende": "11:00", "Task": "Coord: Instruktion Band-MA", "Typ": "Coord"},
+            {"Dienst": "D1", "Start": "10:45", "Ende": "11:00", "Task": "Coord: Instruktion Band-MA/Spezialessen", "Typ": "Coord"},
             {"Dienst": "D1", "Start": "11:00", "Ende": "11:20", "Task": "Admin: Letzte Orgacard-Updates", "Typ": "Admin"},
             {"Dienst": "D1", "Start": "11:20", "Ende": "12:20", "Task": "Service: Diät-Band (System-Ausgabe)", "Typ": "Service"},
             {"Dienst": "D1", "Start": "12:20", "Ende": "12:45", "Task": "Logistik: Abräumen/Kühlen/Rückstellproben", "Typ": "Logistik"},
-            {"Dienst": "D1", "Start": "14:30", "Ende": "15:00", "Task": "Admin: Produktionsprotokolle", "Typ": "Admin"},
+            # 12:45 - 14:30 Pause (Sicherheitslücke)
+            {"Dienst": "D1", "Start": "14:30", "Ende": "15:00", "Task": "Admin: Produktionsprotokolle Folgetag", "Typ": "Admin"},
             {"Dienst": "D1", "Start": "15:00", "Ende": "15:50", "Task": "Prod: MEP Folgetag (Vegi-Komponenten/Fertig)", "Typ": "Prod"},
-            {"Dienst": "D1", "Start": "15:50", "Ende": "16:30", "Task": "Prod: Abend Diät-Komp. (Regenerieren)", "Typ": "Prod"},
-            {"Dienst": "D1", "Start": "16:30", "Ende": "17:00", "Task": "Coord: Service-Vorbereitung Abend", "Typ": "Coord"},
-            {"Dienst": "D1", "Start": "17:00", "Ende": "18:00", "Task": "Service: Band-Abendessen", "Typ": "Service"},
-            {"Dienst": "D1", "Start": "18:00", "Ende": "18:09", "Task": "Logistik: Abschluss", "Typ": "Logistik"},
+            {"Dienst": "D1", "Start": "15:50", "Ende": "16:30", "Task": "Prod: Abend Diät-Komp. (Regenerieren/Garen)", "Typ": "Prod"},
+            {"Dienst": "D1", "Start": "16:30", "Ende": "17:00", "Task": "Coord: Tablettkarten/Service-Setup", "Typ": "Coord"},
+            {"Dienst": "D1", "Start": "17:00", "Ende": "18:05", "Task": "Service: Band-Abendessen", "Typ": "Service"},
+            {"Dienst": "D1", "Start": "18:05", "Ende": "18:09", "Task": "Logistik: Aufräumen/To-Do Liste", "Typ": "Logistik"},
 
-            # --- E1 ENTREMETIER ---
+            # ==========================
+            # E1 ENTREMETIER (07:00 - 15:54)
+            # ==========================
             {"Dienst": "E1", "Start": "07:00", "Ende": "07:15", "Task": "Coord: Posten einrichten", "Typ": "Coord"},
             {"Dienst": "E1", "Start": "07:15", "Ende": "08:30", "Task": "Prod: Stärke (Dämpfen/Convenience 520 Pax)", "Typ": "Prod"},
             {"Dienst": "E1", "Start": "08:30", "Ende": "09:30", "Task": "Prod: Gemüse (Dämpfen/Regenerieren 520 Pax)", "Typ": "Prod"},
             {"Dienst": "E1", "Start": "09:30", "Ende": "09:45", "Task": "Prod: Suppe Finalisieren (Basis)", "Typ": "Prod"},
             {"Dienst": "E1", "Start": "09:45", "Ende": "10:00", "Task": "Logistik: Bereitstellung Gastro", "Typ": "Logistik"},
-            {"Dienst": "E1", "Start": "10:15", "Ende": "10:45", "Task": "Prod: Wahlkost Spezial (System)", "Typ": "Prod"},
+            # 10:00 Pause
+            {"Dienst": "E1", "Start": "10:15", "Ende": "10:45", "Task": "Prod: Wahlkost Spezial (System/Minute)", "Typ": "Prod"},
             {"Dienst": "E1", "Start": "10:45", "Ende": "11:20", "Task": "Prod: Regenerieren Band (High-Convenience)", "Typ": "Prod"},
             {"Dienst": "E1", "Start": "11:20", "Ende": "12:30", "Task": "Potenzial: 70-Min-Falle (Bereitschaft/Warten)", "Typ": "Potenzial"},
             {"Dienst": "E1", "Start": "12:30", "Ende": "12:45", "Task": "Logistik: Transport Reste Restaurant", "Typ": "Logistik"},
             {"Dienst": "E1", "Start": "12:45", "Ende": "13:00", "Task": "Logistik: Reinigung Clean-as-you-go", "Typ": "Logistik"},
-            {"Dienst": "E1", "Start": "13:30", "Ende": "14:00", "Task": "Prod: Wahlkost MEP (Vorbereitung)", "Typ": "Prod"},
+            # 13:00 - 13:30 Pause
+            {"Dienst": "E1", "Start": "13:30", "Ende": "14:00", "Task": "Prod: Wahlkost MEP Abend/Morgen (Vorbereitung)", "Typ": "Prod"},
             {"Dienst": "E1", "Start": "14:00", "Ende": "15:00", "Task": "Prod: MEP Folgetag (Großmenge/Schnittware)", "Typ": "Prod"},
-            {"Dienst": "E1", "Start": "15:00", "Ende": "15:30", "Task": "Admin: QM-Kontrolle MHD", "Typ": "Admin"},
-            {"Dienst": "E1", "Start": "15:30", "Ende": "15:54", "Task": "Logistik: Abschluss", "Typ": "Logistik"},
+            {"Dienst": "E1", "Start": "15:00", "Ende": "15:30", "Task": "Admin/QC: Kühlhäuser/MHDs/Ordnung", "Typ": "Admin"},
+            {"Dienst": "E1", "Start": "15:30", "Ende": "15:54", "Task": "Logistik: Endreinigung Posten/Unterschriften", "Typ": "Logistik"},
 
-            # --- S1 SAUCIER ---
+            # ==========================
+            # S1 SAUCIER (07:00 - 15:54)
+            # ==========================
             {"Dienst": "S1", "Start": "07:00", "Ende": "07:30", "Task": "Prod: Saucen/Basis (Päckli/Convenience)", "Typ": "Prod"},
             {"Dienst": "S1", "Start": "07:30", "Ende": "08:30", "Task": "Prod: Fleisch Finish (Kurzbraten/System)", "Typ": "Prod"},
             {"Dienst": "S1", "Start": "08:30", "Ende": "09:30", "Task": "Coord: Support E1 (Pufferzeit)", "Typ": "Coord"},
             {"Dienst": "S1", "Start": "09:30", "Ende": "10:00", "Task": "Prod: Wahlkost Finish (Montage)", "Typ": "Prod"},
-            {"Dienst": "S1", "Start": "10:15", "Ende": "10:45", "Task": "Prod: Regenerieren Fleisch/Sauce", "Typ": "Prod"},
+            # 10:00 Pause
+            {"Dienst": "S1", "Start": "10:15", "Ende": "10:45", "Task": "Prod: Regenerieren Fleisch/Sauce/Wärmewägen", "Typ": "Prod"},
             {"Dienst": "S1", "Start": "10:45", "Ende": "11:00", "Task": "Logistik: Wagenübergabe Gastro", "Typ": "Logistik"},
             {"Dienst": "S1", "Start": "11:00", "Ende": "11:20", "Task": "Prod: Wahlkost Setup (Montage)", "Typ": "Prod"},
             {"Dienst": "S1", "Start": "11:20", "Ende": "12:30", "Task": "Potenzial: Wahlkost-Idle (Warten auf Bons)", "Typ": "Potenzial"},
             {"Dienst": "S1", "Start": "12:30", "Ende": "12:45", "Task": "Logistik: Nachschub Restaurant", "Typ": "Logistik"},
             {"Dienst": "S1", "Start": "12:45", "Ende": "13:00", "Task": "Logistik: Reinigung Kipper", "Typ": "Logistik"},
-            {"Dienst": "S1", "Start": "13:30", "Ende": "14:15", "Task": "Admin: Planung/TK-Management", "Typ": "Admin"},
+            # 13:00 - 13:30 Pause
+            {"Dienst": "S1", "Start": "13:30", "Ende": "14:15", "Task": "Admin: Produktionspläne/TK-Management", "Typ": "Admin"},
             {"Dienst": "S1", "Start": "14:15", "Ende": "15:00", "Task": "Prod: MEP Folgetag (Fleisch marinieren/Batch)", "Typ": "Prod"},
-            {"Dienst": "S1", "Start": "15:00", "Ende": "15:30", "Task": "Coord: Support G2/D1 (Puffer)", "Typ": "Coord"},
-            {"Dienst": "S1", "Start": "15:30", "Ende": "15:54", "Task": "Logistik: Abschluss", "Typ": "Logistik"},
+            {"Dienst": "S1", "Start": "15:00", "Ende": "15:30", "Task": "Admin/QC: Kühlhäuser/Temperaturen/MHDs", "Typ": "Admin"},
+            {"Dienst": "S1", "Start": "15:30", "Ende": "15:54", "Task": "Logistik: Endreinigung Posten/Unterschriften", "Typ": "Logistik"},
 
-            # --- R1 GASTRO ---
+            # ==========================
+            # R1 GASTRO (06:30 - 15:24)
+            # ==========================
             {"Dienst": "R1", "Start": "06:30", "Ende": "07:15", "Task": "Logistik: Warenannahme Rampe (HACCP Risiko)", "Typ": "Logistik"},
             {"Dienst": "R1", "Start": "07:15", "Ende": "07:30", "Task": "Logistik: Verräumen Kühlhaus", "Typ": "Logistik"},
             {"Dienst": "R1", "Start": "07:30", "Ende": "07:45", "Task": "Potenzial: Hygiene-Schleuse/Umziehen", "Typ": "Potenzial"},
-            {"Dienst": "R1", "Start": "07:45", "Ende": "08:30", "Task": "Admin: Manuelle Deklaration", "Typ": "Admin"},
+            {"Dienst": "R1", "Start": "07:45", "Ende": "08:30", "Task": "Admin: Manuelle Deklaration/Intranet", "Typ": "Admin"},
             {"Dienst": "R1", "Start": "08:30", "Ende": "09:30", "Task": "Prod: MEP Folgetag (Freeflow/Montage)", "Typ": "Prod"},
             {"Dienst": "R1", "Start": "09:30", "Ende": "10:00", "Task": "Service: Setup Heute (Verbrauchsmaterial)", "Typ": "Service"},
-            {"Dienst": "R1", "Start": "10:20", "Ende": "10:45", "Task": "Logistik: Transport Speisen", "Typ": "Logistik"},
-            {"Dienst": "R1", "Start": "10:45", "Ende": "11:00", "Task": "Service: Einsetzen Buffet", "Typ": "Service"},
-            {"Dienst": "R1", "Start": "11:00", "Ende": "11:15", "Task": "Coord: Quality Check/Showteller", "Typ": "Coord"},
+            # 10:00 Pause
+            {"Dienst": "R1", "Start": "10:20", "Ende": "10:45", "Task": "Logistik: Transport Speisen (von G2/H2)", "Typ": "Logistik"},
+            {"Dienst": "R1", "Start": "10:45", "Ende": "11:00", "Task": "Service: Einsetzen Buffet/Suppe", "Typ": "Service"},
+            {"Dienst": "R1", "Start": "11:00", "Ende": "11:15", "Task": "Coord: Quality Check/Showteller/Foto", "Typ": "Coord"},
             {"Dienst": "R1", "Start": "11:15", "Ende": "11:30", "Task": "Potenzial: Bereitschaft", "Typ": "Potenzial"},
             {"Dienst": "R1", "Start": "11:30", "Ende": "13:30", "Task": "Service: Mittagsservice Gastro", "Typ": "Service"},
-            {"Dienst": "R1", "Start": "13:30", "Ende": "14:00", "Task": "Logistik: Abbau Buffet", "Typ": "Logistik"},
-            {"Dienst": "R1", "Start": "14:00", "Ende": "14:30", "Task": "Logistik: Reinigung Office", "Typ": "Logistik"},
+            {"Dienst": "R1", "Start": "13:30", "Ende": "14:00", "Task": "Logistik: Abbau Buffet/Entsorgen", "Typ": "Logistik"},
+            # 14:00 - 14:30 Pause
+            {"Dienst": "R1", "Start": "14:30", "Ende": "15:00", "Task": "Logistik: Bestellungen für Folgetag/MEP", "Typ": "Logistik"},
+            {"Dienst": "R1", "Start": "15:00", "Ende": "15:24", "Task": "Logistik: Endreinigung/Temp-Liste", "Typ": "Logistik"},
 
-            # --- R2 GASTRO ---
-            {"Dienst": "R2", "Start": "06:30", "Ende": "06:50", "Task": "Service: Band-Setup (Patienten)", "Typ": "Service"},
+            # ==========================
+            # R2 GASTRO (06:30 - 15:24)
+            # ==========================
+            {"Dienst": "R2", "Start": "06:30", "Ende": "06:50", "Task": "Service: Band-Setup (Patienten/Butter)", "Typ": "Service"},
             {"Dienst": "R2", "Start": "06:50", "Ende": "07:45", "Task": "Service: Band-Service (Falsche Zuordnung)", "Typ": "Service"},
             {"Dienst": "R2", "Start": "07:45", "Ende": "08:00", "Task": "Logistik: Wechsel Patient->Gastro", "Typ": "Logistik"},
             {"Dienst": "R2", "Start": "08:00", "Ende": "08:30", "Task": "Potenzial: Salat-Finish (Gedehnt 12 Stk)", "Typ": "Potenzial"},
             {"Dienst": "R2", "Start": "08:30", "Ende": "09:00", "Task": "Logistik: Office/Abfall (Botengänge)", "Typ": "Logistik"},
-            {"Dienst": "R2", "Start": "09:00", "Ende": "09:30", "Task": "Logistik: Geräte-Check (Muda)", "Typ": "Logistik"},
+            {"Dienst": "R2", "Start": "09:00", "Ende": "09:30", "Task": "Logistik: Geräte-Check (Muda/Fritteuse)", "Typ": "Logistik"},
             {"Dienst": "R2", "Start": "09:30", "Ende": "10:00", "Task": "Potenzial: Leerlauf/Puffer", "Typ": "Potenzial"},
-            {"Dienst": "R2", "Start": "10:20", "Ende": "10:45", "Task": "Logistik: Transport", "Typ": "Logistik"},
-            {"Dienst": "R2", "Start": "10:45", "Ende": "11:00", "Task": "Prod: Fritteusen Start (System)", "Typ": "Prod"},
-            {"Dienst": "R2", "Start": "11:00", "Ende": "11:30", "Task": "Coord: Show-Setup (Redundanz)", "Typ": "Coord"},
+            # 10:00 Pause
+            {"Dienst": "R2", "Start": "10:20", "Ende": "10:45", "Task": "Logistik: Transport & Fritteuse Start", "Typ": "Logistik"},
+            {"Dienst": "R2", "Start": "10:45", "Ende": "11:00", "Task": "Prod: Fritteuse (Pommes blanchieren)", "Typ": "Prod"},
+            {"Dienst": "R2", "Start": "11:00", "Ende": "11:30", "Task": "Coord: Show-Setup/Foto (Redundanz)", "Typ": "Coord"},
             {"Dienst": "R2", "Start": "11:30", "Ende": "13:30", "Task": "Service: Mittagsservice & ReCircle", "Typ": "Service"},
-            {"Dienst": "R2", "Start": "13:30", "Ende": "14:00", "Task": "Service: Food Rescue (Verkauf)", "Typ": "Service"},
-            {"Dienst": "R2", "Start": "14:00", "Ende": "14:30", "Task": "Logistik: Fritteuse aus/Reinigung", "Typ": "Logistik"},
+            {"Dienst": "R2", "Start": "13:30", "Ende": "14:00", "Task": "Service: ReCircle abfüllen/Food Rescue", "Typ": "Service"},
+            # 14:00 - 14:30 Pause
+            {"Dienst": "R2", "Start": "14:30", "Ende": "15:00", "Task": "Admin: Etiketten-Druck ReCircle/Deklaration", "Typ": "Admin"},
+            {"Dienst": "R2", "Start": "15:00", "Ende": "15:24", "Task": "Logistik: Endreinigung/Bestellungen/Unterschrift", "Typ": "Logistik"},
 
-            # --- H1 FRÜHSTÜCK (UPDATED with full shift until 14:40) ---
+            # ==========================
+            # H1 FRÜHSTÜCK (05:30 - 14:40)
+            # ==========================
             {"Dienst": "H1", "Start": "05:30", "Ende": "06:00", "Task": "Prod: Birchermüsli/Brei (Mischen/Convenience)", "Typ": "Prod"},
             {"Dienst": "H1", "Start": "06:00", "Ende": "06:30", "Task": "Prod: Rahm/Dessert Vorb. (Maschine)", "Typ": "Prod"},
             {"Dienst": "H1", "Start": "06:30", "Ende": "06:50", "Task": "Service: Band-Setup", "Typ": "Service"},
             {"Dienst": "H1", "Start": "06:50", "Ende": "07:45", "Task": "Service: Band Frühstück", "Typ": "Service"},
-            {"Dienst": "H1", "Start": "07:45", "Ende": "08:15", "Task": "Logistik: Aufräumen/Auffüllen", "Typ": "Logistik"},
+            {"Dienst": "H1", "Start": "07:45", "Ende": "08:15", "Task": "Logistik: Aufräumen/Auffüllen (Butter/Konfi)", "Typ": "Logistik"},
             {"Dienst": "H1", "Start": "08:15", "Ende": "09:15", "Task": "Prod: Dessert/Patisserie (Redundanz H2/Convenience)", "Typ": "Prod"},
             {"Dienst": "H1", "Start": "09:15", "Ende": "10:00", "Task": "Prod: Salat Vorbereitung (Redundanz G2/Beutel)", "Typ": "Prod"},
+            # 10:00 Pause
             {"Dienst": "H1", "Start": "10:15", "Ende": "10:45", "Task": "Prod: Glacé portionieren (System)", "Typ": "Prod"},
             {"Dienst": "H1", "Start": "10:45", "Ende": "11:25", "Task": "Prod: Käse schneiden (Maschine/Fertig)", "Typ": "Prod"},
             {"Dienst": "H1", "Start": "11:25", "Ende": "12:30", "Task": "Service: Band Mittagsservice", "Typ": "Service"},
-            {"Dienst": "H1", "Start": "12:30", "Ende": "12:45", "Task": "Logistik: Material versorgen (Nach Mittag)", "Typ": "Logistik"},
+            {"Dienst": "H1", "Start": "12:30", "Ende": "12:45", "Task": "Logistik: Material versorgen", "Typ": "Logistik"},
             # 12:45 - 13:30 Pause
             {"Dienst": "H1", "Start": "13:30", "Ende": "14:00", "Task": "Prod: Menüsalat Abend (Vorbereitung)", "Typ": "Prod"},
             {"Dienst": "H1", "Start": "14:00", "Ende": "14:20", "Task": "Admin: Posten-Protokoll Folgetag", "Typ": "Admin"},
             {"Dienst": "H1", "Start": "14:20", "Ende": "14:40", "Task": "Logistik/Admin: Milchfrigor Kontrolle & Bestellung", "Typ": "Admin"},
 
-            # --- H2 PÄTISSERIE ---
+            # ==========================
+            # H2 PÄTISSERIE (09:15 - 18:09)
+            # ==========================
             {"Dienst": "H2", "Start": "09:15", "Ende": "09:30", "Task": "Prod: Basis-Massen (Convenience/Pulver)", "Typ": "Prod"},
             {"Dienst": "H2", "Start": "09:30", "Ende": "10:15", "Task": "Prod: Restaurant-Finish (Montage 25 Gläser)", "Typ": "Prod"},
             {"Dienst": "H2", "Start": "10:15", "Ende": "11:00", "Task": "Prod: Patienten-Masse (Abfüllen/Convenience)", "Typ": "Prod"},
             {"Dienst": "H2", "Start": "11:00", "Ende": "11:15", "Task": "Logistik: Transport Gastro", "Typ": "Logistik"},
             {"Dienst": "H2", "Start": "11:15", "Ende": "11:45", "Task": "Logistik: Wagen-Bau Abend", "Typ": "Logistik"},
             {"Dienst": "H2", "Start": "11:45", "Ende": "12:30", "Task": "Prod: Power-Dessert (Anrühren/Päckli)", "Typ": "Prod"},
-            {"Dienst": "H2", "Start": "12:30", "Ende": "13:00", "Task": "Service: Privat-Zvieri", "Typ": "Service"},
-            {"Dienst": "H2", "Start": "13:00", "Ende": "13:30", "Task": "Logistik: Reinigung", "Typ": "Logistik"},
-            {"Dienst": "H2", "Start": "14:15", "Ende": "15:15", "Task": "Prod: Morgen Gastro (Abfüllen/System)", "Typ": "Prod"},
-            {"Dienst": "H2", "Start": "15:15", "Ende": "16:00", "Task": "Prod: Morgen Pat (Abfüllen/System)", "Typ": "Prod"},
-            {"Dienst": "H2", "Start": "16:00", "Ende": "16:30", "Task": "Coord: Support H1", "Typ": "Coord"},
-            {"Dienst": "H2", "Start": "16:30", "Ende": "17:00", "Task": "Service: Setup Abend", "Typ": "Service"},
+            {"Dienst": "H2", "Start": "12:30", "Ende": "13:00", "Task": "Service: Privat-Zvieri (Transport)", "Typ": "Service"},
+            {"Dienst": "H2", "Start": "13:00", "Ende": "13:30", "Task": "Logistik: Puffer/Reinigung", "Typ": "Logistik"},
+            # 13:30 - 14:15 Pause
+            {"Dienst": "H2", "Start": "14:15", "Ende": "15:15", "Task": "Prod: Dessert Gastro Folgetag (Abfüllen/System)", "Typ": "Prod"},
+            {"Dienst": "H2", "Start": "15:15", "Ende": "16:00", "Task": "Prod: Dessert Pat Folgetag (Abfüllen/System)", "Typ": "Prod"},
+            {"Dienst": "H2", "Start": "16:00", "Ende": "16:30", "Task": "Coord: Support H1/Glacé", "Typ": "Coord"},
+            {"Dienst": "H2", "Start": "16:30", "Ende": "17:00", "Task": "Service: Setup Abend/Glacé", "Typ": "Service"},
             {"Dienst": "H2", "Start": "17:00", "Ende": "18:00", "Task": "Service: Band Abendessen", "Typ": "Service"},
-            {"Dienst": "H2", "Start": "18:00", "Ende": "18:09", "Task": "Logistik: Abschluss", "Typ": "Logistik"},
+            {"Dienst": "H2", "Start": "18:00", "Ende": "18:09", "Task": "Logistik: Abschluss/Material", "Typ": "Logistik"},
 
-            # --- H3 ASSEMBLY LINE ---
+            # ==========================
+            # H3 ASSEMBLY LINE (09:15 - 18:09)
+            # ==========================
             {"Dienst": "H3", "Start": "09:15", "Ende": "09:45", "Task": "Prod: Wähen Montage (Convenience/Teig)", "Typ": "Prod"},
             {"Dienst": "H3", "Start": "09:45", "Ende": "10:30", "Task": "Prod: Sandwiches (System-Montage)", "Typ": "Prod"},
             {"Dienst": "H3", "Start": "10:30", "Ende": "11:15", "Task": "Prod: Salatteller (Montage/Beutel)", "Typ": "Prod"},
             {"Dienst": "H3", "Start": "11:15", "Ende": "12:00", "Task": "Prod: Abend Kalt (Platten/Legesystem)", "Typ": "Prod"},
             {"Dienst": "H3", "Start": "12:00", "Ende": "12:30", "Task": "Prod: Bircher-Masse für Morgen (Mischen)", "Typ": "Prod"},
             {"Dienst": "H3", "Start": "12:30", "Ende": "13:00", "Task": "Logistik: Reste/Saucen", "Typ": "Logistik"},
-            {"Dienst": "H3", "Start": "13:00", "Ende": "13:30", "Task": "Logistik: Reinigung", "Typ": "Logistik"},
-            {"Dienst": "H3", "Start": "14:15", "Ende": "15:15", "Task": "Prod: Salatbuffet (Montage/System)", "Typ": "Prod"},
-            {"Dienst": "H3", "Start": "15:15", "Ende": "16:00", "Task": "Prod: Wähen-Vorbereitung Morgen (Teig)", "Typ": "Prod"},
-            {"Dienst": "H3", "Start": "16:00", "Ende": "16:30", "Task": "Coord: Support", "Typ": "Coord"},
+            {"Dienst": "H3", "Start": "13:00", "Ende": "13:30", "Task": "Logistik: Zwischenreinigung", "Typ": "Logistik"},
+            # 13:30 - 14:15 Pause
+            {"Dienst": "H3", "Start": "14:15", "Ende": "15:15", "Task": "Prod: Salatbuffet/MEP (System)", "Typ": "Prod"},
+            {"Dienst": "H3", "Start": "15:15", "Ende": "16:00", "Task": "Prod: Wähen/Creme Brulee (Vorbereitung)", "Typ": "Prod"},
+            {"Dienst": "H3", "Start": "16:00", "Ende": "16:30", "Task": "Coord: Protokolle/Nachproduktion", "Typ": "Coord"},
             {"Dienst": "H3", "Start": "16:30", "Ende": "17:00", "Task": "Service: Setup Band", "Typ": "Service"},
             {"Dienst": "H3", "Start": "17:00", "Ende": "18:00", "Task": "Service: Band Abend Support", "Typ": "Service"},
-            {"Dienst": "H3", "Start": "18:00", "Ende": "18:30", "Task": "Logistik: Abschluss Kaltküche", "Typ": "Logistik"},
+            {"Dienst": "H3", "Start": "18:00", "Ende": "18:09", "Task": "Logistik: Abschluss Kaltküche", "Typ": "Logistik"},
 
-            # --- G2 GARDE-MANGER ---
+            # ==========================
+            # G2 GARDE-MANGER (09:30 - 18:30)
+            # ==========================
             {"Dienst": "G2", "Start": "09:30", "Ende": "09:45", "Task": "Coord: Absprache H3", "Typ": "Coord"},
             {"Dienst": "G2", "Start": "09:45", "Ende": "10:30", "Task": "Prod: Wahlkost Kalt (System-Montage)", "Typ": "Prod"},
             {"Dienst": "G2", "Start": "10:30", "Ende": "11:15", "Task": "Prod: Patienten-Salat (Beutel/Convenience)", "Typ": "Prod"},
             {"Dienst": "G2", "Start": "11:15", "Ende": "12:30", "Task": "Prod: Abendessen (Aufschnitt/Montage)", "Typ": "Prod"},
+            {"Dienst": "G2", "Start": "12:30", "Ende": "13:30", "Task": "Prod: Salate Folgetag/Zwischenreinigung", "Typ": "Prod"},
+            # 13:30 - 14:15 Pause
             {"Dienst": "G2", "Start": "14:15", "Ende": "15:00", "Task": "Prod: MEP Folgetag (System)", "Typ": "Prod"},
             {"Dienst": "G2", "Start": "15:00", "Ende": "16:00", "Task": "Potenzial: Leerlauf/Dehnung (Standard-Tag)", "Typ": "Potenzial"},
-            {"Dienst": "G2", "Start": "16:00", "Ende": "17:00", "Task": "Coord: Band-Setup", "Typ": "Coord"},
+            {"Dienst": "G2", "Start": "16:00", "Ende": "17:00", "Task": "Coord: Band-Setup/Nachproduktion", "Typ": "Coord"},
             {"Dienst": "G2", "Start": "17:00", "Ende": "18:00", "Task": "Service: Band-Abendessen", "Typ": "Service"},
-            {"Dienst": "G2", "Start": "18:00", "Ende": "18:30", "Task": "Admin: Hotellerie-Check", "Typ": "Admin"},
+            {"Dienst": "G2", "Start": "18:00", "Ende": "18:30", "Task": "Admin: Hotellerie-Check/To-Do Liste", "Typ": "Admin"},
         ]
         return DataWarehouse.process(data)
 
@@ -435,11 +470,7 @@ class KPI_Engine:
         g2_gap = g2_df[g2_df['Task'].str.contains('Leerlauf', case=False, na=False)]['Duration'].sum()
         g2_gap_cost = (g2_gap / 60) * KPI_Engine.HOURLY_RATE_CHF
 
-        # 20. Structural Redundancy (New 20th Metric)
-        # Audit Findings:
-        # - G2 & H3 parallel at evening band (60 min overlap where 1 person suffices)
-        # - R1 & R2 parallel Setup/Photos (30 min overlap)
-        # - H1 doing Desserts (60 min) while H2 is the Pâtissier
+        # 20. Structural Redundancy
         redundancy_min = 150 
         redundancy_cost = (redundancy_min / 60) * KPI_Engine.HOURLY_RATE_CHF
 
