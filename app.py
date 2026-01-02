@@ -356,7 +356,7 @@ def main():
     kpis_list = KPI_Engine.calculate_all(df_ist)
 
     # --- HEADER & KPI GRID (5x3) ---
-    st.markdown('<div class="main-header">KITCHEN INTELLIGENCE SUITE: DEEP AUDIT 2026</div>', unsafe_allow_html=True)
+    st.markdown('<div class="main-header">WORKSPACE: AUDIT 2026</div>', unsafe_allow_html=True)
     
     st.markdown('<div class="cluster-header">Management Cockpit: 15 Core Metrics</div>', unsafe_allow_html=True)
     
@@ -371,7 +371,7 @@ def main():
                     render_kpi_card(kpi_name, kpi_data)
 
     # --- LOAD CURVE ---
-    st.markdown('<div class="cluster-header">Personal-Einsatzprofil am Band (15-Minuten Auflösung)</div>', unsafe_allow_html=True)
+    st.markdown('<div class="cluster-header">Personal-Einsatzprofil</div>', unsafe_allow_html=True)
     load_data = []
     for h in range(5, 20):
         for m in [0, 15, 30, 45]:
@@ -388,10 +388,10 @@ def main():
     st.markdown('<div class="cluster-header">Zeit-Struktur & Prozess-Analyse (Deep Dive)</div>', unsafe_allow_html=True)
     
     tab1, tab2, tab3, tab4 = st.tabs([
-        "🔴 IST-Zustand (Gantt)", 
-        "⚠️ Verschwendungs-Iso (Muda)", 
-        "📊 Workload-Balance (Ressourcen-Mix)", 
-        "🥧 Aktivitäts-Struktur (Verteilung)"
+        "IST-Zustand (Gantt)", 
+        "Verschwendungs-Iso (Muda)", 
+        "Workload-Balance (Ressourcen-Mix)", 
+        "Aktivitäts-Struktur (Verteilung)"
     ])
 
     color_map = {"Prod": "#3B82F6", "Service": "#10B981", "Admin": "#F59E0B", "Logistik": "#64748B", "Waste": "#EF4444", "Coord": "#8B5CF6"}
