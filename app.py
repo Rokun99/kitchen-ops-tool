@@ -26,27 +26,28 @@ COLORS = {
 }
 
 # DEFINITIONS & CONTEXT (Tooltip Lexicon)
+# REFINED: Professional Wording & Lean Management Terminology
 KPI_DEFINITIONS = {
-    "Skill-Drift (Leakage)": "Anteil der Arbeitszeit, in der hochqualifizierte Fachkräfte (z.B. Köche) niedere Tätigkeiten (Logistik, Putzen) ausführen. Ziel: < 10%.",
-    "Potenzial (Muda)": "Nicht-wertschöpfende Zeit durch Warten, unnötige Wege oder künstlich gedehnte Arbeitsprozesse (nach Lean Management).",
-    "Recovery Value": "Monetärer Gegenwert der durch Prozessoptimierung sofort einsparbaren oder umschichtbaren Arbeitsstunden.",
-    "Kernzeit-Vakuum": "Summierte unproduktive Wartezeit während der Haupt-Servicezeiten (z.B. Warten auf Wahlkost bei E1/S1).",
-    "Context-Switch Rate": "Häufigkeit der Aufgabenwechsel (z.B. Kochen -> Büro -> Telefon -> Kochen) pro Schicht. Hoher Wert indiziert Stress und Fehleranfälligkeit.",
-    "Industrialisierungsgrad": "Anteil der verwendeten High-Convenience-Produkte (z.B. Päckli-Dessert, TK-Produkte, fertiger Salat) im Verhältnis zur Eigenfertigung.",
-    "Value-Add Ratio": "Prozentsatz der Zeit, die direkt in wertschöpfende Tätigkeiten (Kochen, Anrichten, Gastkontakt) fliesst.",
-    "Admin Burden": "Zeitaufwand für bürokratische Aufgaben, Dokumentation, Bestellungen und Orgacard.",
-    "Logistics Drag": "Zeitverlust durch interne Transporte, Warenannahme und Wegezeiten.",
-    "Coordination Tax": "Zeitaufwand für Absprachen, Meetings, Übergaben und Instruktionen.",
-    "Liability Gap": "Kritische Zeiträume ohne klare Verantwortlichkeit (z.B. unbesetztes Diät-Telefon während der Pause von D1).",
-    "Service Intensity": "Anteil der Arbeitszeit mit direktem Gastkontakt oder aktiver Ausgabe am Band.",
-    "Patient/Gastro Split": "Verhältnis der Ressourcenbindung zwischen Patientenverpflegung (stationär) und Restaurant (MA).",
-    "Process Cycle Eff.": "Effizienzkennzahl: Verhältnis von reiner Bearbeitungszeit zur gesamten Durchlaufzeit.",
-    "Peak Staff Load": "Maximale Anzahl Mitarbeiter, die gleichzeitig in der Küche arbeiten (Indikator für räumliche Engpässe).",
-    "R2 Inflation (Hidden)": "Künstlich gedehnte Arbeitszeit im Dienst R2 am Morgen (z.B. 2h für 12 Salate abfüllen) mangels echter Aufgaben.",
-    "H1 Skill-Dilution": "Verwässerung des Rollenprofils H1 durch fachfremde Aufgaben (Dessert/Salat statt Frühstücksservice).",
-    "R1 Hygiene-Risk": "Dauer, in der R1 zwischen unreinen Bereichen (Rampe/Warenannahme) und reinen Bereichen (Buffet) wechselt.",
-    "G2 Capacity Gap": "Explizite ungenutzte Kapazität im Dienst G2 am Nachmittag (Leerlauf).",
-    "Qualifikations-Verschw.": "Einsatz von High-Skill-Personal für Low-Skill-Tasks (z.B. Diätkoch füllt Suppe ab). Teuerste Form der Verschwendung."
+    "Skill-Drift (Leakage)": "Anteil der Arbeitszeit, in der Fachkräfte (z.B. Köche) qualifikationsfremde Routinetätigkeiten (Logistik, Reinigung) ausführen. Ziel: < 10%.",
+    "Potenzial (Muda)": "Nicht-wertschöpfende Zeit durch Warten, unnötige Wege oder Prozess-Leerlauf (Verschwendung nach Lean Management).",
+    "Recovery Value": "Monetäres Einsparpotenzial pro Jahr durch Eliminierung von Muda und Optimierung des Skill-Mix.",
+    "Kernzeit-Vakuum": "Summierte unproduktive Wartezeit während der kritischen Service-Phasen (z.B. Warten auf Wahlkost-Ausgabe).",
+    "Context-Switch Rate": "Durchschnittliche Anzahl der Aufgabenwechsel pro Mitarbeiter/Schicht. Hohe Werte (>15) indizieren Fragmentierung und Ineffizienz.",
+    "Industrialisierungsgrad": "Anteil von High-Convenience-Komponenten (z.B. Fertigdessert, Schnittsalat, TK) im Verhältnis zur Eigenfertigung.",
+    "Value-Add Ratio": "Anteil der Netto-Arbeitszeit, die direkt in wertschöpfende Tätigkeiten (Produktion, Gastkontakt) fließt.",
+    "Admin Burden": "Zeitaufwand für administrative Prozesse, Dokumentation, Bestellwesen und Systempflege (Orgacard).",
+    "Logistics Drag": "Prozentualer Zeitverlust durch interne Transporte, Warenannahme und Rüstwege.",
+    "Coordination Tax": "Zeitaufwand für Absprachen, Meetings, Übergaben und Instruktionen (Reibungsverlust).",
+    "Liability Gap": "Operative Risikofenster ohne klare Verantwortlichkeit (z.B. unbesetztes Diät-Telefon während Pausenzeiten).",
+    "Service Intensity": "Anteil der Arbeitszeit mit direktem Gastkontakt oder aktiver Ausgabe am Band (Touchpoints).",
+    "Patient/Gastro Split": "Verhältnis der Ressourcenbindung zwischen Patientenverpflegung (Stationär) und Mitarbeiterrestaurant.",
+    "Process Cycle Eff.": "Verhältnis von reiner Bearbeitungszeit zur gesamten Durchlaufzeit (Indikator für Prozessfluss).",
+    "Peak Staff Load": "Maximale Anzahl Mitarbeiter, die gleichzeitig in der Küche operieren (Indikator für räumliche Engpässe).",
+    "R2 Inflation (Hidden)": "Arbeitszeitdehnung (Parkinsonsches Gesetz) im Dienst R2 am Morgen mangels operativer Auslastung.",
+    "H1 Skill-Dilution": "Verwässerung des Rollenprofils H1 durch fachfremde Aufgaben (Dessert/Salat statt Kernkompetenz Frühstück).",
+    "R1 Hygiene-Risk": "Kumulierte Dauer der Wechsel zwischen unreinen Bereichen (Rampe) und reinen Bereichen (Buffet) durch R1.",
+    "G2 Capacity Gap": "Explizite, ungenutzte Personalkapazität im Dienst G2 (Nachmittag) aufgrund von Prozesslücken.",
+    "Qualifikations-Verschw.": "Einsatz von High-Skill-Personal für Low-Skill-Tasks (Overprocessing). Teuerste Form der Verschwendung."
 }
 
 SECTION_TOOLTIPS = {
@@ -547,17 +548,38 @@ class KPI_Engine:
         redundancy_min = 150
         redundancy_disp = redundancy_min if mode == 'time' else (redundancy_min/60 * KPI_Engine.HOURLY_RATE_CHF)
 
-        # Other standard metrics (simplified calculation for display)
-        val_add = 62.0 
-        adm_burden = 145 if mode == 'time' else (145/60 * KPI_Engine.HOURLY_RATE_CHF)
-        log_drag = 22.5
-        coord_tax = 8.5
+        # --- REAL DATA CALCULATIONS (Replaced Magic Numbers) ---
+        # Value Add: Prod + Service
+        val_add_min = df_ist[df_ist['Typ'].isin(['Prod', 'Service'])]['Duration'].sum()
+        val_add_ratio = (val_add_min / total_min * 100) if total_min > 0 else 0
+        
+        # Admin Burden
+        adm_burden_min = df_ist[df_ist['Typ'] == 'Admin']['Duration'].sum()
+        adm_burden = adm_burden_min if mode == 'time' else (adm_burden_min/60 * KPI_Engine.HOURLY_RATE_CHF)
+        
+        # Logistics Drag
+        log_drag_min = df_ist[df_ist['Typ'] == 'Logistik']['Duration'].sum()
+        log_drag = (log_drag_min / total_min * 100) if total_min > 0 else 0
+        
+        # Coordination Tax
+        coord_tax_min = df_ist[df_ist['Typ'] == 'Coord']['Duration'].sum()
+        coord_tax = (coord_tax_min / total_min * 100) if total_min > 0 else 0
+        
+        # Service Intensity
+        serv_int_min = df_ist[df_ist['Typ'] == 'Service']['Duration'].sum()
+        serv_int = (serv_int_min / total_min * 100) if total_min > 0 else 0
+        
+        # Simple Context Switch Estimator (Avg Tasks per Person)
+        num_staff = len(df_ist['Dienst'].unique())
+        total_tasks = len(df_ist)
+        avg_tasks_per_person = total_tasks / num_staff if num_staff > 0 else 0
+        context_sw = f"{avg_tasks_per_person:.1f}x"
+        
+        # Constants that remain valid heuristics
         liab_gap = 105
-        serv_int = 34.0
         split = "62/38"
         cycle_eff = 81.0
         peak = "9 Pax"
-        context_sw = "10.4x"
         recov = 5.5 * 60 if mode == 'time' else (5.5 * KPI_Engine.HOURLY_RATE_CHF)
 
         # The 20 Metrics List
@@ -569,7 +591,7 @@ class KPI_Engine:
             ("Context-Switch Rate", {"val": context_sw, "sub": "D1 Fragmentierung", "trend": "bad"}),
             
             ("Industrialisierungsgrad", {"val": f"{ind_rate:.0f}%", "sub": "Convenience-Anteil", "trend": "neutral"}),
-            ("Value-Add Ratio", {"val": f"{val_add:.1f}%", "sub": "Prod + Service", "trend": "good"}),
+            ("Value-Add Ratio", {"val": f"{val_add_ratio:.1f}%", "sub": "Prod + Service", "trend": "good"}),
             ("Admin Burden", {"val": fmt(adm_burden), "sub": "Bürokratie-Last", "trend": "bad"}),
             ("Logistics Drag", {"val": f"{log_drag:.1f}%", "sub": "Transport/Reinigung", "trend": "neutral"}),
             ("Coordination Tax", {"val": f"{coord_tax:.1f}%", "sub": "Absprachen/Meetings", "trend": "neutral"}),
