@@ -520,9 +520,11 @@ class KPI_Engine:
         h1_foreign = df_ist[(df_ist['Dienst'] == 'H1') & df_ist['Task'].str.contains('Dessert|Salat|Brei|Rahm', case=False, na=False)]['Duration'].sum()
         h1_dilution = (h1_foreign / h1_total * 100) if h1_total > 0 else 0
 
-        r1_risk_min = df_ist[(df_ist['Dienst'] == 'R1') & 
-                             (df_ist['Task'].str.contains('Warenannahme|Rampe|Hygiene', case=False, na=False))]['Duration'].sum()
-        r1_risk_val = r1_risk_min if mode == 'time' else (r1_risk_min / 60 * KPI_Engine.HOURLY_RATE_CHF)
+        # R1 Hygiene-Risk
+        # Time spent at ramp/changing
+        r1_df = df_ist[df_ist['Dienst'] == 'R1']
+        r1_risk = r1_df[r1_df['Task'].str.contains('Warenannahme|Verräumen|Hygiene', case=False, na=False)]['Duration'].sum()
+        r1_risk_cost = (r1_risk / 60) * KPI_Engine.HOURLY_RATE_CHF
 
 
         g2_gap = df_ist[(df_ist['Dienst'] == 'G2') & df_ist['Task'].str.contains('Leerlauf', case=False, na=False)]['Duration'].sum()
