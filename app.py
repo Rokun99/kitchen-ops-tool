@@ -608,15 +608,15 @@ class KPI_Engine:
         return [
             ("Skill-Drift (Leakage)", {"val": fmt(leakage_val), "sub": "Fachkraft-Einsatz", "trend": "bad"}),
             ("Potenzial (Muda)", {"val": fmt(muda_val), "sub": "Nicht-Wertschöpfend", "trend": "bad"}),
-            ("Recovery Value (Yearly)", {"val": fmt(recov_val), "sub": "Jahres-Potenzial (250 Tage)", "trend": "good"}),
+            ("Recovery Value (Yearly)", {"val": fmt(recov_val), "sub": "Täglich ca. 5.5 Std.", "trend": "good"}),
             ("Kernzeit-Vakuum", {"val": fmt(idle_val), "sub": "Wartezeit Service", "trend": "bad"}),
             ("Context-Switch Rate", {"val": context_sw, "sub": "D1 Fragmentierung", "trend": "bad"}),
             
             ("Industrialisierungsgrad", {"val": f"{ind_rate:.0f}%", "sub": "Convenience-Anteil", "trend": "neutral"}),
             ("Value-Add Ratio", {"val": f"{val_add_ratio:.1f}%", "sub": "Prod + Service", "trend": "good"}),
-            ("Admin Burden", {"val": fmt(adm_burden), "sub": "Bürokratie-Last", "trend": "bad"}),
+            ("Admin Burden", {"val": fmt(adm_burden), "sub": "Bürokratie & Orgacard", "trend": "bad"}),
             ("Logistics Drag", {"val": f"{log_drag:.1f}%", "sub": "Transport/Reinigung", "trend": "neutral"}),
-            ("Coordination Tax", {"val": f"{coord_tax:.1f}%", "sub": "Absprachen/Meetings", "trend": "neutral"}),
+            ("Coordination Tax", {"val": f"{coord_tax:.1f}%", "sub": "Absprachen/Koordination", "trend": "neutral"}),
             
             ("Liability Gap", {"val": "105 Min", "sub": "Risiko D1 Pause", "trend": "bad"}),
             ("Service Intensity", {"val": f"{serv_int:.0f}%", "sub": "Patient Touchpoint", "trend": "good"}),
