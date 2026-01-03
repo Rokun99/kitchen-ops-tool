@@ -29,7 +29,7 @@ COLORS = {
 KPI_DEFINITIONS = {
     "Skill-Drift (Leakage)": "Anteil der Arbeitszeit, in der hochqualifizierte Fachkräfte (z.B. Köche) niedere Tätigkeiten (Logistik, Putzen) ausführen. Ziel: < 10%.",
     "Potenzial (Muda)": "Nicht-wertschöpfende Zeit durch Warten, unnötige Wege oder künstlich gedehnte Arbeitsprozesse (nach Lean Management).",
-    "Recovery Value": "Monetärer Gegenwert der durch Prozessoptimierung sofort einsparbaren oder umschichtbaren Arbeitsstunden pro Jahr.",
+    "Recovery Value": "Monetärer Gegenwert der durch Prozessoptimierung sofort einsparbaren oder umschichtbaren Arbeitsstunden.",
     "Kernzeit-Vakuum": "Summierte unproduktive Wartezeit während der Haupt-Servicezeiten (z.B. Warten auf Wahlkost bei E1/S1).",
     "Context-Switch Rate": "Häufigkeit der Aufgabenwechsel (z.B. Kochen -> Büro -> Telefon -> Kochen) pro Schicht. Hoher Wert indiziert Stress und Fehleranfälligkeit.",
     "Industrialisierungsgrad": "Anteil der verwendeten High-Convenience-Produkte (z.B. Päckli-Dessert, TK-Produkte, fertiger Salat) im Verhältnis zur Eigenfertigung.",
