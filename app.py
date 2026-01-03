@@ -565,7 +565,7 @@ class KPI_Engine:
             # Deep Dives
             ("R2 Inflation (Hidden)", {"val": fmt(r2_inf_display), "sub": "Gedehnte Arbeit", "trend": "bad"}),
             ("H1 Skill-Dilution", {"val": f"{h1_dilution:.0f}%", "sub": "Fremdaufgaben", "trend": "bad"}),
-            ("R1 Hygiene-Risk", {"val": fmt(r1_risk_disp), "sub": "Zeit an Rampe", "trend": "bad"}),
+            ("R1 Hygiene-Risk", {"abs": fmt(r1_risk_disp), "sub": "Zeit an Rampe", "trend": "bad"}),
             ("G2 Capacity Gap", {"val": fmt(g2_gap_disp), "sub": "PM Leerlauf", "trend": "bad"}),
             ("Qualifikations-Verschw.", {"val": fmt(mismatch_disp), "sub": "High Skill/Low Task", "trend": "bad"}),
         ]
