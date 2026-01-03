@@ -42,7 +42,7 @@ KPI_DEFINITIONS = {
     "Service Intensity": "Anteil der Arbeitszeit mit direktem Gastkontakt oder aktiver Ausgabe am Band (Touchpoints).",
     "Patient/Gastro Split": "Verhältnis der Ressourcenbindung zwischen Patientenverpflegung (Stationär) und Mitarbeiterrestaurant.",
     "Process Cycle Eff.": "Verhältnis von reiner Bearbeitungszeit zur gesamten Durchlaufzeit (Indikator für Prozessfluss).",
-    "FTE-Verschwendung (Overstaffing)": "Summierte Stunden, in denen die Personalkapazität die tatsächliche Arbeitslast übersteigt (Überdeckung).",
+    "FTE-Verschwendung (Overstaffing)": "Täglich summierte Stunden, in denen die Personalkapazität die tatsächliche Arbeitslast übersteigt (Überdeckung).",
     "R2 Inflation (Hidden)": "Arbeitszeitdehnung (Parkinsonsches Gesetz) im Dienst R2 am Morgen mangels operativer Auslastung.",
     "H1 Skill-Dilution": "Verwässerung des Rollenprofils H1 durch fachfremde Aufgaben (Dessert/Salat statt Kernkompetenz Frühstück).",
     "R1 Hygiene-Risk": "Kumulierte Dauer der Wechsel zwischen unreinen Bereichen (Rampe) und reinen Bereichen (Buffet) durch R1.",
