@@ -776,7 +776,7 @@ def main():
     with tab5:
         skill_pivot = df_ist.groupby(['Dienst', 'Skill_Status'])['Duration'].sum().reset_index()
         fig_skill = px.bar(skill_pivot, x="Dienst", y="Duration", color="Skill_Status", 
-                           color_discrete_map={"Critical Mismatch": "#EF4444", "Match": "#10B981", "Underutilized": "#F59E0B", "Risk: Overwhelmed": "#6366F1"},
+                           color_discrete_map={"Kritische Fehlallokation": "#EF4444", "Ideal": "#10B981", "Unterforderung": "#F59E0B", "Risk: Overwhelmed": "#6366F1"},
                            title="Qualifikations-Check: Rote Balken = Identifikation von Ressourcen-Fehlzuordnung (Skill-Mismatch)")
         st.plotly_chart(clean_chart_layout(fig_skill), use_container_width=True, config={'displayModeBar': False})
 
