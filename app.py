@@ -38,7 +38,7 @@ st.markdown(f"""
     
     /* Clean Header */
     .header-container {{
-        padding-bottom: 1.5rem;
+        padding-bottom: 2rem;
         margin-bottom: 2rem;
         border-bottom: 1px solid {COLORS['border']};
         display: flex;
@@ -47,7 +47,7 @@ st.markdown(f"""
     }}
     
     .main-title {{
-        font-size: 1.8rem;
+        font-size: 1.5rem;
         font-weight: 700;
         letter-spacing: -0.025em;
         color: {COLORS['text_main']};
@@ -55,7 +55,7 @@ st.markdown(f"""
     }}
     
     .sub-title {{
-        font-size: 0.9rem;
+        font-size: 0.875rem;
         color: {COLORS['text_sub']};
         font-weight: 400;
         margin-top: 0.25rem;
@@ -63,12 +63,12 @@ st.markdown(f"""
 
     /* Section Headers */
     .section-label {{
-        font-size: 0.85rem;
+        font-size: 0.75rem;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.1em;
         color: {COLORS['text_sub']};
-        margin-top: 2.5rem;
+        margin-top: 3rem;
         margin-bottom: 1rem;
         display: flex;
         align-items: center;
@@ -78,8 +78,8 @@ st.markdown(f"""
     .section-label::before {{
         content: '';
         display: block;
-        width: 4px;
-        height: 16px;
+        width: 12px;
+        height: 2px;
         background-color: {COLORS['accent']};
         border-radius: 2px;
     }}
@@ -88,7 +88,7 @@ st.markdown(f"""
     .kpi-card {{
         background-color: {COLORS['card']};
         border: 1px solid {COLORS['border']};
-        border-radius: 8px;
+        border-radius: 12px;
         padding: 1.25rem;
         height: 100%;
         min-height: 110px;
@@ -118,7 +118,7 @@ st.markdown(f"""
     }}
     
     .kpi-metric {{
-        font-size: 1.6rem;
+        font-size: 1.75rem;
         font-weight: 700;
         color: {COLORS['text_main']};
         letter-spacing: -0.05em;
@@ -624,7 +624,7 @@ def main():
     # --- DEEP DIVE TABS ---
     st.markdown('<div class="section-label">Detail-Analyse</div>', unsafe_allow_html=True)
     
-    tab1, tab2, tab3 = st.tabs(["Gantt-Flow", "Skill-Match-Matrix", "Service-Heatmap"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Gantt-Flow", "Potenzial-Analyse", "Ressourcen-Balance", "Aktivitäts-Verteilung", "Skill-Match-Matrix"])
     
     color_map = {
         "Prod": "#3B82F6", "Service": "#10B981", "Admin": "#F59E0B",
@@ -634,31 +634,38 @@ def main():
     with tab1:
         fig1 = px.timeline(df_ist, x_start="Start_DT", x_end="End_DT", y="Dienst", color="Typ", hover_name="Task", color_discrete_map=color_map, height=600)
         fig1.update_yaxes(categoryorder="array", categoryarray=["H3","H2","H1","R2","R1","G2","S1","E1","D1"])
-        st.plotly_chart(fig1, use_container_width=True)
+        st.plotly_chart(clean_chart_layout(fig1), use_container_width=True, config={'displayModeBar': False})
 
     with tab2:
+        df_waste = df_ist[df_ist['Typ'] == 'Potenzial']
+        if not df_waste.empty:
+            fig2 = px.timeline(df_waste, x_start="Start_DT", x_end="End_DT", y="Dienst", hover_name="Task", color_discrete_sequence=["#F43F5E"], height=400)
+            fig2.update_yaxes(categoryorder="array", categoryarray=["H3","H2","H1","R2","R1","G2","S1","E1","D1"])
+            st.plotly_chart(clean_chart_layout(fig2), use_container_width=True, config={'displayModeBar': False})
+        else:
+            st.info("Keine expliziten Potenzial-Blöcke identifiziert.")
+            
+    with tab3:
+        df_grouped = df_ist.groupby(['Dienst', 'Typ'])['Duration'].sum().reset_index()
+        fig3 = px.bar(df_grouped, x="Dienst", y="Duration", color="Typ", color_discrete_map=color_map, barmode='stack', height=500)
+        fig3.update_layout(yaxis_title="Minuten (Soll: 504 Min)")
+        # Add Reference Line for 8.4h Workday
+        fig3.add_hline(y=504, line_dash="dot", line_color="#94A3B8", annotation_text="Standard Day (8.4h)", annotation_position="top right")
+        st.plotly_chart(clean_chart_layout(fig3), use_container_width=True, config={'displayModeBar': False})
+        
+    with tab4:
+        df_pie = df_ist.groupby('Typ')['Duration'].sum().reset_index()
+        fig4 = px.pie(df_pie, values='Duration', names='Typ', color='Typ', color_discrete_map=color_map, hole=0.6, height=500)
+        fig4.update_traces(textinfo='percent+label', textfont_size=13)
+        fig4.update_layout(showlegend=False, annotations=[dict(text='Total', x=0.5, y=0.5, font_size=20, showarrow=False)])
+        st.plotly_chart(clean_chart_layout(fig4), use_container_width=True, config={'displayModeBar': False})
+
+    with tab5:
         skill_pivot = df_ist.groupby(['Dienst', 'Skill_Status'])['Duration'].sum().reset_index()
         fig_skill = px.bar(skill_pivot, x="Dienst", y="Duration", color="Skill_Status", 
                            color_discrete_map={"Critical Mismatch": "#EF4444", "Match": "#10B981", "Underutilized": "#F59E0B", "Risk: Overwhelmed": "#6366F1"},
                            title="Qualifikations-Check: Rote Balken = Teure Fachkraft macht Billig-Job")
-        st.plotly_chart(fig_skill, use_container_width=True)
-        
-    with tab3:
-        # Heatmap
-        heatmap_data = []
-        for t in pd.date_range(start="2026-01-01 06:00", end="2026-01-01 18:00", freq="30T"):
-            for d in df_ist['Dienst'].unique():
-                active = df_ist[(df_ist['Dienst'] == d) & (df_ist['Start_DT'] <= t) & (df_ist['End_DT'] > t)]
-                if not active.empty:
-                    typ = active.iloc[0]['Typ']
-                    val = WorkloadEngine.LOAD_FACTORS.get(typ, 0.5)
-                else:
-                    val = 0
-                heatmap_data.append({"Dienst": d, "Zeit": t.strftime("%H:%M"), "Last": val})
-        
-        hm_df = pd.DataFrame(heatmap_data)
-        fig3 = px.density_heatmap(hm_df, x="Zeit", y="Dienst", z="Last", color_continuous_scale="RdBu_r", range_color=[0, 1])
-        st.plotly_chart(fig3, use_container_width=True)
+        st.plotly_chart(clean_chart_layout(fig_skill), use_container_width=True, config={'displayModeBar': False})
 
 if __name__ == "__main__":
     main()
