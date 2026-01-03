@@ -38,7 +38,7 @@ st.markdown(f"""
     
     /* Clean Header */
     .header-container {{
-        padding-bottom: 2rem;
+        padding-bottom: 1.5rem;
         margin-bottom: 2rem;
         border-bottom: 1px solid {COLORS['border']};
         display: flex;
@@ -47,7 +47,7 @@ st.markdown(f"""
     }}
     
     .main-title {{
-        font-size: 1.5rem;
+        font-size: 1.8rem;
         font-weight: 700;
         letter-spacing: -0.025em;
         color: {COLORS['text_main']};
@@ -55,7 +55,7 @@ st.markdown(f"""
     }}
     
     .sub-title {{
-        font-size: 0.875rem;
+        font-size: 0.9rem;
         color: {COLORS['text_sub']};
         font-weight: 400;
         margin-top: 0.25rem;
@@ -63,12 +63,12 @@ st.markdown(f"""
 
     /* Section Headers */
     .section-label {{
-        font-size: 0.75rem;
+        font-size: 0.85rem;
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: 0.1em;
         color: {COLORS['text_sub']};
-        margin-top: 3rem;
+        margin-top: 2.5rem;
         margin-bottom: 1rem;
         display: flex;
         align-items: center;
@@ -78,8 +78,8 @@ st.markdown(f"""
     .section-label::before {{
         content: '';
         display: block;
-        width: 12px;
-        height: 2px;
+        width: 4px;
+        height: 16px;
         background-color: {COLORS['accent']};
         border-radius: 2px;
     }}
@@ -88,7 +88,7 @@ st.markdown(f"""
     .kpi-card {{
         background-color: {COLORS['card']};
         border: 1px solid {COLORS['border']};
-        border-radius: 12px;
+        border-radius: 8px;
         padding: 1.25rem;
         height: 100%;
         min-height: 110px;
@@ -118,7 +118,7 @@ st.markdown(f"""
     }}
     
     .kpi-metric {{
-        font-size: 1.75rem;
+        font-size: 1.6rem;
         font-weight: 700;
         color: {COLORS['text_main']};
         letter-spacing: -0.05em;
@@ -499,7 +499,7 @@ class KPI_Engine:
         split = "62/38"
         cycle_eff = 81.0
         peak = "9 Pax"
-        context_sw = "4.0x"
+        context_sw = "10.4x"
         recov = 5.5 * 60 if mode == 'time' else (5.5 * KPI_Engine.HOURLY_RATE_CHF)
 
         # Formatter
@@ -624,6 +624,20 @@ def main():
     # --- DEEP DIVE TABS ---
     st.markdown('<div class="section-label">Detail-Analyse</div>', unsafe_allow_html=True)
     
+    # Helper to clean chart layout
+    def clean_chart_layout(fig):
+        fig.update_layout(
+            plot_bgcolor="white", 
+            paper_bgcolor="white", 
+            margin=dict(l=10, r=10, t=30, b=20),
+            xaxis=dict(showgrid=True, gridcolor='#F1F5F9', title=None),
+            yaxis=dict(showgrid=False, title=None),
+            font=dict(family="Inter", color="#64748B"),
+            hoverlabel=dict(bgcolor="white", font_size=12, font_family="Inter"),
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, title=None)
+        )
+        return fig
+
     tab1, tab2, tab3, tab4, tab5 = st.tabs(["Gantt-Flow", "Potenzial-Analyse", "Ressourcen-Balance", "Aktivitäts-Verteilung", "Skill-Match-Matrix"])
     
     color_map = {
