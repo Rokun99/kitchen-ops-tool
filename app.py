@@ -480,6 +480,17 @@ class KPI_Engine:
         total_min = df_ist['Duration'].sum()
         if total_min == 0: return []
 
+        # Formatter-Funktion mit Einheiten-Fix
+        def fmt(val, unit=None):
+            if mode == 'money':
+                return f"{val:,.0f} CHF".replace(",", "'")
+            if unit == 'abs':
+                return f"{val:.0f} Min"
+            if unit == 'pct':
+                return f"{val:.1f}%"
+            # Fallback
+            return f"{val:.0f} Min" if val > 100 else f"{val:.1f}%"
+
         # BASIC METRICS
         potenzial_min = df_ist[df_ist['Typ'] == 'Potenzial']['Duration'].sum()
         skilled_dienste = ['D1', 'S1', 'E1', 'G2', 'R1']
