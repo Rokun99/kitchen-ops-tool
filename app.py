@@ -30,7 +30,7 @@ COLORS = {
 KPI_DEFINITIONS = {
     "Skill-Drift (Leakage)": "Anteil der Arbeitszeit, in der Fachkräfte (z.B. Köche) qualifikationsfremde Routinetätigkeiten (Logistik, Reinigung) ausführen. Ziel: < 10%.",
     "Potenzial (Muda)": "Nicht-wertschöpfende Zeit durch Warten, unnötige Wege oder Prozess-Leerlauf (Verschwendung nach Lean Management).",
-    "Recovery Value": "Monetäres Einsparpotenzial pro Jahr durch Eliminierung von Muda und Optimierung des Skill-Mix.",
+    "Recovery Value (Yearly)": "Extrapoliertes Einsparpotenzial pro Jahr (Basis 250 Tage) durch Eliminierung von Muda und Optimierung des Skill-Mix.",
     "Kernzeit-Vakuum": "Summierte unproduktive Wartezeit während der kritischen Service-Phasen (z.B. Warten auf Wahlkost-Ausgabe).",
     "Context-Switch Rate": "Durchschnittliche Anzahl der Aufgabenwechsel pro Mitarbeiter/Schicht. Hohe Werte (>15) indizieren Fragmentierung und Ineffizienz.",
     "Industrialisierungsgrad": "Anteil von High-Convenience-Komponenten (z.B. Fertigdessert, Schnittsalat, TK) im Verhältnis zur Eigenfertigung.",
@@ -42,7 +42,7 @@ KPI_DEFINITIONS = {
     "Service Intensity": "Anteil der Arbeitszeit mit direktem Gastkontakt oder aktiver Ausgabe am Band (Touchpoints).",
     "Patient/Gastro Split": "Verhältnis der Ressourcenbindung zwischen Patientenverpflegung (Stationär) und Mitarbeiterrestaurant.",
     "Process Cycle Eff.": "Verhältnis von reiner Bearbeitungszeit zur gesamten Durchlaufzeit (Indikator für Prozessfluss).",
-    "Peak Staff Load": "Maximale Anzahl Mitarbeiter, die gleichzeitig in der Küche operieren (Indikator für räumliche Engpässe).",
+    "FTE-Verschwendung (Overstaffing)": "Summierte Stunden, in denen die Personalkapazität die tatsächliche Arbeitslast übersteigt (Überdeckung).",
     "R2 Inflation (Hidden)": "Arbeitszeitdehnung (Parkinsonsches Gesetz) im Dienst R2 am Morgen mangels operativer Auslastung.",
     "H1 Skill-Dilution": "Verwässerung des Rollenprofils H1 durch fachfremde Aufgaben (Dessert/Salat statt Kernkompetenz Frühstück).",
     "R1 Hygiene-Risk": "Kumulierte Dauer der Wechsel zwischen unreinen Bereichen (Rampe) und reinen Bereichen (Buffet) durch R1.",
@@ -575,18 +575,40 @@ class KPI_Engine:
         avg_tasks_per_person = total_tasks / num_staff if num_staff > 0 else 0
         context_sw = f"{avg_tasks_per_person:.1f}x"
         
+        # Overstaffing Index (Replaces Peak Staff Load)
+        # Calculates sum of (Capacity - Demand) where Capacity > Demand
+        # We reuse WorkloadEngine for consistency
+        workload_df = WorkloadEngine.get_load_curve(df_ist)
+        # Each point is 15 min = 0.25 hours
+        overstaffing_fte_hours = 0
+        for _, row in workload_df.iterrows():
+            cap = row['Capacity (FTE)']
+            dem = row['Real Demand (FTE)']
+            if cap > dem:
+                overstaffing_fte_hours += (cap - dem) * 0.25
+        
+        overstaffing_val = (overstaffing_fte_hours * 60) # in minutes
+        overstaffing_disp = overstaffing_val if mode == 'time' else (overstaffing_fte_hours * KPI_Engine.HOURLY_RATE_CHF)
+
+        # Recovery Value - Annualized (250 Days)
+        # Original logic was approx 5.5h/day. Let's base it on actual 'Muda' + 'Overstaffing' or similar? 
+        # For consistency with user request, we stick to the heuristic but scale it to year.
+        # Daily: ~330 mins (5.5h)
+        daily_recov_min = 5.5 * 60 
+        yearly_recov_min = daily_recov_min * 250
+        
+        recov_val = yearly_recov_min if mode == 'time' else (yearly_recov_min/60 * KPI_Engine.HOURLY_RATE_CHF)
+        
         # Constants that remain valid heuristics
         liab_gap = 105
         split = "62/38"
         cycle_eff = 81.0
-        peak = "9 Pax"
-        recov = 5.5 * 60 if mode == 'time' else (5.5 * KPI_Engine.HOURLY_RATE_CHF)
 
         # The 20 Metrics List
         return [
             ("Skill-Drift (Leakage)", {"val": fmt(leakage_val), "sub": "Fachkraft-Einsatz", "trend": "bad"}),
             ("Potenzial (Muda)", {"val": fmt(muda_val), "sub": "Nicht-Wertschöpfend", "trend": "bad"}),
-            ("Recovery Value", {"val": fmt(recov), "sub": "Täglich (5.5h)", "trend": "good"}),
+            ("Recovery Value (Yearly)", {"val": fmt(recov_val), "sub": "Jahres-Potenzial (250 Tage)", "trend": "good"}),
             ("Kernzeit-Vakuum", {"val": fmt(idle_val), "sub": "Wartezeit Service", "trend": "bad"}),
             ("Context-Switch Rate", {"val": context_sw, "sub": "D1 Fragmentierung", "trend": "bad"}),
             
@@ -600,14 +622,15 @@ class KPI_Engine:
             ("Service Intensity", {"val": f"{serv_int:.0f}%", "sub": "Patient Touchpoint", "trend": "good"}),
             ("Patient/Gastro Split", {"val": split, "sub": "Ressourcen-Allokation", "trend": "neutral"}),
             ("Process Cycle Eff.", {"val": f"{cycle_eff:.1f}%", "sub": "Netto-Effizienz", "trend": "good"}),
-            ("Peak Staff Load", {"val": peak, "sub": "Max. Gleichzeitig", "trend": "neutral"}),
+            ("FTE-Verschwendung (Overstaffing)", {"val": fmt(overstaffing_disp), "sub": "Bezahlte Leerzeit", "trend": "bad"}),
 
             # Deep Dives
-            ("R2 Inflation (Hidden)", {"val": fmt(r2_inf_display), "sub": "Gedehnte Arbeit", "trend": "bad"}),
+            # FIX: Forced unit='abs' to prevent % formatting for minutes < 100
+            ("R2 Inflation (Hidden)", {"val": fmt(r2_inf_display, unit='abs'), "sub": "Gedehnte Arbeit", "trend": "bad"}),
             ("H1 Skill-Dilution", {"val": f"{h1_dilution:.0f}%", "sub": "Fremdaufgaben", "trend": "bad"}),
-            # Bugfix applied here: using unit='abs' and correct variable
             ("R1 Hygiene-Risk", {"val": fmt(r1_risk_val, unit='abs'), "sub": "Zeit an Rampe", "trend": "bad"}),
-            ("G2 Capacity Gap", {"val": fmt(g2_gap_disp), "sub": "PM Leerlauf", "trend": "bad"}),
+            # FIX: Forced unit='abs'
+            ("G2 Capacity Gap", {"val": fmt(g2_gap_disp, unit='abs'), "sub": "PM Leerlauf", "trend": "bad"}),
             ("Qualifikations-Verschw.", {"val": fmt(mismatch_disp), "sub": "High Skill/Low Task", "trend": "bad"}),
         ]
 
