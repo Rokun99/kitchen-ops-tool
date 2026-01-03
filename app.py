@@ -25,6 +25,37 @@ COLORS = {
     "border": "#E2E8F0"     # Slate 200
 }
 
+# DEFINITIONS & CONTEXT (Tooltip Lexicon)
+KPI_DEFINITIONS = {
+    "Skill-Drift (Leakage)": "Anteil der Arbeitszeit, in der hochqualifizierte Fachkräfte (z.B. Köche) niedere Tätigkeiten (Logistik, Putzen) ausführen. Ziel: < 10%.",
+    "Potenzial (Muda)": "Nicht-wertschöpfende Zeit durch Warten, unnötige Wege oder künstlich gedehnte Arbeitsprozesse (nach Lean Management).",
+    "Recovery Value": "Monetärer Gegenwert der durch Prozessoptimierung sofort einsparbaren oder umschichtbaren Arbeitsstunden pro Jahr.",
+    "Kernzeit-Vakuum": "Summierte unproduktive Wartezeit während der Haupt-Servicezeiten (z.B. Warten auf Wahlkost bei E1/S1).",
+    "Context-Switch Rate": "Häufigkeit der Aufgabenwechsel (z.B. Kochen -> Büro -> Telefon -> Kochen) pro Schicht. Hoher Wert indiziert Stress und Fehleranfälligkeit.",
+    "Industrialisierungsgrad": "Anteil der verwendeten High-Convenience-Produkte (z.B. Päckli-Dessert, TK-Produkte, fertiger Salat) im Verhältnis zur Eigenfertigung.",
+    "Value-Add Ratio": "Prozentsatz der Zeit, die direkt in wertschöpfende Tätigkeiten (Kochen, Anrichten, Gastkontakt) fliesst.",
+    "Admin Burden": "Zeitaufwand für bürokratische Aufgaben, Dokumentation, Bestellungen und Orgacard.",
+    "Logistics Drag": "Zeitverlust durch interne Transporte, Warenannahme und Wegezeiten.",
+    "Coordination Tax": "Zeitaufwand für Absprachen, Meetings, Übergaben und Instruktionen.",
+    "Liability Gap": "Kritische Zeiträume ohne klare Verantwortlichkeit (z.B. unbesetztes Diät-Telefon während der Pause von D1).",
+    "Service Intensity": "Anteil der Arbeitszeit mit direktem Gastkontakt oder aktiver Ausgabe am Band.",
+    "Patient/Gastro Split": "Verhältnis der Ressourcenbindung zwischen Patientenverpflegung (stationär) und Restaurant (MA).",
+    "Process Cycle Eff.": "Effizienzkennzahl: Verhältnis von reiner Bearbeitungszeit zur gesamten Durchlaufzeit.",
+    "Peak Staff Load": "Maximale Anzahl Mitarbeiter, die gleichzeitig in der Küche arbeiten (Indikator für räumliche Engpässe).",
+    "R2 Inflation (Hidden)": "Künstlich gedehnte Arbeitszeit im Dienst R2 am Morgen (z.B. 2h für 12 Salate abfüllen) mangels echter Aufgaben.",
+    "H1 Skill-Dilution": "Verwässerung des Rollenprofils H1 durch fachfremde Aufgaben (Dessert/Salat statt Frühstücksservice).",
+    "R1 Hygiene-Risk": "Dauer, in der R1 zwischen unreinen Bereichen (Rampe/Warenannahme) und reinen Bereichen (Buffet) wechselt.",
+    "G2 Capacity Gap": "Explizite ungenutzte Kapazität im Dienst G2 am Nachmittag (Leerlauf).",
+    "Qualifikations-Verschw.": "Einsatz von High-Skill-Personal für Low-Skill-Tasks (z.B. Diätkoch füllt Suppe ab). Teuerste Form der Verschwendung."
+}
+
+SECTION_TOOLTIPS = {
+    "Management Cockpit": "Strategische Übersicht der 20 wichtigsten Leistungskennzahlen (KPIs) zur Steuerung des Betriebs.",
+    "Belastungs-Matrix": "Vergleich der vorhandenen Personalkapazität (grau) mit der tatsächlich benötigten Arbeitslast (Linie). Zeigt Über- und Unterdeckung.",
+    "Detail-Analyse": "Interaktive Tiefenanalyse der Arbeitspläne, Prozessflüsse und spezifischen Schwachstellen.",
+    "Personal-Einsatzprofil": "Visuelle Darstellung der anwesenden Mitarbeiter über den Tagesverlauf (Schichtplan-Dichte)."
+}
+
 # Custom CSS for Minimalist/Profi Look
 st.markdown(f"""
 <style>
@@ -61,7 +92,7 @@ st.markdown(f"""
         margin-top: 0.25rem;
     }}
 
-    /* Section Headers */
+    /* Section Headers with Tooltip Cursor */
     .section-label {{
         font-size: 0.85rem;
         font-weight: 700;
@@ -73,6 +104,7 @@ st.markdown(f"""
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        cursor: help; /* Shows question mark cursor */
     }}
     
     .section-label::before {{
@@ -97,6 +129,8 @@ st.markdown(f"""
         display: flex; 
         flex-direction: column; 
         justify-content: space-between;
+        cursor: help; /* Tooltip indicator */
+        position: relative;
     }}
     
     .kpi-card:hover {{
@@ -194,7 +228,6 @@ class DataWarehouse:
     @staticmethod
     def get_full_ist_data():
         # DATEN EXAKT NACH DEN DIENSTPLÄNEN (DOCX)
-        # Vollständige Abdeckung aller Nachmittags-Lücken
         data = [
             # ==========================
             # D1 DIÄTETIK (08:00 - 18:09)
@@ -540,8 +573,11 @@ class KPI_Engine:
 # --- 5. RENDERER ---
 def render_kpi_card(title, data):
     trend_color = data['trend']
+    # Get tooltip from dictionary
+    tooltip = KPI_DEFINITIONS.get(title, f"{title}: {data['sub']}")
+    
     html = f"""
-    <div class="kpi-card">
+    <div class="kpi-card" title="{tooltip}">
         <div class="kpi-label">{title}</div>
         <div class="kpi-metric">{data['val']}</div>
         <div class="kpi-context">
@@ -573,7 +609,7 @@ def main():
 
     kpis = KPI_Engine.calculate_all(df_ist, mode=mode)
 
-    st.markdown('<div class="section-label">Management Cockpit: 20 Core Metrics</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="section-label" title="{SECTION_TOOLTIPS["Management Cockpit"]}">20 Core Metrics</div>', unsafe_allow_html=True)
     for row in range(4):
         cols = st.columns(5, gap="small")
         for col in range(5):
@@ -583,7 +619,7 @@ def main():
                     render_kpi_card(kpis[idx][0], kpis[idx][1])
 
     # --- BELASTUNGS-MATRIX ---
-    st.markdown('<div class="section-label">Belastungs-Matrix (Capacity vs. Demand)</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="section-label" title="{SECTION_TOOLTIPS["Belastungs-Matrix"]}">Belastungs-Matrix (Capacity vs. Demand)</div>', unsafe_allow_html=True)
     
     workload_df = WorkloadEngine.get_load_curve(df_ist)
     
@@ -622,9 +658,10 @@ def main():
         st.plotly_chart(fig_load, use_container_width=True, config={'displayModeBar': False})
 
     # --- DEEP DIVE TABS ---
-    st.markdown('<div class="section-label">Detail-Analyse</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="section-label" title="{SECTION_TOOLTIPS["Detail-Analyse"]}">Detail-Analyse</div>', unsafe_allow_html=True)
     
-    # Helper to clean chart layout
+    # Helper to clean chart layout - DEFINED GLOBALLY NOW inside main to be safe or outside
+    # Placing it inside main before usage is safe.
     def clean_chart_layout(fig):
         fig.update_layout(
             plot_bgcolor="white", 
@@ -680,6 +717,34 @@ def main():
                            color_discrete_map={"Critical Mismatch": "#EF4444", "Match": "#10B981", "Underutilized": "#F59E0B", "Risk: Overwhelmed": "#6366F1"},
                            title="Qualifikations-Check: Rote Balken = Teure Fachkraft macht Billig-Job")
         st.plotly_chart(clean_chart_layout(fig_skill), use_container_width=True, config={'displayModeBar': False})
+
+    # --- LOAD PROFILE ---
+    # Moved to bottom or can be anywhere, but let's keep consistency with previous request to include it
+    st.markdown(f'<div class="section-label" title="{SECTION_TOOLTIPS["Personal-Einsatzprofil"]}">Personal-Einsatzprofil (Staffing Load)</div>', unsafe_allow_html=True)
+    
+    load_data = []
+    for h in range(5, 20):
+        for m in [0, 15, 30, 45]:
+            t = datetime(2026, 1, 1, h, m)
+            active = len(df_ist[(df_ist['Start_DT'] <= t) & (df_ist['End_DT'] > t)])
+            load_data.append({"Zeit": f"{h:02d}:{m:02d}", "Staff": active})
+    
+    with st.container():
+        fig_load_profile = px.area(pd.DataFrame(load_data), x="Zeit", y="Staff", line_shape="spline")
+        fig_load_profile.update_traces(line_color="#0F172A", fillcolor="rgba(15, 23, 42, 0.05)")
+        fig_load_profile.update_layout(
+            plot_bgcolor="white", 
+            paper_bgcolor="white", 
+            margin=dict(l=20, r=20, t=20, b=20),
+            height=250,
+            xaxis=dict(showgrid=False, title=None, linecolor='#E2E8F0'),
+            yaxis=dict(showgrid=True, gridcolor='#F1F5F9', title="Active FTE", range=[0, 10]),
+            hovermode="x unified"
+        )
+        # Critical Zone Line
+        fig_load_profile.add_hline(y=8, line_dash="dot", line_color="#EF4444", annotation_text="Congestion Zone", annotation_position="top right", annotation_font_color="#EF4444")
+        st.plotly_chart(fig_load_profile, use_container_width=True, config={'displayModeBar': False})
+
 
 if __name__ == "__main__":
     main()
