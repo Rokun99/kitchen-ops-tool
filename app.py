@@ -480,16 +480,25 @@ class KPI_Engine:
         total_min = df_ist['Duration'].sum()
         if total_min == 0: return []
 
-        # Formatter-Funktion mit Einheiten-Fix
+        # SINGLE SOURCE OF TRUTH FORMATTER
+        # Fix: Removed the shadowing 2nd fmt definition
         def fmt(val, unit=None):
+            # 1. Mode check overrides everything if set to money
             if mode == 'money':
                 return f"{val:,.0f} CHF".replace(",", "'")
+            
+            # 2. If Unit is absolute (Minutes), return Min
             if unit == 'abs':
                 return f"{val:.0f} Min"
-            if unit == 'pct':
+            
+            # 3. String passthrough
+            if isinstance(val, str): return val
+            
+            # 4. Standard Heuristics (Percentage vs Min)
+            # If it's a small float, assume percent, if large, assume minutes (fallback)
+            if isinstance(val, float) and val < 100:
                 return f"{val:.1f}%"
-            # Fallback
-            return f"{val:.0f} Min" if val > 100 else f"{val:.1f}%"
+            return f"{val:.0f} Min"
 
         # BASIC METRICS
         potenzial_min = df_ist[df_ist['Typ'] == 'Potenzial']['Duration'].sum()
@@ -520,12 +529,13 @@ class KPI_Engine:
         h1_foreign = df_ist[(df_ist['Dienst'] == 'H1') & df_ist['Task'].str.contains('Dessert|Salat|Brei|Rahm', case=False, na=False)]['Duration'].sum()
         h1_dilution = (h1_foreign / h1_total * 100) if h1_total > 0 else 0
 
-        # R1 Hygiene-Risk
-        # Time spent at ramp/changing
+        # R1 Hygiene-Risk FIXED LOGIC
         r1_df = df_ist[df_ist['Dienst'] == 'R1']
         r1_risk = r1_df[r1_df['Task'].str.contains('Warenannahme|Verräumen|Hygiene', case=False, na=False)]['Duration'].sum()
         r1_risk_cost = (r1_risk / 60) * KPI_Engine.HOURLY_RATE_CHF
-
+        
+        # Bugfix: Define variable to hold either Minutes or CHF
+        r1_risk_val = r1_risk if mode == 'time' else r1_risk_cost
 
         g2_gap = df_ist[(df_ist['Dienst'] == 'G2') & df_ist['Task'].str.contains('Leerlauf', case=False, na=False)]['Duration'].sum()
         g2_gap_disp = g2_gap if mode == 'time' else (g2_gap/60 * KPI_Engine.HOURLY_RATE_CHF)
@@ -550,13 +560,6 @@ class KPI_Engine:
         context_sw = "10.4x"
         recov = 5.5 * 60 if mode == 'time' else (5.5 * KPI_Engine.HOURLY_RATE_CHF)
 
-        # Formatter
-        def fmt(val, is_money=False):
-            if mode == 'money' or is_money:
-                return f"{val:,.0f} CHF".replace(",", "'")
-            if isinstance(val, str): return val
-            return f"{val:.1f}%" if isinstance(val, float) and val < 100 else f"{val:.0f} Min"
-
         # The 20 Metrics List
         return [
             ("Skill-Drift (Leakage)", {"val": fmt(leakage_val), "sub": "Fachkraft-Einsatz", "trend": "bad"}),
@@ -580,7 +583,8 @@ class KPI_Engine:
             # Deep Dives
             ("R2 Inflation (Hidden)", {"val": fmt(r2_inf_display), "sub": "Gedehnte Arbeit", "trend": "bad"}),
             ("H1 Skill-Dilution", {"val": f"{h1_dilution:.0f}%", "sub": "Fremdaufgaben", "trend": "bad"}),
-            ("R1 Hygiene-Risk", {"val": fmt(r1_risk_val, 'abs'), "sub": "Zeit an Rampe", "trend": "bad"}),
+            # Bugfix applied here: using unit='abs' and correct variable
+            ("R1 Hygiene-Risk", {"val": fmt(r1_risk_val, unit='abs'), "sub": "Zeit an Rampe", "trend": "bad"}),
             ("G2 Capacity Gap", {"val": fmt(g2_gap_disp), "sub": "PM Leerlauf", "trend": "bad"}),
             ("Qualifikations-Verschw.", {"val": fmt(mismatch_disp), "sub": "High Skill/Low Task", "trend": "bad"}),
         ]
@@ -675,8 +679,6 @@ def main():
     # --- DEEP DIVE TABS ---
     st.markdown(f'<div class="section-label" title="{SECTION_TOOLTIPS["Detail-Analyse"]}">Detail-Analyse</div>', unsafe_allow_html=True)
     
-    # Helper to clean chart layout - DEFINED GLOBALLY NOW inside main to be safe or outside
-    # Placing it inside main before usage is safe.
     def clean_chart_layout(fig):
         fig.update_layout(
             plot_bgcolor="white", 
@@ -734,7 +736,6 @@ def main():
         st.plotly_chart(clean_chart_layout(fig_skill), use_container_width=True, config={'displayModeBar': False})
 
     # --- LOAD PROFILE ---
-    # Moved to bottom or can be anywhere, but let's keep consistency with previous request to include it
     st.markdown(f'<div class="section-label" title="{SECTION_TOOLTIPS["Personal-Einsatzprofil"]}">Personal-Einsatzprofil (Staffing Load)</div>', unsafe_allow_html=True)
     
     load_data = []
@@ -759,7 +760,6 @@ def main():
         # Critical Zone Line
         fig_load_profile.add_hline(y=8, line_dash="dot", line_color="#EF4444", annotation_text="Congestion Zone", annotation_position="top right", annotation_font_color="#EF4444")
         st.plotly_chart(fig_load_profile, use_container_width=True, config={'displayModeBar': False})
-
 
 if __name__ == "__main__":
     main()
