@@ -23,9 +23,8 @@ COLORS = {
     "warning": "#F59E0B",   # Amber 500
     "neutral": "#94A3B8",   # Slate 400
     "border": "#E2E8F0",    # Slate 200
-    # Sector Colors
-    "kitchen": "#3B82F6",   # Blue
-    "gastro": "#64748B"     # Slate
+    "kitchen": "#3B82F6",   # Blue (Push)
+    "gastro": "#64748B"     # Slate (Pull)
 }
 
 # DEFINITIONS & CONTEXT (Tooltip Lexicon)
@@ -47,7 +46,7 @@ KPI_DEFINITIONS = {
     "Patient/Gastro Split": "Verhältnis der Ressourcenbindung zwischen Patientenverpflegung und Restaurant.",
     "Process Cycle Eff.": "Verhältnis von reiner Bearbeitungszeit zur gesamten Durchlaufzeit.",
     "Peak Staff Load": "Maximale Anzahl Mitarbeiter, die gleichzeitig operieren.",
-    "R2 Inflation (Hidden)": "Arbeitszeitdehnung im Dienst R2 mangels Auslastung.",
+    "R2 Inflation (Hidden)": "Arbeitszeitdehnung (Parkinson) im Dienst R2 (08:00-10:00) mangels Auslastung.",
     "H1 Skill-Dilution": "Verwässerung des Rollenprofils H1 durch fachfremde Aufgaben.",
     "R1 Hygiene-Risk": "Dauer der Wechsel zwischen unreinen und reinen Bereichen.",
     "G2 Capacity Gap": "Explizite, ungenutzte Personalkapazität im Dienst G2.",
@@ -58,7 +57,7 @@ KPI_DEFINITIONS = {
     "Elevator Dependency": "Zeitrisiko durch Aufzugwartezeiten (Geschätzt aus Transportwegen).",
     "Return-Flow Velocity": "Zeitdauer von 'Station holt ab' bis 'Teller in Spülmaschine'.",
     "Trolley Turnover": "Umschlaghäufigkeit der Speisewagen pro Tag.",
-    "Logistics Dead-Time": "Leere Wege (ohne Wagen) oder Warten auf Transport.",
+    "Logistics Dead-Time": "Leere Wege (ohne Wagen) oder Warten auf Transport (Parkinson-Indikator).",
     "Band-Machine Uptime": "Laufzeit der Hauptwaschstrasse (K6/K8 Input).",
     "Granuldisk Load": "Auslastung der Topfspüle (K15) – Indikator für Produktionsvolumen.",
     "Chemical Efficiency": "Verbrauch Reinigungsmittel pro Spülgang (Simuliert basierend auf Spülzeit).",
@@ -105,7 +104,7 @@ SECTION_TOOLTIPS = {
     "Personal-Einsatzprofil": "Visuelle Darstellung der anwesenden Mitarbeiter über den Tagesverlauf (Schichtplan-Dichte)."
 }
 
-# Custom CSS for Minimalist/Profi Look
+# Custom CSS
 st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -581,22 +580,30 @@ class KPI_Engine:
         if isinstance(val, str): return val
         if isinstance(val, float) and val < 100: return f"{val:.1f}%"
         return f"{val:.0f} Min"
+    
+    @staticmethod
+    def fmt_cost(val_min, mode):
+        """ Strict helper to convert minutes to cost if mode is money """
+        if mode == 'money':
+            cost = (val_min / 60) * KPI_Engine.HOURLY_RATE_CHF
+            return f"{cost:,.0f} CHF".replace(",", "'")
+        return f"{val_min:.0f} Min"
 
     @staticmethod
     def calculate_kitchen(df, mode):
         # ... (Existing Logic adapted - EXACT ORIGINAL LOGIC) ...
         total_min = df['Duration'].sum()
         leakage_min = df[(df['Dienst'].isin(['D1', 'S1', 'E1', 'G2', 'R1'])) & (df['Typ'].isin(['Logistik', 'Potenzial']))]['Duration'].sum()
-        leakage_val = (leakage_min / total_min * 100) if mode == 'time' else (leakage_min/60 * KPI_Engine.HOURLY_RATE_CHF)
         
         potenzial_min = df[df['Typ'] == 'Potenzial']['Duration'].sum()
-        muda_val = (potenzial_min / total_min * 100) if mode == 'time' else (potenzial_min/60 * KPI_Engine.HOURLY_RATE_CHF)
         
-        recov_val = 5.5 * 60 * 250 if mode == 'time' else (5.5 * 250 * KPI_Engine.HOURLY_RATE_CHF)
+        # Recov calculation (Annualized)
+        daily_recov_min = 5.5 * 60 
+        yearly_recov_min = daily_recov_min * 250
+        recov_val = yearly_recov_min if mode == 'time' else (yearly_recov_min/60 * KPI_Engine.HOURLY_RATE_CHF)
         
         band_crunch = df[(df['Start'] >= "11:00") & (df['Ende'] <= "12:30")]
         idle_band_min = band_crunch[band_crunch['Typ'] == 'Potenzial']['Duration'].sum() + 105
-        idle_val = idle_band_min if mode == 'time' else (idle_band_min/60 * KPI_Engine.HOURLY_RATE_CHF)
 
         prod_df = df[df['Typ'] == 'Prod']
         prod_min = prod_df['Duration'].sum()
@@ -607,17 +614,21 @@ class KPI_Engine:
         val_add_min = df[df['Typ'].isin(['Prod', 'Service'])]['Duration'].sum()
         val_add_ratio = (val_add_min / total_min * 100) if total_min > 0 else 0
         
-        adm_burden_min = 145 # Hardcoded in original script logic
-        adm_burden = adm_burden_min if mode == 'time' else (adm_burden_min/60 * KPI_Engine.HOURLY_RATE_CHF)
+        adm_burden_min = 145 # Hardcoded basis from original logic
         
-        log_drag = 22.5 # Hardcoded in original
-        coord_tax = 8.5 # Hardcoded in original
-        serv_int = 34.0 # Hardcoded in original
+        log_drag_min = df[df['Typ'] == 'Logistik']['Duration'].sum()
+        log_drag_ratio = (log_drag_min / total_min * 100) if total_min > 0 else 0
         
-        # Deep Dives
-        r2_gap = df[(df['Dienst'] == 'R2') & (df['Start'] >= "08:00") & (df['Ende'] <= "10:00")]['Duration'].sum()
-        r2_inf_val = max(0, r2_gap - 40)
-        r2_inf_display = r2_inf_val if mode == 'time' else (r2_inf_val/60 * KPI_Engine.HOURLY_RATE_CHF)
+        coord_min = df[df['Typ'] == 'Coord']['Duration'].sum()
+        coord_tax_ratio = (coord_min / total_min * 100) if total_min > 0 else 0
+        
+        serv_int_min = df[df['Typ'] == 'Service']['Duration'].sum()
+        serv_int_ratio = (serv_int_min / total_min * 100) if total_min > 0 else 0
+        
+        # Deep Dives - Parkinson Feedback Integration
+        # R2 08:00-10:00 (120 min window) - Check tasks in this window
+        r2_parkinson_min = df[(df['Dienst'] == 'R2') & (df['Start'] >= "08:00") & (df['Ende'] <= "10:00")]['Duration'].sum()
+        # Original logic was "max(0, gap - 40)". We use the full window sum based on feedback "2h!".
         
         h1_total = df[df['Dienst'] == 'H1']['Duration'].sum()
         h1_foreign = df[(df['Dienst'] == 'H1') & df['Task'].str.contains('Dessert|Salat|Brei|Rahm', case=False, na=False)]['Duration'].sum()
@@ -625,14 +636,10 @@ class KPI_Engine:
 
         r1_df = df[df['Dienst'] == 'R1']
         r1_risk = r1_df[r1_df['Task'].str.contains('Warenannahme|Verräumen|Hygiene', case=False, na=False)]['Duration'].sum()
-        r1_risk_cost = (r1_risk / 60) * KPI_Engine.HOURLY_RATE_CHF
-        r1_risk_val = r1_risk if mode == 'time' else r1_risk_cost
 
         g2_gap = df[(df['Dienst'] == 'G2') & df['Task'].str.contains('Leerlauf', case=False, na=False)]['Duration'].sum()
-        g2_gap_disp = g2_gap if mode == 'time' else (g2_gap/60 * KPI_Engine.HOURLY_RATE_CHF)
 
         mismatch_min = df[df['Skill_Status'] == "Kritische Fehlallokation"]['Duration'].sum()
-        mismatch_disp = mismatch_min if mode == 'time' else (mismatch_min/60 * KPI_Engine.HOURLY_RATE_CHF)
 
         # Overstaffing Index
         workload_df = WorkloadEngine.get_load_curve(df, sector_filter='kitchen')
@@ -642,34 +649,38 @@ class KPI_Engine:
             dem = row['Real Demand (FTE)']
             if cap > dem:
                 overstaffing_fte_hours += (cap - dem) * 0.25
-        overstaffing_val = (overstaffing_fte_hours * 60)
-        overstaffing_disp = overstaffing_val if mode == 'time' else (overstaffing_fte_hours * KPI_Engine.HOURLY_RATE_CHF)
+        overstaffing_min = (overstaffing_fte_hours * 60)
+
+        # Context Switch
+        num_staff = len(df['Dienst'].unique())
+        total_tasks = len(df)
+        context_sw = f"{total_tasks / num_staff:.1f}x"
 
         return [
-            ("Skill-Drift (Leakage)", {"val": KPI_Engine.fmt(leakage_val), "sub": "Fachkraft-Einsatz", "trend": "bad"}),
-            ("Potenzial (Muda)", {"val": KPI_Engine.fmt(muda_val), "sub": "Nicht-Wertschöpfend", "trend": "bad"}),
+            ("Skill-Drift (Leakage)", {"val": KPI_Engine.fmt_cost(leakage_min, mode), "sub": "Fachkraft-Einsatz", "trend": "bad"}),
+            ("Potenzial (Muda)", {"val": KPI_Engine.fmt_cost(potenzial_min, mode), "sub": "Nicht-Wertschöpfend", "trend": "bad"}),
             ("Recovery Value (Yearly)", {"val": KPI_Engine.fmt(recov_val), "sub": "Täglich ca. 5.5 Std.", "trend": "good"}),
-            ("Kernzeit-Vakuum", {"val": KPI_Engine.fmt(idle_val), "sub": "Wartezeit Service", "trend": "bad"}),
-            ("Context-Switch Rate", {"val": "10.4x", "sub": "D1 Fragmentierung", "trend": "bad"}),
+            ("Kernzeit-Vakuum", {"val": KPI_Engine.fmt_cost(idle_band_min, mode), "sub": "Wartezeit Service", "trend": "bad"}),
+            ("Context-Switch Rate", {"val": context_sw, "sub": "D1 Fragmentierung", "trend": "bad"}),
             
             ("Industrialisierungsgrad", {"val": f"{ind_rate:.0f}%", "sub": "Convenience-Anteil", "trend": "neutral"}),
-            ("Value-Add Ratio", {"val": "62.0%", "sub": "Prod + Service", "trend": "good"}),
-            ("Admin Burden", {"val": KPI_Engine.fmt(adm_burden), "sub": "Bürokratie-Last", "trend": "bad"}),
-            ("Logistics Drag", {"val": f"{log_drag:.1f}%", "sub": "Transport/Reinigung", "trend": "neutral"}),
-            ("Coordination Tax", {"val": f"{coord_tax:.1f}%", "sub": "Absprachen/Meetings", "trend": "neutral"}),
+            ("Value-Add Ratio", {"val": f"{val_add_ratio:.1f}%", "sub": "Prod + Service", "trend": "good"}),
+            ("Admin Burden", {"val": KPI_Engine.fmt_cost(adm_burden_min, mode), "sub": "Bürokratie-Last", "trend": "bad"}),
+            ("Logistics Drag", {"val": f"{log_drag_ratio:.1f}%", "sub": "Transport/Reinigung", "trend": "neutral"}),
+            ("Coordination Tax", {"val": f"{coord_tax_ratio:.1f}%", "sub": "Absprachen/Meetings", "trend": "neutral"}),
             
             ("Liability Gap", {"val": "105 Min", "sub": "Risiko D1 Pause", "trend": "bad"}),
-            ("Service Intensity", {"val": f"{serv_int:.0f}%", "sub": "Patient Touchpoint", "trend": "good"}),
+            ("Service Intensity", {"val": f"{serv_int_ratio:.0f}%", "sub": "Patient Touchpoint", "trend": "good"}),
             ("Patient/Gastro Split", {"val": "62/38", "sub": "Ressourcen-Allokation", "trend": "neutral"}),
             ("Process Cycle Eff.", {"val": "81.0%", "sub": "Netto-Effizienz", "trend": "good"}),
-            ("FTE-Verschwendung (Overstaffing)", {"val": KPI_Engine.fmt(overstaffing_disp), "sub": "Bezahlte Leerzeit (Täglich)", "trend": "bad"}),
+            ("FTE-Verschwendung (Overstaffing)", {"val": KPI_Engine.fmt_cost(overstaffing_min, mode), "sub": "Bezahlte Leerzeit (Täglich)", "trend": "bad"}),
 
             # Deep Dives
-            ("R2 Inflation (Hidden)", {"val": KPI_Engine.fmt(r2_inf_display, unit='abs'), "sub": "Gedehnte Arbeit", "trend": "bad"}),
+            ("R2 Inflation (Hidden)", {"val": KPI_Engine.fmt_cost(r2_parkinson_min, mode), "sub": "Gedehnte Arbeit", "trend": "bad"}),
             ("H1 Skill-Dilution", {"val": f"{h1_dilution:.0f}%", "sub": "Fremdaufgaben", "trend": "bad"}),
-            ("R1 Hygiene-Risk", {"val": KPI_Engine.fmt(r1_risk_val, unit='abs'), "sub": "Zeit an Rampe", "trend": "bad"}),
-            ("G2 Capacity Gap", {"val": KPI_Engine.fmt(g2_gap_disp, unit='abs'), "sub": "PM Leerlauf", "trend": "bad"}),
-            ("Qualifikations-Verschw.", {"val": KPI_Engine.fmt(mismatch_disp), "sub": "High Skill/Low Task", "trend": "bad"}),
+            ("R1 Hygiene-Risk", {"val": KPI_Engine.fmt_cost(r1_risk, mode), "sub": "Zeit an Rampe", "trend": "bad"}),
+            ("G2 Capacity Gap", {"val": KPI_Engine.fmt_cost(g2_gap, mode), "sub": "PM Leerlauf", "trend": "bad"}),
+            ("Qualifikations-Verschw.", {"val": KPI_Engine.fmt_cost(mismatch_min, mode), "sub": "High Skill/Low Task", "trend": "bad"}),
         ]
 
     @staticmethod
@@ -677,35 +688,28 @@ class KPI_Engine:
         total_min = df['Duration'].sum()
         if total_min == 0: return []
         
-        # 1. Transport Intensity (former Transport Drag)
         transport_min = df[df['Typ'] == 'Transport']['Duration'].sum()
         transport_int = (transport_min / total_min * 100)
         
-        # 2. Machine Utilization (Typ Spülen)
         spuel_min = df[df['Typ'] == 'Spülen']['Duration'].sum()
-        mach_util = (spuel_min / total_min * 100) # Proxy
+        mach_util = (spuel_min / total_min * 100)
         
-        # 3. Hygiene Compliance (Typ Reinigung)
         hygiene_min = df[df['Typ'] == 'Reinigung']['Duration'].sum()
-        hygiene_val = hygiene_min if mode == 'time' else (hygiene_min/60 * KPI_Engine.HOURLY_RATE_CHF)
         
-        # 4. Service Support Factor
         svc_sup_min = df[df['Typ'] == 'Service-Support']['Duration'].sum()
         svc_sup_factor = (svc_sup_min / total_min * 100)
         
-        # 5. Ergonomic Load (Proxy: Spülen + Transport)
         ergo_load = ((spuel_min + transport_min) / total_min * 100)
 
-        # 6. Waste Handling (Logistik with specific tasks, simplified here as total Logistik ratio)
-        log_min = df[df['Typ'] == 'Logistik']['Duration'].sum()
+        # Parkinson Check: K13 (08:45-10:30) - "Lagerbewirtschaftung" which is often waiting
+        k13_parkinson = df[(df['Dienst'] == 'K13') & (df['Start'] >= "08:45") & (df['Ende'] <= "10:30")]['Duration'].sum()
         
-        # Simulated/Heuristic KPIs based on prompt
         return [
             ("Transport Intensity", {"val": f"{transport_int:.1f}%", "sub": "Wegzeiten (Wagen)", "trend": "bad"}),
             ("Elevator Dependency", {"val": "15 Min", "sub": "Wartezeit Aufzug (Sim)", "trend": "neutral"}),
             ("Return-Flow Velocity", {"val": "8 Min", "sub": "Station -> Spüle", "trend": "good"}),
             ("Trolley Turnover", {"val": "4.2x", "sub": "Einsätze pro Wagen", "trend": "good"}),
-            ("Logistics Dead-Time", {"val": KPI_Engine.fmt(45 if mode=='time' else 45/60*55), "sub": "Leere Wege", "trend": "bad"}),
+            ("Logistics Dead-Time", {"val": KPI_Engine.fmt_cost(k13_parkinson, mode), "sub": "K13 Wartezeit/Lager (Parkinson)", "trend": "bad"}),
             
             ("Band-Machine Uptime", {"val": "6.5h", "sub": "Hauptwaschstrasse", "trend": "neutral"}),
             ("Granuldisk Load", {"val": "82%", "sub": "Topfspüle Auslastung", "trend": "bad"}),
@@ -716,7 +720,7 @@ class KPI_Engine:
             ("Hygiene Compliance (11:20)", {"val": "100%", "sub": "Wechselslot eingehalten", "trend": "good"}),
             ("Bio-Trans Volume", {"val": "120 kg", "sub": "Food Waste (Est)", "trend": "bad"}),
             ("Clean-Side Integrity", {"val": "High", "sub": "Personaldichte", "trend": "good"}),
-            ("Deep-Clean Index", {"val": KPI_Engine.fmt(hygiene_val, unit='abs'), "sub": "Grundreinigung (Total)", "trend": "good"}),
+            ("Deep-Clean Index", {"val": KPI_Engine.fmt_cost(hygiene_min, mode), "sub": "Grundreinigung (Total)", "trend": "good"}),
             ("HACCP Admin", {"val": "45 Min", "sub": "Doku-Aufwand", "trend": "neutral"}),
             
             ("Service Support Factor", {"val": f"{svc_sup_factor:.1f}%", "sub": "Entlastung Küche", "trend": "good"}),
@@ -728,9 +732,7 @@ class KPI_Engine:
 
     @staticmethod
     def calculate_total(df, mode):
-        # Combined Metrics
         total_min = df['Duration'].sum()
-        
         prod_min = df[df['Sector'] == 'kitchen']['Duration'].sum()
         stew_min = df[df['Sector'] == 'gastro']['Duration'].sum()
         
@@ -739,20 +741,17 @@ class KPI_Engine:
         else:
             cost_ratio = "0 / 0"
         
-        # Overall Productivity
         meals = 1150
         total_hours = total_min / 60
         prod_val = meals / total_hours if total_hours > 0 else 0
         
-        # Muda Calculation Global
         muda_total = df[df['Typ'] == 'Potenzial']['Duration'].sum()
-        muda_cost = muda_total if mode == 'time' else (muda_total/60 * KPI_Engine.HOURLY_RATE_CHF)
 
         return [
             ("Cost per Tray", {"val": "8.50 CHF", "sub": "Personalanteil", "trend": "neutral"}),
             ("Labor Cost Split", {"val": cost_ratio, "sub": "Prod (Blue) vs Gastro (Gray)", "trend": "neutral"}),
             ("Overall Productivity", {"val": f"{prod_val:.1f}", "sub": "Mahlzeiten / Std", "trend": "good"}),
-            ("Non-Value-Add Cost", {"val": KPI_Engine.fmt(muda_cost), "sub": "Muda (Total)", "trend": "bad"}),
+            ("Non-Value-Add Cost", {"val": KPI_Engine.fmt_cost(muda_total, mode), "sub": "Muda (Total)", "trend": "bad"}),
             ("Overtime Risk", {"val": "High", "sub": "Abendspitzen", "trend": "bad"}),
             
             ("Production-Logistics Gap", {"val": "45 Min", "sub": "Verzögerung Rücklauf", "trend": "bad"}),
@@ -856,7 +855,7 @@ def main():
         # Single View (Kitchen OR Gastro)
         workload_df = WorkloadEngine.get_load_curve(df, current_sector)
         
-        # Restore Hint Text for Kitchen
+        # Restore Hint Text for Kitchen View - Crucial Feedback Fix
         if current_sector == 'kitchen':
              st.markdown("""
             <div style="font-size: 0.8rem; color: #64748B; margin-bottom: 10px;">
@@ -905,7 +904,7 @@ def main():
         "Spülen": "#0EA5E9", "Transport": "#F97316", "Reinigung": "#14B8A6", "Service-Support": "#8B5CF6"
     }
 
-    # RESTORE ALL 5 TABS FOR KITCHEN
+    # RESTORE ALL 5 TABS FOR KITCHEN (Original Functionality)
     if current_sector == 'kitchen':
         tab1, tab2, tab3, tab4, tab5 = st.tabs(["Gantt-Flow", "Potenzial-Analyse", "Ressourcen-Balance", "Aktivitäts-Verteilung", "Skill-Match-Matrix"])
         
