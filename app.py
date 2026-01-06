@@ -104,7 +104,9 @@ SECTION_TOOLTIPS = {
     "Personal-Einsatzprofil": "Visuelle Darstellung der anwesenden Mitarbeiter über den Tagesverlauf (Schichtplan-Dichte)."
 }
 
-# Custom CSS for Minimalist/Profi Look + New Switcher Styling
+# ... (Imports wie gehabt) ...
+
+# Custom CSS for Minimalist/Profi Look + TRUE Segmented Control
 st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -114,31 +116,30 @@ st.markdown(f"""
         color: {COLORS['text_main']}; 
         background-color: {COLORS['bg']}; 
     }}
-    
-    /* Header Styling */
-    .header-container {{
-        padding-bottom: 1.5rem; margin-bottom: 2rem; border-bottom: 1px solid {COLORS['border']};
-        display: flex; justify-content: space-between; align-items: center;
-    }}
-    .main-title {{ font-size: 1.8rem; font-weight: 700; letter-spacing: -0.025em; color: {COLORS['text_main']}; margin: 0; }}
-    .sub-title {{ font-size: 0.9rem; color: {COLORS['text_sub']}; font-weight: 400; margin-top: 0.25rem; }}
 
-    /* MODERN SEGMENTED CONTROL (Radio Button Replacement) */
+    /* HIDE DEFAULT RADIO CIRCLES */
+    div[role="radiogroup"] input[type="radio"] {{
+        display: none;
+    }}
+
+    /* CONTAINER STYLING (Die graue Leiste) */
     div[role="radiogroup"] {{
         background-color: #F1F5F9;
         padding: 4px;
-        border-radius: 12px;
+        border-radius: 10px;
+        border: 1px solid #E2E8F0;
         display: flex;
         flex-direction: row;
-        gap: 0px !important; /* No Gap for seamless look */
-        border: 1px solid #E2E8F0;
+        gap: 0px !important;
+        width: 100%; /* Full Width */
     }}
-    
+
+    /* ITEM STYLING (Die Buttons inaktiv) */
     div[role="radiogroup"] label {{
         flex: 1;
         background-color: transparent;
         border: none;
-        border-radius: 10px;
+        border-radius: 8px;
         margin: 0 !important;
         padding: 8px 12px !important;
         text-align: center;
@@ -146,47 +147,54 @@ st.markdown(f"""
         color: {COLORS['text_sub']} !important;
         cursor: pointer;
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }}
-    
+
+    /* HOVER EFFECT */
     div[role="radiogroup"] label:hover {{
         color: {COLORS['text_main']} !important;
         background-color: rgba(255,255,255, 0.5);
     }}
 
-    /* Active State Hack */
-    div[data-baseweb="radio"] {{
-        margin-right: 0px !important; /* Fix Streamlit Spacing */
+    /* ACTIVE STATE (The Magic - nutzt :has() Selektor) */
+    /* Wenn das Label einen gecheckten Input hat -> Style es weiss */
+    div[role="radiogroup"] label:has(input:checked) {{
+        background-color: #FFFFFF !important;
+        color: {COLORS['accent']} !important;
+        font-weight: 600 !important;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        transform: scale(1.02);
     }}
 
-    .section-label {{
-        font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
-        color: {COLORS['text_sub']}; margin-top: 2.5rem; margin-bottom: 1rem;
-        display: flex; align-items: center; gap: 0.5rem; cursor: help;
-    }}
-    .section-label::before {{ content: ''; display: block; width: 4px; height: 16px; background-color: {COLORS['accent']}; border-radius: 2px; }}
-    
+    /* KPI CARD STYLING (unverändert gut) */
     .kpi-card {{
-        background-color: {COLORS['card']}; border: 1px solid {COLORS['border']}; border-radius: 8px;
-        padding: 1.25rem; height: 100%; min-height: 110px; transition: all 0.2s ease;
-        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); display: flex; flex-direction: column; justify-content: space-between;
-        cursor: help; position: relative;
+        background-color: {COLORS['card']}; 
+        border: 1px solid {COLORS['border']}; 
+        border-radius: 8px;
+        padding: 1.25rem; 
+        height: 100%; 
+        min-height: 110px; 
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); 
+        display: flex; 
+        flex-direction: column; 
+        justify-content: space-between;
     }}
-    .kpi-card:hover {{ transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); border-color: {COLORS['accent']}; }}
-
-    .kpi-label {{ font-size: 0.75rem; font-weight: 600; color: {COLORS['text_sub']}; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }}
-    .kpi-metric {{ font-size: 1.6rem; font-weight: 700; color: {COLORS['text_main']}; letter-spacing: -0.05em; line-height: 1.1; }}
-    .kpi-context {{ font-size: 0.75rem; color: {COLORS['neutral']}; margin-top: 0.5rem; font-weight: 500; display: flex; align-items: center; gap: 0.375rem; }}
-
-    .tag {{ padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; }}
-    .tag-bad {{ background: #FEF2F2; color: {COLORS['danger']}; }}
-    .tag-good {{ background: #ECFDF5; color: {COLORS['success']}; }}
-    .tag-neutral {{ background: #F1F5F9; color: {COLORS['text_sub']}; }}
-
-    .stTabs [data-baseweb="tab-list"] {{ gap: 2rem; border-bottom: 1px solid {COLORS['border']}; padding-bottom: 0px; }}
-    .stTabs [data-baseweb="tab"] {{ background-color: transparent !important; border: none !important; padding: 0.75rem 0 !important; font-weight: 500; color: {COLORS['text_sub']}; }}
-    .stTabs [aria-selected="true"] {{ color: {COLORS['accent']} !important; border-bottom: 2px solid {COLORS['accent']} !important; }}
+    .kpi-card:hover {{ 
+        transform: translateY(-2px); 
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); 
+        border-color: {COLORS['accent']}; 
+    }}
+    .kpi-label {{ font-size: 0.75rem; font-weight: 600; color: {COLORS['text_sub']}; text-transform: uppercase; letter-spacing: 0.05em; }}
+    .kpi-metric {{ font-size: 1.6rem; font-weight: 700; color: {COLORS['text_main']}; line-height: 1.1; margin: 0.5rem 0; }}
     
-    .chart-container {{ background-color: {COLORS['card']}; border-radius: 12px; border: 1px solid {COLORS['border']}; padding: 1rem; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05); }}
+    /* TAG STYLING */
+    .tag {{ padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; display: inline-block; }}
+    .tag-bad {{ background: #FEF2F2; color: {COLORS['danger']}; border: 1px solid #FECACA; }}
+    .tag-good {{ background: #ECFDF5; color: {COLORS['success']}; border: 1px solid #A7F3D0; }}
+    .tag-neutral {{ background: #F8FAFC; color: {COLORS['text_sub']}; border: 1px solid #E2E8F0; }}
 </style>
 """, unsafe_allow_html=True)
 
