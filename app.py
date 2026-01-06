@@ -27,22 +27,22 @@ COLORS = {
     "gastro": "#64748B"     # Slate (Pull)
 }
 
-# DEFINITIONS & CONTEXT (Optimized Wording)
+# DEFINITIONS & CONTEXT (Optimized Wording & Psychology)
 KPI_DEFINITIONS = {
     # --- KITCHEN (Produktion) ---
-    "Fachkraft-Fremdeinsatz": "Anteil der Zeit, in der teure Fachkräfte einfache Routinetätigkeiten (z.B. Putzen) erledigen.", # War: Skill-Drift
-    "Potenzial (Leerlauf)": "Nicht-wertschöpfende Zeit durch Warten oder unnötige Wege.", # War: Muda
-    "Jahres-Einsparpotenzial": "Monetärer Wert der unproduktiven Zeiten, hochgerechnet auf 250 Tage.", # War: Recovery Value
-    "Kapazitäts-Überhang": "Stunden, in denen mehr Personal anwesend ist, als für die Arbeit nötig wäre.", # War: FTE-Verschwendung
+    "Fachkraft-Fremdeinsatz": "Anteil der Zeit, in der teure Fachkräfte einfache Routinetätigkeiten (z.B. Putzen) erledigen.",
+    "Potenzial (Leerlauf)": "Nicht-wertschöpfende Zeit durch Warten oder unnötige Wege.",
+    "Jahres-Einsparpotenzial": "Monetärer Wert der unproduktiven Zeiten, hochgerechnet auf 250 Tage.",
+    "Kapazitäts-Überhang": "Stunden, in denen mehr Personal anwesend ist, als für die Arbeit nötig wäre.",
     "Kernzeit-Vakuum": "Unproduktive Wartezeit während der kritischen Service-Phasen (Bandstillstand).",
-    "Aufgaben-Wechselrate": "Wie oft muss ein Mitarbeiter pro Schicht die Tätigkeit wechseln (Fragmentierung).", # War: Context-Switch
+    "Aufgaben-Wechselrate": "Wie oft muss ein Mitarbeiter pro Schicht die Tätigkeit wechseln (Fragmentierung).",
     "Industrialisierungsgrad": "Anteil von Convenience-Komponenten vs. Eigenfertigung.",
-    "Wertschöpfungs-Quote": "Anteil der Zeit, die direkt in das Produkt (Kochen) oder den Gast fließt.", # War: Value-Add Ratio
-    "Admin-Quote": "Zeitaufwand für Büro, Dokumentation und Systempflege.", # War: Admin Burden
-    "Logistik-Anteil": "Zeitverlust durch interne Transporte und Rüstwege.", # War: Logistics Drag
-    "Koordinations-Aufwand": "Zeit für Absprachen, Meetings und Übergaben.", # War: Coordination Tax
-    "Risiko-Fenster": "Zeiträume ohne klare Verantwortlichkeit oder Aufsicht.", # War: Liability Gap
-    "Patienten-Fokus": "Anteil der Arbeitszeit mit direktem Einfluss auf das Patientenerlebnis.", # War: Service Intensity
+    "Wertschöpfungs-Quote": "Anteil der Zeit, die direkt in das Produkt (Kochen) oder den Gast fließt.",
+    "Admin-Quote": "Zeitaufwand für Büro, Dokumentation und Systempflege.",
+    "Logistik-Anteil": "Zeitverlust durch interne Transporte und Rüstwege.",
+    "Koordinations-Aufwand": "Zeit für Absprachen, Meetings und Übergaben.",
+    "Risiko-Fenster": "Zeiträume ohne klare Verantwortlichkeit oder Aufsicht.",
+    "Patienten-Fokus": "Anteil der Arbeitszeit mit direktem Einfluss auf das Patientenerlebnis.",
     "Ressourcen-Split": "Verhältnis Personalbindung Patientenverpflegung vs. Restaurant.",
     "Prozess-Effizienz": "Verhältnis von reiner Bearbeitungszeit zur gesamten Durchlaufzeit.",
     "Max. Personal-Last": "Maximale Anzahl Mitarbeiter, die gleichzeitig im Einsatz sind.",
@@ -50,21 +50,21 @@ KPI_DEFINITIONS = {
     "Profil-Verwässerung (H1)": "Einsatz des H1 für aufgabenfremde Tätigkeiten.",
     "Hygiene-Risiko (R1)": "Kritische Wechseldauer zwischen Schmutz- und Reinbereich.",
     "Leerlauf-Lücke (G2)": "Explizite, ungenutzte Zeit im Dienst G2.",
-    "Teure Ausführung": "Einsatz von High-Skill-Personal für Low-Skill-Aufgaben (Kosten-Sicht).", # War: Qualifikations-Verschw.
+    "Teure Ausführung": "Einsatz von High-Skill-Personal für Low-Skill-Aufgaben (Kosten-Sicht).",
 
     # --- GASTRODIENSTE (Logistik & Hygiene) ---
     "Transport-Intensität": "Anteil der Arbeitszeit für reine Wegstrecken (Wagen schieben/holen).",
-    "Aufzug-Abhängigkeit": "Zeitrisiko durch Wartezeiten vor den Liften.", # War: Elevator Dependency
-    "Rücklauf-Tempo": "Dauer von 'Abholung Station' bis 'Eingabe Spülmaschine'.", # War: Return-Flow Velocity
-    "Wagen-Umschlag": "Wie oft wird ein Speisewagen pro Tag genutzt/gedreht.", # War: Trolley Turnover
-    "Logistik-Wartezeit": "Leere Wege oder Warten auf Transportmittel (Vermeidbar).", # War: Dead-Time
+    "Aufzug-Abhängigkeit": "Zeitrisiko durch Wartezeiten vor den Liften.",
+    "Rücklauf-Tempo": "Dauer von 'Abholung Station' bis 'Eingabe Spülmaschine'.",
+    "Wagen-Umschlag": "Wie oft wird ein Speisewagen pro Tag genutzt/gedreht.",
+    "Logistik-Wartezeit": "Leere Wege oder Warten auf Transportmittel (Vermeidbar).",
     "Laufzeit Bandmaschine": "Aktive Betriebszeit der Hauptwaschstrasse.",
     "Auslastung Topfspüle": "Nutzungsgrad der Granuldisk (Indikator für Produktionsmenge).",
     "Chemie-Effizienz": "Verbrauch Reinigungsmittel pro Stunde (Simuliert).",
-    "Korb-Durchsatz": "Gesamtmenge gewaschener Körbe pro Stunde.", # War: Rack-Rate
+    "Korb-Durchsatz": "Gesamtmenge gewaschener Körbe pro Stunde.",
     "Wartungs-Quote": "Zeitaufwand für Pflege & Reinigung der Maschinen (Werterhalt).",
     "Hygiene-Switch (11:20)": "Einhaltung des kritischen Wechselslots 'Schmutzig zu Sauber'.",
-    "Bio-Trans Volumen": "Menge entsorgter Speisereste (Food Waste Indikator).",
+    "Bio-Trans Volumen": "Menge entsorgter Speisereste (Messwert 2024: 156g/Gast).",
     "Integrität Reine Seite": "Personaldichte im sauberen Bereich (Vermeidung Rekontamination).",
     "Grundreinigungs-Index": "Investierte Zeit in Tiefenreinigung (Böden/Wände).",
     "HACCP-Doku": "Zeitaufwand für gesetzlich vorgeschriebene Listenführung.",
@@ -80,12 +80,12 @@ KPI_DEFINITIONS = {
     "Gesamt-Produktivität": "Mahlzeiten pro geleistete Personalstunde (Total).",
     "Leerlauf-Kosten": "Monetärer Wert der nicht-wertschöpfenden Zeit (Total).",
     "Überstunden-Risiko": "Wahrscheinlichkeit für Arbeitszeitüberschreitung durch Abendspitzen.",
-    "Sync-Lücke": "Zeitversatz zwischen Produktionsende und Spül-Ende.", # War: Prod-Logistics Gap
+    "Sync-Lücke": "Zeitversatz zwischen Produktionsende und Spül-Ende.",
     "Service-Bereitschaft": "Verfügbarkeit von Besteck/Geschirr bei Bandstart.",
     "Mise-en-Place Sync": "Greifen Vorbereitung (Küche) und Bereitstellung (Gastro) ineinander?",
     "Max. Personal (Total)": "Höchststand an Mitarbeitern gleichzeitig im Haus.",
     "Absprache-Aufwand": "Summe der Koordinationszeiten über alle Abteilungen.",
-    "Energie-Spitzenlast": "Gleichzeitige Nutzung von Kipper, Ofen und Spülstraße.", # War: Infrastructure Stress
+    "Energie-Spitzenlast": "Gleichzeitige Nutzung von Kipper, Ofen und Spülstraße.",
     "Raum-Dichte": "Personaldichte in Küche/Spüle zu Stosszeiten (Stressfaktor).",
     "Reste-Quote": "Verhältnis Food Waste zu produziertem Essen.",
     "Anlagen-Nutzung (ROI)": "Wie gut sind teure Maschinen ausgelastet?",
@@ -104,7 +104,7 @@ SECTION_TOOLTIPS = {
     "Personal-Einsatzprofil": "Visuelle Darstellung der anwesenden Mitarbeiter über den Tagesverlauf (Schichtplan-Dichte)."
 }
 
-# Custom CSS
+# Custom CSS for Minimalist/Profi Look + New Switcher Styling
 st.markdown(f"""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -115,12 +115,47 @@ st.markdown(f"""
         background-color: {COLORS['bg']}; 
     }}
     
+    /* Header Styling */
     .header-container {{
         padding-bottom: 1.5rem; margin-bottom: 2rem; border-bottom: 1px solid {COLORS['border']};
         display: flex; justify-content: space-between; align-items: center;
     }}
     .main-title {{ font-size: 1.8rem; font-weight: 700; letter-spacing: -0.025em; color: {COLORS['text_main']}; margin: 0; }}
     .sub-title {{ font-size: 0.9rem; color: {COLORS['text_sub']}; font-weight: 400; margin-top: 0.25rem; }}
+
+    /* Sector Switcher Styling (Radio Button Hack) */
+    div[role="radiogroup"] {{
+        background-color: #F1F5F9;
+        padding: 4px;
+        border-radius: 12px;
+        display: flex;
+        gap: 4px;
+    }}
+    div[role="radiogroup"] label {{
+        flex: 1;
+        background-color: transparent;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        padding: 8px 16px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        margin: 0 !important;
+        color: {COLORS['text_sub']} !important;
+        font-weight: 500 !important;
+    }}
+    div[role="radiogroup"] label:hover {{
+        background-color: #E2E8F0; /* Hover Overlay Effect */
+        color: {COLORS['text_main']} !important;
+    }}
+    /* This targets the selected radio button roughly (simplified for Streamlit) */
+    div[role="radiogroup"] [data-baseweb="radio"] {{
+        background-color: white !important;
+        box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1);
+        border-radius: 8px;
+        color: {COLORS['accent']} !important;
+        font-weight: 600 !important;
+    }}
 
     .section-label {{
         font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
@@ -726,6 +761,9 @@ class KPI_Engine:
         # Parkinson Check: K13 (08:45-10:30) - "Lagerbewirtschaftung" which is often waiting
         k13_parkinson = df[(df['Dienst'] == 'K13') & (df['Start'] >= "08:45") & (df['Ende'] <= "10:30")]['Duration'].sum()
         
+        # New Food Waste Calculation (156g/Guest)
+        bio_trans_kg = 1150 * 0.156
+
         return [
             ("Transport-Intensität", {"val": KPI_Engine.fmt(transport_int, unit='pct'), "sub": "Wegzeiten (Wagen)", "trend": "bad"}),
             ("Aufzug-Abhängigkeit", {"val": "15 Min", "sub": "Wartezeit Aufzug (Sim)", "trend": "neutral"}),
@@ -740,7 +778,7 @@ class KPI_Engine:
             ("Wartungs-Quote", {"val": "5.5%", "sub": "Wartungszeit", "trend": "good"}),
             
             ("Hygiene-Switch (11:20)", {"val": "100%", "sub": "Wechselslot eingehalten", "trend": "good"}),
-            ("Bio-Trans Volumen", {"val": "120 kg", "sub": "Food Waste (Est)", "trend": "bad"}),
+            ("Bio-Trans Volumen", {"val": f"{bio_trans_kg:.0f} kg", "sub": "Food Waste (Messwert '24)", "trend": "bad"}),
             ("Integrität Reine Seite", {"val": "High", "sub": "Personaldichte", "trend": "good"}),
             ("Grundreinigungs-Index", {"val": KPI_Engine.fmt_cost(hygiene_min, mode), "sub": "Grundreinigung (Total)", "trend": "good"}),
             ("HACCP-Doku", {"val": "45 Min", "sub": "Doku-Aufwand", "trend": "neutral"}),
@@ -792,7 +830,7 @@ class KPI_Engine:
             ("Hygiene-Risiko Total", {"val": "Medium", "sub": "Aggregiertes Risiko", "trend": "neutral"}),
             ("Patienten-Kontakt", {"val": "1200+", "sub": "Täglich", "trend": "good"}),
             ("Prozess-Standard", {"val": "75%", "sub": "Ad-hoc vs. Std", "trend": "neutral"}),
-            ("Führungs-Spanne", {"val": "1:15", "sub": "Führungskraft/MA", "trend": "bad"}),
+            ("Führungs-Spanne", {"val": "1:15", "sub": "Führungskraft/MA (Idealwert 1:8)", "trend": "bad"}),
         ]
 
 # --- 5. MAIN APPLICATION ---
@@ -807,7 +845,7 @@ def main():
     """, unsafe_allow_html=True)
     
     # 1. Sector Switcher
-    sector_mode = st.radio("SECTOR VIEW:", ["Küche (Produktion)", "Gastrodienste (Stewarding)", "Total Operations (Gesamt)"], horizontal=True)
+    sector_mode = st.radio("SECTOR VIEW:", ["Küche (Produktion)", "Gastrodienste (Logistik)", "Total Operations (Gesamt)"], horizontal=True)
     
     # Data Fetching
     if "Küche" in sector_mode:
@@ -851,6 +889,16 @@ def main():
     st.markdown(f'<div class="section-label" title="{SECTION_TOOLTIPS["Belastungs-Matrix"]}">Belastungs-Matrix (Capacity vs. Demand)</div>', unsafe_allow_html=True)
     
     if current_sector == "total":
+        # Detailed Description for Total View
+        st.markdown("""
+        <div style="font-size: 0.9rem; color: #64748B; margin-bottom: 15px; background-color: #F8FAFC; padding: 10px; border-radius: 8px; border: 1px solid #E2E8F0;">
+        <b>Gesamt-Last-Analyse:</b><br>
+        <span style="color: #3B82F6; font-weight: bold;">🟦 Blau (Produktion/Push):</span> Zeigt die aktive Arbeitslast der Küche. Diese Kurve wird durch den Menüplan diktiert (Mise en Place, Service-Vorbereitung).<br>
+        <span style="color: #64748B; font-weight: bold;">⬜ Grau (Stewarding/Pull):</span> Zeigt die reaktive Last der Gastrodienste. Diese Kurve folgt verzögert auf die Produktion und den Service (Rücklauf, Reinigung).<br>
+        <i><b>Erkenntnis:</b> Überlappungen der beiden Flächen zeigen Energie- und Raum-Spitzen (Infrastructure Stress).</i>
+        </div>
+        """, unsafe_allow_html=True)
+
         # Stacked View for Total Operations
         workload_df = WorkloadEngine.get_load_curve(df)
         fig_load = go.Figure()
@@ -858,19 +906,19 @@ def main():
         # Kitchen Area (Blue / Push)
         fig_load.add_trace(go.Scatter(
             x=workload_df['Zeit'], y=workload_df['Load Kitchen'],
-            mode='none', name='Kitchen Demand (Push)', stackgroup='one',
+            mode='none', name='Produktion (Push)', stackgroup='one',
             fillcolor=COLORS['kitchen']
         ))
         # Gastro Area (Gray / Pull)
         fig_load.add_trace(go.Scatter(
             x=workload_df['Zeit'], y=workload_df['Load Gastro'],
-            mode='none', name='Gastro Demand (Pull)', stackgroup='one',
+            mode='none', name='Logistik (Pull)', stackgroup='one',
             fillcolor=COLORS['gastro']
         ))
         # Total Capacity Line
         fig_load.add_trace(go.Scatter(
             x=workload_df['Zeit'], y=workload_df['Capacity (FTE)'],
-            mode='lines', name='Total Staff (FTE)',
+            mode='lines', name='Total Personal (FTE)',
             line=dict(color='#0F172A', width=2, dash='dot')
         ))
     else:
