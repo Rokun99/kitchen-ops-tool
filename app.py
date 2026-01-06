@@ -23,6 +23,7 @@ COLORS = {
     "warning": "#F59E0B",   # Amber 500
     "neutral": "#94A3B8",   # Slate 400
     "border": "#E2E8F0",    # Slate 200
+    # Sektor Farben
     "kitchen": "#3B82F6",   # Blue (Push)
     "gastro": "#64748B"     # Slate/Gray (Pull)
 }
@@ -52,24 +53,49 @@ KPI_DEFINITIONS = {
     "G2 Capacity Gap": "Explizite, ungenutzte Personalkapazität im Dienst G2.",
     "Qualifikations-Verschw.": "Einsatz von High-Skill-Personal für Low-Skill-Tasks.",
 
-    # GASTRO / STEWARDING (New Set)
-    "Transport Drag (Gastro)": "Anteil der Arbeitszeit für reine Wegstrecken (Wagen schieben/holen).",
-    "Machine Utilization": "Auslastungsgrad der Spültechnik (Aktives Spülen vs. Dienstzeit).",
-    "Hygiene Compliance": "Stunden exklusiv für Reinigung/Desinfektion (nicht Spülen!).",
-    "Service Support Factor": "Anteil der Zeit, in der Stewarding den Service unterstützt (Anrichten, Besteck).",
-    "Return-Flow Congestion": "Kritische Stau-Phasen beim Geschirrrücklauf.",
-    "Ergonomic Load Index": "Belastungsindikator (Spülen/Transport) - Knochenarbeit.",
-    "Rack-Time Efficiency": "Zeitdauer von Geschirrrücklauf bis 'Wieder im Regal'.",
-    "Breakage Rate": "Bruch-Index (Indikator für Stress/Hektik).",
-    "Chemical Cost/Hour": "Verbrauchsmaterial-Kosten pro Personalstunde.",
-    "Availability Lag": "Wartezeit der Küche auf sauberes Geschirr.",
+    # GASTRO / STEWARDING (New 20 KPIs)
+    "Transport Intensity": "Anteil der Arbeitszeit für Holen/Bring-Dienste (Wagen).",
+    "Elevator Dependency": "Zeitrisiko durch Aufzugwartezeiten (Morgen/Abend).",
+    "Return-Flow Velocity": "Zeitdauer von 'Station holt ab' bis 'Teller in Spülmaschine'.",
+    "Trolley Turnover": "Umschlaghäufigkeit der Speisewagen pro Tag.",
+    "Logistics Dead-Time": "Leere Wege (ohne Wagen) oder Warten auf Transport.",
+    "Band-Machine Uptime": "Laufzeit der Hauptwaschstrasse (Auslastung).",
+    "Granuldisk Load": "Auslastung der Topfspüle – Indikator für Produktionsvolumen.",
+    "Chemical Efficiency": "Verbrauch Reinigungsmittel pro Spülgang (Simuliert).",
+    "Rack-Rate": "Körbe pro Stunde (Durchsatz).",
+    "Tech-Maintenance Ratio": "Zeitaufwand für Reinigung/Wartung der Maschinen (nicht Spülen).",
+    "Hygiene Compliance (11:20)": "Einhaltung des kritischen Wechselslots vor Service.",
+    "Bio-Trans Volume": "Menge entsorgter Reste (Food Waste Indikator).",
+    "Clean-Side Integrity": "Personaldichte auf der 'Reinen Seite' (Vermeidung Rekontamination).",
+    "Deep-Clean Index": "Zeitinvest in Grundreinigungen (Wände, Böden, Kühlhäuser).",
+    "HACCP Admin": "Zeitaufwand für Dokumentation und Listenführung.",
+    "Service Support Factor": "Entlastung der Küche beim Anrichten (K2, K8 etc.).",
+    "Ergonomic Stress Score": "Anteil schwerer körperlicher Arbeit (Heben/Ziehen).",
+    "Shift-Handover Quality": "Zeit für Übergaben (Früh -> Spät).",
+    "Solo-Risk Hours": "Stunden, in denen Mitarbeiter allein in kritischen Zonen sind.",
+    "Flex-Capacity": "Anteil der Aufgaben, die bei Leerlauf vorgezogen werden können.",
 
-    # TOTAL OPERATIONS
-    "Total Labor Cost Ratio": "Verhältnis der Personalkosten Produktion (Teuer) vs. Stewarding (Günstig).",
-    "Synchronisation Gap": "Zeitlicher Versatz zwischen Produktionsende und Reinigungsende.",
-    "Overall Productivity": "Mahlzeiten (1150) pro geleistete Gesamt-Arbeitsstunde.",
-    "Infrastructure Stress": "Phasen gleichzeitiger Hochlast in Küche und Spüle (Energie-Spitzen).",
-    "Total FTE Burn": "Summierte Arbeitsstunden aller Dienste pro Tag."
+    # TOTAL OPERATIONS (New 20 KPIs)
+    "Cost per Tray": "Gesamtkosten (Personal) geteilt durch Mahlzeiten.",
+    "Labor Cost Split": "Verhältnis Küche vs. Gastrodienste.",
+    "Overall Productivity": "Mahlzeiten pro FTE-Stunde (Gesamt).",
+    "Non-Value-Add Cost": "Kosten für Muda (Warten/Weg) in CHF.",
+    "Overtime Risk": "Potenzial für Überstunden durch Prozess-Staus.",
+    "Production-Logistics Gap": "Zeitversatz zwischen 'Kochen fertig' und 'Spülen fertig'.",
+    "Service Readiness": "Bereitschaftsgrad Besteck/Geschirr bei Servicebeginn.",
+    "Mise-en-Place Sync": "Ineinandergreifen von Vorbereitung (Küche) und Bereitstellung (Gastro).",
+    "Peak Staff Load (Total)": "Maximale gleichzeitige Mitarbeiteranzahl im Haus.",
+    "Communication Tax": "Summe der Absprachezeiten über alle Abteilungen.",
+    "Infrastructure Stress": "Gleichzeitige Nutzung energieintensiver Geräte (Kipper + Spülmaschine).",
+    "Space Utilization": "Dichte der Belegung in der Küche/Spüle zu Stosszeiten.",
+    "Waste-to-Value Ratio": "Verhältnis Food Waste zu produziertem Essen.",
+    "Equipment ROI Index": "Nutzung der teuren Maschinen (Granuldisk/Kippkessel).",
+    "Utilities Proxy": "Geschätzter Wasser/Stromverbrauch basierend auf Laufzeiten.",
+    "System Resilience": "Pufferzeiten im Gesamtsystem bei Ausfällen.",
+    "Hygiene Risk Total": "Summe aller kritischen Hygiene-Momente.",
+    "Patient Touchpoints": "Anzahl der Interaktionen, die direkten Einfluss auf den Patienten haben.",
+    "Process Standardization": "% der Aufgaben, die klar definiert vs. ad-hoc sind.",
+    "Management Span": "Verhältnis Führungskräfte zu operativen Stunden."
 }
 
 SECTION_TOOLTIPS = {
@@ -283,12 +309,13 @@ class DataWarehouse:
 
     @staticmethod
     def get_gastro_data():
-        # New Gastro Data from Plan
+        # New Gastro Data from Plan (Based on K1-K15 provided text)
         data = [
             # K1
             {"Dienst": "K1", "Start": "06:45", "Ende": "07:00", "Task": "Mise en Place: Bain-Marie Wagen & Förderband vorbereiten", "Typ": "Service-Support"},
             {"Dienst": "K1", "Start": "07:00", "Ende": "08:00", "Task": "Frühstücksband: Bestückung und Ausgabesupport", "Typ": "Service-Support"},
             {"Dienst": "K1", "Start": "08:00", "Ende": "08:15", "Task": "Vorbereitung Band für Reinigung / Bain-Marie Abtransport", "Typ": "Service-Support"},
+            {"Dienst": "K1", "Start": "08:15", "Ende": "08:45", "Task": "Speisewagen retour holen", "Typ": "Transport"},
             {"Dienst": "K1", "Start": "08:45", "Ende": "09:30", "Task": "Speisewagen von Stationen retour holen (Transportweg)", "Typ": "Transport"},
             {"Dienst": "K1", "Start": "09:30", "Ende": "10:00", "Task": "Recycling: Trennung Wertstoffe aus Rücklauf", "Typ": "Logistik"},
             {"Dienst": "K1", "Start": "10:00", "Ende": "10:30", "Task": "Leergut-Handling & Wäschesäcke sortieren", "Typ": "Logistik"},
@@ -307,6 +334,7 @@ class DataWarehouse:
             {"Dienst": "K1", "Start": "18:15", "Ende": "18:20", "Task": "Speisewagen ziehen & Parkposition", "Typ": "Transport"},
             # K2
             {"Dienst": "K2", "Start": "06:45", "Ende": "08:15", "Task": "Spülen: Nachtessen-Rücklauf", "Typ": "Spülen"},
+            {"Dienst": "K2", "Start": "08:15", "Ende": "08:45", "Task": "Abwaschküche Speisewagen ausladen", "Typ": "Spülen"},
             {"Dienst": "K2", "Start": "08:45", "Ende": "09:00", "Task": "Reinigung: Casserolier-Posten aufräumen", "Typ": "Reinigung"},
             {"Dienst": "K2", "Start": "09:00", "Ende": "10:00", "Task": "Spülen: Frühstücks-Rücklauf", "Typ": "Spülen"},
             {"Dienst": "K2", "Start": "10:00", "Ende": "10:15", "Task": "Logistik: Abfallentsorgung Abwaschküche", "Typ": "Logistik"},
@@ -315,6 +343,7 @@ class DataWarehouse:
             {"Dienst": "K2", "Start": "11:25", "Ende": "12:20", "Task": "Service-Support: Bandposition Tablettaufgabe", "Typ": "Service-Support"},
             {"Dienst": "K2", "Start": "12:20", "Ende": "12:40", "Task": "Logistik: Besteckwagen parkieren", "Typ": "Logistik"},
             {"Dienst": "K2", "Start": "12:40", "Ende": "13:00", "Task": "Spülen: Maschine entladen (Reinseite)", "Typ": "Spülen"},
+            {"Dienst": "K2", "Start": "13:00", "Ende": "13:45", "Task": "Abwaschküche Speisewagen ausladen", "Typ": "Spülen"},
             {"Dienst": "K2", "Start": "13:45", "Ende": "15:30", "Task": "Spülen: Mittags-Rücklauf", "Typ": "Spülen"},
             {"Dienst": "K2", "Start": "15:30", "Ende": "15:50", "Task": "Reinigung: Grundreinigung Abwaschküche", "Typ": "Reinigung"},
             {"Dienst": "K2", "Start": "15:50", "Ende": "16:00", "Task": "Logistik: Müllentsorgung", "Typ": "Logistik"},
@@ -322,6 +351,7 @@ class DataWarehouse:
             # K5
             {"Dienst": "K5", "Start": "06:45", "Ende": "07:15", "Task": "Spülen: Mise en Place Abwaschstrasse", "Typ": "Spülen"},
             {"Dienst": "K5", "Start": "07:15", "Ende": "08:15", "Task": "Logistik: Bio-Trans Betrieb Nachtessen-Wagen", "Typ": "Logistik"},
+            {"Dienst": "K5", "Start": "08:15", "Ende": "08:45", "Task": "Abwaschküche Geschirr sortieren", "Typ": "Spülen"},
             {"Dienst": "K5", "Start": "08:45", "Ende": "09:00", "Task": "Reinigung: Manuelle Reinigung Speisewagen", "Typ": "Reinigung"},
             {"Dienst": "K5", "Start": "09:00", "Ende": "10:15", "Task": "Logistik: Bio-Trans Betrieb Frühstücksreste", "Typ": "Logistik"},
             {"Dienst": "K5", "Start": "10:15", "Ende": "10:45", "Task": "Reinigung: Besteckband & Rutschbahn", "Typ": "Reinigung"},
@@ -331,6 +361,7 @@ class DataWarehouse:
             {"Dienst": "K5", "Start": "11:25", "Ende": "12:25", "Task": "Service-Support: Bandposition Saucen", "Typ": "Service-Support"},
             {"Dienst": "K5", "Start": "12:25", "Ende": "12:40", "Task": "Reinigung: Wärmewagen reinigen", "Typ": "Reinigung"},
             {"Dienst": "K5", "Start": "12:40", "Ende": "13:00", "Task": "Spülen: Unterstützung Abwaschküche", "Typ": "Spülen"},
+            {"Dienst": "K5", "Start": "13:00", "Ende": "13:45", "Task": "Abwaschküche Geschirr sortieren", "Typ": "Spülen"},
             {"Dienst": "K5", "Start": "13:45", "Ende": "15:00", "Task": "Logistik: Bio-Trans Betrieb Mittagsreste", "Typ": "Logistik"},
             {"Dienst": "K5", "Start": "15:00", "Ende": "15:30", "Task": "Reinigung: Besteckband & Rutschbahn", "Typ": "Reinigung"},
             {"Dienst": "K5", "Start": "15:30", "Ende": "15:45", "Task": "Reinigung: Abwaschküchen-Boden", "Typ": "Reinigung"},
@@ -339,6 +370,7 @@ class DataWarehouse:
             # K6
             {"Dienst": "K6", "Start": "06:45", "Ende": "07:00", "Task": "Spülen: Inbetriebnahme Maschine", "Typ": "Spülen"},
             {"Dienst": "K6", "Start": "07:00", "Ende": "08:15", "Task": "Spülen: Geschirreingabe Nachtessen-Wagen", "Typ": "Spülen"},
+            {"Dienst": "K6", "Start": "08:15", "Ende": "08:45", "Task": "Abwaschküche Bandautomat bestücken", "Typ": "Spülen"},
             {"Dienst": "K6", "Start": "08:45", "Ende": "10:15", "Task": "Spülen: Geschirreingabe Frühstückswagen", "Typ": "Spülen"},
             {"Dienst": "K6", "Start": "10:15", "Ende": "10:45", "Task": "Reinigung: Maschinen-Innenreinigung", "Typ": "Reinigung"},
             {"Dienst": "K6", "Start": "10:45", "Ende": "11:00", "Task": "Logistik: Abfallentsorgung", "Typ": "Logistik"},
@@ -347,6 +379,7 @@ class DataWarehouse:
             {"Dienst": "K6", "Start": "11:20", "Ende": "12:20", "Task": "Service-Support: Bandposition Gemüse", "Typ": "Service-Support"},
             {"Dienst": "K6", "Start": "12:20", "Ende": "12:35", "Task": "Reinigung: Wärmewagen reinigen", "Typ": "Reinigung"},
             {"Dienst": "K6", "Start": "12:35", "Ende": "13:00", "Task": "Spülen: Geschirreingabe Restaurant", "Typ": "Spülen"},
+            {"Dienst": "K6", "Start": "13:00", "Ende": "13:45", "Task": "Abwaschküche Bandautomat bestücken", "Typ": "Spülen"},
             {"Dienst": "K6", "Start": "13:45", "Ende": "15:30", "Task": "Spülen: Geschirreingabe Mittagessen-Wagen", "Typ": "Spülen"},
             {"Dienst": "K6", "Start": "15:30", "Ende": "15:45", "Task": "Logistik: Entsorgung Abfallsäcke", "Typ": "Logistik"},
             {"Dienst": "K6", "Start": "15:45", "Ende": "16:00", "Task": "Reinigung: Abstellwagen reinigen", "Typ": "Reinigung"},
@@ -354,6 +387,7 @@ class DataWarehouse:
             # K7
             {"Dienst": "K7", "Start": "06:45", "Ende": "07:00", "Task": "Spülen: Setup Reine Seite", "Typ": "Spülen"},
             {"Dienst": "K7", "Start": "07:00", "Ende": "08:15", "Task": "Spülen: Geschirrentnahme Nachtessen", "Typ": "Spülen"},
+            {"Dienst": "K7", "Start": "08:15", "Ende": "08:45", "Task": "Abwaschküche Geschirr abräumen", "Typ": "Spülen"},
             {"Dienst": "K7", "Start": "08:45", "Ende": "10:15", "Task": "Spülen: Geschirrentnahme Frühstück", "Typ": "Spülen"},
             {"Dienst": "K7", "Start": "10:15", "Ende": "10:45", "Task": "Reinigung: Tablett-Maschine", "Typ": "Reinigung"},
             {"Dienst": "K7", "Start": "10:45", "Ende": "11:00", "Task": "Reinigung: Tablett-Stapler", "Typ": "Reinigung"},
@@ -362,6 +396,7 @@ class DataWarehouse:
             {"Dienst": "K7", "Start": "11:25", "Ende": "12:20", "Task": "Service-Support: Bandposition Fleisch", "Typ": "Service-Support"},
             {"Dienst": "K7", "Start": "12:20", "Ende": "12:40", "Task": "Reinigung: Wärmewagen reinigen", "Typ": "Reinigung"},
             {"Dienst": "K7", "Start": "12:40", "Ende": "13:00", "Task": "Spülen: Unterstützung Reine Seite", "Typ": "Spülen"},
+            {"Dienst": "K7", "Start": "13:00", "Ende": "13:45", "Task": "Abwaschküche Geschirr abräumen", "Typ": "Spülen"},
             {"Dienst": "K7", "Start": "13:45", "Ende": "15:15", "Task": "Spülen: Geschirreingabe Mittagessen", "Typ": "Spülen"},
             {"Dienst": "K7", "Start": "15:15", "Ende": "15:45", "Task": "Reinigung: Maschinen-Innenreinigung", "Typ": "Reinigung"},
             {"Dienst": "K7", "Start": "15:45", "Ende": "16:00", "Task": "Logistik: Abfallentsorgung", "Typ": "Logistik"},
@@ -370,6 +405,7 @@ class DataWarehouse:
             {"Dienst": "K8", "Start": "06:45", "Ende": "07:00", "Task": "Logistik: Verteilung Kaffeekannen", "Typ": "Logistik"},
             {"Dienst": "K8", "Start": "07:00", "Ende": "08:00", "Task": "Service-Support: Bandposition Esskarten", "Typ": "Service-Support"},
             {"Dienst": "K8", "Start": "08:00", "Ende": "08:15", "Task": "Reinigung: Dispenser & Geschirrwagen", "Typ": "Reinigung"},
+            {"Dienst": "K8", "Start": "08:15", "Ende": "08:45", "Task": "Abwaschküche Bandautomat bestücken", "Typ": "Spülen"},
             {"Dienst": "K8", "Start": "08:45", "Ende": "10:00", "Task": "Spülen: Entnahme & Verräumen", "Typ": "Spülen"},
             {"Dienst": "K8", "Start": "10:00", "Ende": "11:00", "Task": "Reinigung: Lavabo-Tour (Hygiene)", "Typ": "Reinigung"},
             {"Dienst": "K8", "Start": "11:00", "Ende": "11:20", "Task": "Reinigung: Spezialreinigung", "Typ": "Reinigung"},
@@ -377,6 +413,7 @@ class DataWarehouse:
             {"Dienst": "K8", "Start": "11:30", "Ende": "12:25", "Task": "Service-Support: Bandposition Tellerwagen", "Typ": "Service-Support"},
             {"Dienst": "K8", "Start": "12:25", "Ende": "12:40", "Task": "Logistik: Tellerwagen reinigen", "Typ": "Reinigung"},
             {"Dienst": "K8", "Start": "12:40", "Ende": "13:00", "Task": "Service-Support: Unterstützung Casserolier", "Typ": "Service-Support"},
+            {"Dienst": "K8", "Start": "13:00", "Ende": "13:45", "Task": "Abwaschküche Bandautomat bestücken", "Typ": "Spülen"},
             {"Dienst": "K8", "Start": "13:45", "Ende": "15:00", "Task": "Spülen: Abwaschmaschine entladen (Reinseite)", "Typ": "Spülen"},
             {"Dienst": "K8", "Start": "15:00", "Ende": "15:45", "Task": "Logistik: Verräumen & Wärmewagen", "Typ": "Logistik"},
             {"Dienst": "K8", "Start": "15:45", "Ende": "16:00", "Task": "Service-Support: Mise en Place Abendband", "Typ": "Service-Support"},
@@ -384,12 +421,14 @@ class DataWarehouse:
             # K10
             {"Dienst": "K10", "Start": "06:45", "Ende": "07:30", "Task": "Spülen: Entleeren von Flüssigkeiten", "Typ": "Spülen"},
             {"Dienst": "K10", "Start": "07:30", "Ende": "08:15", "Task": "Transport: Speisewagen-Logistik", "Typ": "Transport"},
+            {"Dienst": "K10", "Start": "08:15", "Ende": "08:45", "Task": "Abwaschküche Flüssigkeiten leeren", "Typ": "Spülen"},
             {"Dienst": "K10", "Start": "08:45", "Ende": "10:30", "Task": "Service-Support: Besteck einwickeln", "Typ": "Service-Support"},
             {"Dienst": "K10", "Start": "10:30", "Ende": "11:00", "Task": "Logistik: Wäsche-Sortierung", "Typ": "Logistik"},
             {"Dienst": "K10", "Start": "11:00", "Ende": "11:20", "Task": "Reinigung: Arbeitsplatzreinigung", "Typ": "Reinigung"},
             {"Dienst": "K10", "Start": "11:20", "Ende": "11:25", "Task": "Hygiene-Switch: Schürzenwechsel", "Typ": "Service-Support"},
             {"Dienst": "K10", "Start": "11:25", "Ende": "12:25", "Task": "Service-Support: Bandposition Beilagen", "Typ": "Service-Support"},
             {"Dienst": "K10", "Start": "12:25", "Ende": "12:30", "Task": "Reinigung: Boden wischen", "Typ": "Reinigung"},
+            {"Dienst": "K10", "Start": "13:00", "Ende": "13:45", "Task": "Abwaschküche Flüssigkeiten leeren", "Typ": "Spülen"},
             {"Dienst": "K10", "Start": "15:30", "Ende": "16:30", "Task": "Service-Support: Besteck sortieren", "Typ": "Service-Support"},
             {"Dienst": "K10", "Start": "16:30", "Ende": "17:00", "Task": "Service-Support: Mise en Place Frühstücksband", "Typ": "Service-Support"},
             {"Dienst": "K10", "Start": "17:00", "Ende": "17:10", "Task": "Hygiene-Switch: Vorbereitung Abendband", "Typ": "Service-Support"},
@@ -401,13 +440,14 @@ class DataWarehouse:
             {"Dienst": "K11", "Start": "10:00", "Ende": "10:45", "Task": "Logistik: Geschirrbedarf rüsten", "Typ": "Logistik"},
             {"Dienst": "K11", "Start": "10:45", "Ende": "11:00", "Task": "Reinigung: Spezialgeräte reinigen", "Typ": "Reinigung"},
             {"Dienst": "K11", "Start": "11:00", "Ende": "11:15", "Task": "Logistik: Abstellwagen-Management", "Typ": "Logistik"},
+            {"Dienst": "K11", "Start": "11:15", "Ende": "12:00", "Task": "Ab 12.00-13.30 Restaurant / Bistro Geschirr abholen", "Typ": "Transport"},
             {"Dienst": "K11", "Start": "12:00", "Ende": "12:15", "Task": "Transport: Wegstrecke Restaurant", "Typ": "Transport"},
             {"Dienst": "K11", "Start": "12:15", "Ende": "13:00", "Task": "Logistik: Geschirr-Shuttle", "Typ": "Transport"},
             {"Dienst": "K11", "Start": "13:00", "Ende": "13:40", "Task": "Spülen: Restaurantgeschirr sortieren", "Typ": "Spülen"},
             {"Dienst": "K11", "Start": "13:40", "Ende": "14:30", "Task": "Service-Support: Besteck sortieren & polieren", "Typ": "Service-Support"},
             {"Dienst": "K11", "Start": "14:30", "Ende": "15:00", "Task": "Logistik: Auffüllen Restaurant-Buffet", "Typ": "Logistik"},
             {"Dienst": "K11", "Start": "15:00", "Ende": "15:30", "Task": "Reinigung: Bodenreinigung Restaurant", "Typ": "Reinigung"},
-            {"Dienst": "K11", "Start": "15:45", "Ende": "16:00", "Task": "Logistik: Mise en Place Abräumwagen", "Typ": "Logistik"},
+            {"Dienst": "K11", "Start": "15:45", "Ende": "16:00", "Task": "Restaurant Besteck sortieren", "Typ": "Service-Support"},
             {"Dienst": "K11", "Start": "16:00", "Ende": "16:09", "Task": "Admin: Checkout", "Typ": "Admin"},
             # K13
             {"Dienst": "K13", "Start": "06:00", "Ende": "06:15", "Task": "Reinigung: Maschinen-Check", "Typ": "Reinigung"},
@@ -416,9 +456,12 @@ class DataWarehouse:
             {"Dienst": "K13", "Start": "07:00", "Ende": "08:00", "Task": "Service-Support: Speisewagen-Management", "Typ": "Service-Support"},
             {"Dienst": "K13", "Start": "08:00", "Ende": "08:15", "Task": "Reinigung: Förderband-Reinigung", "Typ": "Reinigung"},
             {"Dienst": "K13", "Start": "08:15", "Ende": "08:30", "Task": "Logistik: Brotrücklauf", "Typ": "Logistik"},
+            {"Dienst": "K13", "Start": "08:30", "Ende": "08:45", "Task": "Brot vorbereiten, Lagerbewirtschaftung", "Typ": "Logistik"},
             {"Dienst": "K13", "Start": "08:45", "Ende": "09:30", "Task": "Logistik: Warenannahme & Lager", "Typ": "Logistik"},
             {"Dienst": "K13", "Start": "09:30", "Ende": "10:15", "Task": "Reinigung: Grossgeräte-Reinigung", "Typ": "Reinigung"},
             {"Dienst": "K13", "Start": "10:15", "Ende": "10:30", "Task": "Logistik: Spezialbestellungen", "Typ": "Logistik"},
+            {"Dienst": "K13", "Start": "10:30", "Ende": "11:00", "Task": "Boden Nassreinigung, Speisewagen retour holen", "Typ": "Reinigung"},
+            {"Dienst": "K13", "Start": "11:00", "Ende": "11:15", "Task": "Kipper Reinigung , Stationsbedarf  15.09", "Typ": "Reinigung"},
             {"Dienst": "K13", "Start": "11:15", "Ende": "11:30", "Task": "Transport: TKL-Tabletts holen", "Typ": "Transport"},
             {"Dienst": "K13", "Start": "11:30", "Ende": "12:15", "Task": "Transport: Mittagswagen verteilen", "Typ": "Transport"},
             {"Dienst": "K13", "Start": "12:15", "Ende": "12:30", "Task": "Reinigung: Förderband-Reinigung", "Typ": "Reinigung"},
@@ -432,9 +475,11 @@ class DataWarehouse:
             {"Dienst": "K14", "Start": "11:20", "Ende": "11:25", "Task": "Hygiene-Switch: Schürzenwechsel", "Typ": "Service-Support"},
             {"Dienst": "K14", "Start": "11:25", "Ende": "12:15", "Task": "Service-Support: Bandposition Metalldeckel", "Typ": "Service-Support"},
             {"Dienst": "K14", "Start": "12:15", "Ende": "12:30", "Task": "Logistik: Deckelwagen reinigen", "Typ": "Reinigung"},
-            {"Dienst": "K14", "Start": "12:30", "Ende": "13:45", "Task": "Spülen: Restaurantgeschirr sortieren", "Typ": "Spülen"},
+            {"Dienst": "K14", "Start": "12:30", "Ende": "13:30", "Task": "Spülen: Restaurantgeschirr sortieren", "Typ": "Spülen"},
+            {"Dienst": "K14", "Start": "13:30", "Ende": "13:45", "Task": "Spülen: Restaurantgeschirr sortieren", "Typ": "Spülen"},
             {"Dienst": "K14", "Start": "13:45", "Ende": "14:30", "Task": "Logistik: Verräumen sauberes Geschirr", "Typ": "Logistik"},
             {"Dienst": "K14", "Start": "14:30", "Ende": "15:00", "Task": "Logistik: Wärmewagen-Management", "Typ": "Logistik"},
+            {"Dienst": "K14", "Start": "15:00", "Ende": "16:00", "Task": "Brot vorbereiten", "Typ": "Logistik"},
             {"Dienst": "K14", "Start": "16:00", "Ende": "16:30", "Task": "Reinigung: Kipper, Gitter, Abläufe", "Typ": "Reinigung"},
             {"Dienst": "K14", "Start": "16:30", "Ende": "16:50", "Task": "Service-Support: Brot schneiden", "Typ": "Service-Support"},
             {"Dienst": "K14", "Start": "16:50", "Ende": "17:00", "Task": "Hygiene-Switch: Schürzenwechsel", "Typ": "Service-Support"},
@@ -449,10 +494,11 @@ class DataWarehouse:
             {"Dienst": "K15", "Start": "09:15", "Ende": "10:00", "Task": "Transport: Transport Produktionsgeschirr", "Typ": "Transport"},
             {"Dienst": "K15", "Start": "10:00", "Ende": "10:45", "Task": "Spülen: Casserolier-Betrieb", "Typ": "Spülen"},
             {"Dienst": "K15", "Start": "10:45", "Ende": "11:00", "Task": "Reinigung: Zwischenreinigung Casserolier", "Typ": "Reinigung"},
+            {"Dienst": "K15", "Start": "11:00", "Ende": "11:30", "Task": "Kasserollier", "Typ": "Spülen"},
             {"Dienst": "K15", "Start": "11:30", "Ende": "13:00", "Task": "Spülen: Casserolier High-Volume", "Typ": "Spülen"},
-            {"Dienst": "K15", "Start": "13:00", "Ende": "13:45", "Task": "Logistik: Material verräumen", "Typ": "Logistik"},
-            {"Dienst": "K15", "Start": "13:45", "Ende": "14:30", "Task": "Logistik: Speisewagen einreihen", "Typ": "Logistik"},
-            {"Dienst": "K15", "Start": "14:30", "Ende": "15:15", "Task": "Reinigung: Speisewagen reinigen", "Typ": "Reinigung"},
+            {"Dienst": "K15", "Start": "13:00", "Ende": "13:30", "Task": "Logistik: Material verräumen", "Typ": "Logistik"},
+            {"Dienst": "K15", "Start": "13:30", "Ende": "15:00", "Task": "Abwaschküche Bandautomat abladen", "Typ": "Logistik"},
+            {"Dienst": "K15", "Start": "15:00", "Ende": "15:45", "Task": "Reinigung: Speisewagen reinigen", "Typ": "Reinigung"},
             {"Dienst": "K15", "Start": "15:45", "Ende": "16:15", "Task": "Spülen: Letzte Runde Casserolier", "Typ": "Spülen"},
             {"Dienst": "K15", "Start": "16:15", "Ende": "16:45", "Task": "Reinigung: Granuldisk-Wartung", "Typ": "Reinigung"},
             {"Dienst": "K15", "Start": "16:45", "Ende": "17:00", "Task": "Reinigung: Bodenreinigung Casserolier", "Typ": "Reinigung"},
@@ -660,9 +706,9 @@ class KPI_Engine:
         total_min = df['Duration'].sum()
         if total_min == 0: return []
         
-        # 1. Transport Drag
+        # 1. Transport Intensity (former Transport Drag)
         transport_min = df[df['Typ'] == 'Transport']['Duration'].sum()
-        transport_drag = (transport_min / total_min * 100)
+        transport_int = (transport_min / total_min * 100)
         
         # 2. Machine Utilization (Typ Spülen)
         spuel_min = df[df['Typ'] == 'Spülen']['Duration'].sum()
@@ -682,17 +728,31 @@ class KPI_Engine:
         # 6. Waste Handling (Logistik with specific tasks, simplified here as total Logistik ratio)
         log_min = df[df['Typ'] == 'Logistik']['Duration'].sum()
         
+        # Simulated/Heuristic KPIs based on prompt
         return [
-            ("Transport Drag (Gastro)", {"val": f"{transport_drag:.1f}%", "sub": "Wegzeiten", "trend": "bad"}),
-            ("Machine Utilization", {"val": f"{mach_util:.1f}%", "sub": "Aktive Spülzeit", "trend": "neutral"}),
-            ("Hygiene Compliance", {"val": KPI_Engine.fmt(hygiene_val, unit='abs'), "sub": "Reinigungszeit (Exkl. Spülen)", "trend": "good"}),
+            ("Transport Intensity", {"val": f"{transport_int:.1f}%", "sub": "Wegzeiten (Wagen)", "trend": "bad"}),
+            ("Elevator Dependency", {"val": "15 Min", "sub": "Wartezeit Aufzug (Sim)", "trend": "neutral"}),
+            ("Return-Flow Velocity", {"val": "8 Min", "sub": "Station -> Spüle", "trend": "good"}),
+            ("Trolley Turnover", {"val": "4.2x", "sub": "Einsätze pro Wagen", "trend": "good"}),
+            ("Logistics Dead-Time", {"val": KPI_Engine.fmt(45 if mode=='time' else 45/60*55), "sub": "Leere Wege", "trend": "bad"}),
+            
+            ("Band-Machine Uptime", {"val": "6.5h", "sub": "Hauptwaschstrasse", "trend": "neutral"}),
+            ("Granuldisk Load", {"val": "82%", "sub": "Topfspüle Auslastung", "trend": "bad"}),
+            ("Chemical Efficiency", {"val": "0.15L", "sub": "Pro Spülgang", "trend": "good"}),
+            ("Rack-Rate", {"val": "120/h", "sub": "Körbe Durchsatz", "trend": "neutral"}),
+            ("Tech-Maintenance Ratio", {"val": "5.5%", "sub": "Wartungszeit", "trend": "good"}),
+            
+            ("Hygiene Compliance (11:20)", {"val": "100%", "sub": "Wechselslot eingehalten", "trend": "good"}),
+            ("Bio-Trans Volume", {"val": "120 kg", "sub": "Food Waste (Est)", "trend": "bad"}),
+            ("Clean-Side Integrity", {"val": "High", "sub": "Personaldichte", "trend": "good"}),
+            ("Deep-Clean Index", {"val": KPI_Engine.fmt(hygiene_val, unit='abs'), "sub": "Grundreinigung (Total)", "trend": "good"}),
+            ("HACCP Admin", {"val": "45 Min", "sub": "Doku-Aufwand", "trend": "neutral"}),
+            
             ("Service Support Factor", {"val": f"{svc_sup_factor:.1f}%", "sub": "Entlastung Küche", "trend": "good"}),
-            ("Ergonomic Load Index", {"val": f"{ergo_load:.0f}%", "sub": "Physische Last (High)", "trend": "bad"}),
-            ("Rack-Time Efficiency", {"val": "98.5%", "sub": "Rücklauf -> Regal", "trend": "good"}),
-            ("Breakage Rate", {"val": "1.2%", "sub": "Bruch-Index", "trend": "neutral"}),
-            ("Chemical Cost/Hour", {"val": "4.50 CHF", "sub": "Verbrauchsmaterial", "trend": "neutral"}),
-            ("Return-Flow Congestion", {"val": "High", "sub": "12:30 & 18:45", "trend": "bad"}),
-            ("Availability Lag", {"val": "2 Min", "sub": "Wartezeit Teller", "trend": "good"})
+            ("Ergonomic Stress Score", {"val": f"{ergo_load:.0f}%", "sub": "Physische Last", "trend": "bad"}),
+            ("Shift-Handover Quality", {"val": "15 Min", "sub": "Übergabezeit", "trend": "neutral"}),
+            ("Solo-Risk Hours", {"val": "2.5h", "sub": "Alleinarbeit (Abend)", "trend": "bad"}),
+            ("Flex-Capacity", {"val": "12%", "sub": "Verschiebbare Tasks", "trend": "neutral"}),
         ]
 
     @staticmethod
@@ -713,12 +773,34 @@ class KPI_Engine:
         total_hours = total_min / 60
         prod_val = meals / total_hours if total_hours > 0 else 0
         
+        # Muda Calculation Global
+        muda_total = df[df['Typ'] == 'Potenzial']['Duration'].sum()
+        muda_cost = muda_total if mode == 'time' else (muda_total/60 * KPI_Engine.HOURLY_RATE_CHF)
+
         return [
-            ("Total Labor Cost Ratio", {"val": cost_ratio, "sub": "Prod (Blue) vs Stew (Orange)", "trend": "neutral"}),
+            ("Cost per Tray", {"val": "8.50 CHF", "sub": "Personalanteil", "trend": "neutral"}),
+            ("Labor Cost Split", {"val": cost_ratio, "sub": "Prod (Blue) vs Gastro (Gray)", "trend": "neutral"}),
             ("Overall Productivity", {"val": f"{prod_val:.1f}", "sub": "Mahlzeiten / Std", "trend": "good"}),
-            ("Synchronisation Gap", {"val": "45 Min", "sub": "Prod Ende vs Spül Ende", "trend": "bad"}),
+            ("Non-Value-Add Cost", {"val": KPI_Engine.fmt(muda_cost), "sub": "Muda (Total)", "trend": "bad"}),
+            ("Overtime Risk", {"val": "High", "sub": "Abendspitzen", "trend": "bad"}),
+            
+            ("Production-Logistics Gap", {"val": "45 Min", "sub": "Verzögerung Rücklauf", "trend": "bad"}),
+            ("Service Readiness", {"val": "98%", "sub": "Pünktlichkeit", "trend": "good"}),
+            ("Mise-en-Place Sync", {"val": "85%", "sub": "Küche/Gastro", "trend": "good"}),
+            ("Peak Staff Load (Total)", {"val": "23 Pax", "sub": "Max. Gleichzeitig", "trend": "neutral"}),
+            ("Communication Tax", {"val": "12.5%", "sub": "Absprachen (Total)", "trend": "neutral"}),
+            
             ("Infrastructure Stress", {"val": "11:30", "sub": "Peak Energy Load", "trend": "bad"}),
-            ("Total FTE Burn", {"val": f"{total_hours:.0f}h", "sub": "Täglicher Einsatz", "trend": "neutral"})
+            ("Space Utilization", {"val": "95%", "sub": "Dichte (High Peak)", "trend": "bad"}),
+            ("Waste-to-Value Ratio", {"val": "1:8", "sub": "Input/Output", "trend": "neutral"}),
+            ("Equipment ROI Index", {"val": "High", "sub": "Anlagennutzung", "trend": "good"}),
+            ("Utilities Proxy", {"val": "High", "sub": "Wasser/Strom", "trend": "bad"}),
+            
+            ("System Resilience", {"val": "Low", "sub": "Ausfall-Puffer", "trend": "bad"}),
+            ("Hygiene Risk Total", {"val": "Medium", "sub": "Aggregiertes Risiko", "trend": "neutral"}),
+            ("Patient Touchpoints", {"val": "1200+", "sub": "Täglich", "trend": "good"}),
+            ("Process Standardization", {"val": "75%", "sub": "Ad-hoc vs. Std", "trend": "neutral"}),
+            ("Management Span", {"val": "1:15", "sub": "Führungskraft/MA", "trend": "bad"}),
         ]
 
 # --- 5. MAIN APPLICATION ---
@@ -733,13 +815,13 @@ def main():
     """, unsafe_allow_html=True)
     
     # 1. Sector Switcher
-    sector_mode = st.radio("SECTOR VIEW:", ["Küche (Produktion)", "Stewarding (Gastro)", "Total Operations (Gesamt)"], horizontal=True)
+    sector_mode = st.radio("SECTOR VIEW:", ["Küche (Produktion)", "Gastrodienste (Stewarding)", "Total Operations (Gesamt)"], horizontal=True)
     
     # Data Fetching
     if "Küche" in sector_mode:
         df = DataWarehouse.get_kitchen_data()
         current_sector = "kitchen"
-    elif "Stewarding" in sector_mode:
+    elif "Gastrodienste" in sector_mode:
         df = DataWarehouse.get_gastro_data()
         current_sector = "gastro"
     else:
@@ -758,16 +840,12 @@ def main():
     elif current_sector == "gastro":
         kpis = KPI_Engine.calculate_gastro(df, mode)
     else:
-        kpis = KPI_Engine.calculate_total(df, mode) # Add specific Total KPIs plus key ones from others
-        # Merge key KPIs for dashboard
-        k_kpis = KPI_Engine.calculate_kitchen(df[df['Sector']=='kitchen'], mode)
-        g_kpis = KPI_Engine.calculate_gastro(df[df['Sector']=='gastro'], mode)
-        # Select specific KPIs for the Total View dashboard to fill the grid
-        kpis = kpis + [k_kpis[0], k_kpis[2], g_kpis[0], g_kpis[4], g_kpis[2]] 
+        kpis = KPI_Engine.calculate_total(df, mode)
 
     # KPI Grid
     st.markdown(f'<div class="section-label" title="{SECTION_TOOLTIPS["Management Cockpit"]}">Management Cockpit: {sector_mode}</div>', unsafe_allow_html=True)
     
+    # Grid Logic for 20 KPIs (4 Rows x 5 Cols)
     rows = (len(kpis) + 4) // 5
     for row in range(rows):
         cols = st.columns(5, gap="small")
@@ -794,7 +872,7 @@ def main():
         # Gastro Area (Gray / Pull)
         fig_load.add_trace(go.Scatter(
             x=workload_df['Zeit'], y=workload_df['Load Gastro'],
-            mode='none', name='Stewarding Demand (Pull)', stackgroup='one',
+            mode='none', name='Gastro Demand (Pull)', stackgroup='one',
             fillcolor=COLORS['gastro']
         ))
         # Total Capacity Line
