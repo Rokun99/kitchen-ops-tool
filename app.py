@@ -789,7 +789,7 @@ class KPI_Engine:
             ("Wartungs-Quote", {"val": "5.5%", "sub": "Wartungszeit", "trend": "good"}),
             
             ("Hygiene-Switch (11:20)", {"val": "100%", "sub": "Wechselslot eingehalten", "trend": "good"}),
-            ("Bio-Trans Volumen", {"val": f"{bio_trans_kg:.0f} kg", "sub": "Food Waste (Messwert '24)", "trend": "bad"}),
+            ("Bio-Trans Volumen", {"val": f"{bio_trans_kg:.0f} kg", "sub": "Food Waste (156g pro Gast)", "trend": "bad"}),
             ("Integrität Reine Seite", {"val": "High", "sub": "Personaldichte", "trend": "good"}),
             ("Grundreinigungs-Index", {"val": KPI_Engine.fmt_cost(hygiene_min, mode), "sub": "Grundreinigung (Total)", "trend": "good"}),
             ("HACCP-Doku", {"val": "45 Min", "sub": "Doku-Aufwand", "trend": "neutral"}),
