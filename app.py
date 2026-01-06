@@ -64,7 +64,7 @@ KPI_DEFINITIONS = {
     "Korb-Durchsatz": "Gesamtmenge gewaschener Körbe pro Stunde.",
     "Wartungs-Quote": "Zeitaufwand für Pflege & Reinigung der Maschinen (Werterhalt).",
     "Hygiene-Switch (11:20)": "Einhaltung des kritischen Wechselslots 'Schmutzig zu Sauber'.",
-    "Bio-Trans Volumen": "Menge entsorgter Speisereste (Messwert 2024: 156g/Gast).",
+    "Bio-Trans Volumen": "Menge entsorgter Speisereste (Messwert 156g/Gast).",
     "Integrität Reine Seite": "Personaldichte im sauberen Bereich (Vermeidung Rekontamination).",
     "Grundreinigungs-Index": "Investierte Zeit in Tiefenreinigung (Böden/Wände).",
     "HACCP-Doku": "Zeitaufwand für gesetzlich vorgeschriebene Listenführung.",
