@@ -123,38 +123,39 @@ st.markdown(f"""
     .main-title {{ font-size: 1.8rem; font-weight: 700; letter-spacing: -0.025em; color: {COLORS['text_main']}; margin: 0; }}
     .sub-title {{ font-size: 0.9rem; color: {COLORS['text_sub']}; font-weight: 400; margin-top: 0.25rem; }}
 
-    /* Sector Switcher Styling (Radio Button Hack) */
+    /* MODERN SEGMENTED CONTROL (Radio Button Replacement) */
     div[role="radiogroup"] {{
         background-color: #F1F5F9;
         padding: 4px;
         border-radius: 12px;
         display: flex;
-        gap: 4px;
+        flex-direction: row;
+        gap: 0px !important; /* No Gap for seamless look */
+        border: 1px solid #E2E8F0;
     }}
+    
     div[role="radiogroup"] label {{
         flex: 1;
         background-color: transparent;
-        border: 1px solid transparent;
-        border-radius: 8px;
-        padding: 8px 16px;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.2s ease;
+        border: none;
+        border-radius: 10px;
         margin: 0 !important;
-        color: {COLORS['text_sub']} !important;
+        padding: 8px 12px !important;
+        text-align: center;
         font-weight: 500 !important;
+        color: {COLORS['text_sub']} !important;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }}
+    
     div[role="radiogroup"] label:hover {{
-        background-color: #E2E8F0; /* Hover Overlay Effect */
         color: {COLORS['text_main']} !important;
+        background-color: rgba(255,255,255, 0.5);
     }}
-    /* This targets the selected radio button roughly (simplified for Streamlit) */
-    div[role="radiogroup"] [data-baseweb="radio"] {{
-        background-color: white !important;
-        box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1);
-        border-radius: 8px;
-        color: {COLORS['accent']} !important;
-        font-weight: 600 !important;
+
+    /* Active State Hack */
+    div[data-baseweb="radio"] {{
+        margin-right: 0px !important; /* Fix Streamlit Spacing */
     }}
 
     .section-label {{
@@ -184,6 +185,8 @@ st.markdown(f"""
     .stTabs [data-baseweb="tab-list"] {{ gap: 2rem; border-bottom: 1px solid {COLORS['border']}; padding-bottom: 0px; }}
     .stTabs [data-baseweb="tab"] {{ background-color: transparent !important; border: none !important; padding: 0.75rem 0 !important; font-weight: 500; color: {COLORS['text_sub']}; }}
     .stTabs [aria-selected="true"] {{ color: {COLORS['accent']} !important; border-bottom: 2px solid {COLORS['accent']} !important; }}
+    
+    .chart-container {{ background-color: {COLORS['card']}; border-radius: 12px; border: 1px solid {COLORS['border']}; padding: 1rem; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05); }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -830,7 +833,7 @@ class KPI_Engine:
             ("Hygiene-Risiko Total", {"val": "Medium", "sub": "Aggregiertes Risiko", "trend": "neutral"}),
             ("Patienten-Kontakt", {"val": "1200+", "sub": "Täglich", "trend": "good"}),
             ("Prozess-Standard", {"val": "75%", "sub": "Ad-hoc vs. Std", "trend": "neutral"}),
-            ("Führungs-Spanne", {"val": "1:15", "sub": "Führungskraft/MA (Idealwert 1:8)", "trend": "bad"}),
+            ("Führungs-Spanne", {"val": "1:15", "sub": "Führungskraft/MA (Ideal 1:8)", "trend": "bad"}),
         ]
 
 # --- 5. MAIN APPLICATION ---
@@ -838,7 +841,7 @@ def main():
     st.markdown("""
         <div class="header-container">
             <div>
-                <h1 class="main-title">WORKSPACE: TOTAL OPERATIONS</h1>
+                <h1 class="main-title">WORKSPACE: TOTAL</h1>
                 <div class="sub-title">Enterprise Security Architecture</div>
             </div>
         </div>
