@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 # --- 1. CONFIGURATION & HIGH END STYLING ---
 st.set_page_config(
-    page_title="WORKSPACE: TOTAL OPERATIONS",
+    page_title="WORKSPACE: TOTAL",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
@@ -27,7 +27,7 @@ COLORS = {
     "gastro": "#64748B"     # Slate (Pull)
 }
 
-# DEFINITIONS & CONTEXT (Optimized Wording & Psychology)
+# DEFINITIONS & CONTEXT (Optimized Wording)
 KPI_DEFINITIONS = {
     # --- KITCHEN (Produktion) ---
     "Fachkraft-Fremdeinsatz": "Anteil der Zeit, in der teure Fachkräfte einfache Routinetätigkeiten (z.B. Putzen) erledigen.", # War: Skill-Drift
