@@ -27,74 +27,74 @@ COLORS = {
     "gastro": "#64748B"     # Slate (Pull)
 }
 
-# DEFINITIONS & CONTEXT (Tooltip Lexicon)
+# DEFINITIONS & CONTEXT (Optimized Wording & Psychology)
 KPI_DEFINITIONS = {
-    # --- KITCHEN (ORIGINAL) ---
-    "Skill-Drift (Leakage)": "Anteil der Arbeitszeit, in der Fachkräfte qualifikationsfremde Routinetätigkeiten ausführen.",
-    "Potenzial (Muda)": "Nicht-wertschöpfende Zeit durch Warten, unnötige Wege oder Prozess-Leerlauf.",
-    "Recovery Value (Yearly)": "Extrapoliertes Einsparpotenzial pro Jahr (Basis 250 Tage) durch Eliminierung von Muda.",
-    "FTE-Verschwendung (Overstaffing)": "Täglich summierte Stunden, in denen die Personalkapazität die tatsächliche Arbeitslast übersteigt.",
-    "Kernzeit-Vakuum": "Summierte unproduktive Wartezeit während der kritischen Service-Phasen.",
-    "Context-Switch Rate": "Durchschnittliche Anzahl der Aufgabenwechsel pro Mitarbeiter/Schicht.",
-    "Industrialisierungsgrad": "Anteil von High-Convenience-Komponenten im Verhältnis zur Eigenfertigung.",
-    "Value-Add Ratio": "Anteil der Netto-Arbeitszeit, die direkt in wertschöpfende Tätigkeiten fließt.",
-    "Admin Burden": "Zeitaufwand für administrative Prozesse, Dokumentation und Systempflege.",
-    "Logistics Drag": "Prozentualer Zeitverlust durch interne Transporte und Rüstwege.",
-    "Coordination Tax": "Zeitaufwand für Absprachen, Meetings und Übergaben.",
-    "Liability Gap": "Operative Risikofenster ohne klare Verantwortlichkeit.",
-    "Service Intensity": "Anteil der Arbeitszeit mit direktem Gastkontakt oder aktiver Ausgabe.",
-    "Patient/Gastro Split": "Verhältnis der Ressourcenbindung zwischen Patientenverpflegung und Restaurant.",
-    "Process Cycle Eff.": "Verhältnis von reiner Bearbeitungszeit zur gesamten Durchlaufzeit.",
-    "Peak Staff Load": "Maximale Anzahl Mitarbeiter, die gleichzeitig operieren.",
-    "R2 Inflation (Hidden)": "Arbeitszeitdehnung (Parkinson) im Dienst R2 (08:00-10:00) mangels Auslastung.",
-    "H1 Skill-Dilution": "Verwässerung des Rollenprofils H1 durch fachfremde Aufgaben.",
-    "R1 Hygiene-Risk": "Dauer der Wechsel zwischen unreinen und reinen Bereichen.",
-    "G2 Capacity Gap": "Explizite, ungenutzte Personalkapazität im Dienst G2.",
-    "Qualifikations-Verschw.": "Einsatz von High-Skill-Personal für Low-Skill-Tasks.",
+    # --- KITCHEN (Produktion) ---
+    "Fachkraft-Fremdeinsatz": "Anteil der Zeit, in der teure Fachkräfte einfache Routinetätigkeiten (z.B. Putzen) erledigen.", # War: Skill-Drift
+    "Potenzial (Leerlauf)": "Nicht-wertschöpfende Zeit durch Warten oder unnötige Wege.", # War: Muda
+    "Jahres-Einsparpotenzial": "Monetärer Wert der unproduktiven Zeiten, hochgerechnet auf 250 Tage.", # War: Recovery Value
+    "Kapazitäts-Überhang": "Stunden, in denen mehr Personal anwesend ist, als für die Arbeit nötig wäre.", # War: FTE-Verschwendung
+    "Kernzeit-Vakuum": "Unproduktive Wartezeit während der kritischen Service-Phasen (Bandstillstand).",
+    "Aufgaben-Wechselrate": "Wie oft muss ein Mitarbeiter pro Schicht die Tätigkeit wechseln (Fragmentierung).", # War: Context-Switch
+    "Industrialisierungsgrad": "Anteil von Convenience-Komponenten vs. Eigenfertigung.",
+    "Wertschöpfungs-Quote": "Anteil der Zeit, die direkt in das Produkt (Kochen) oder den Gast fließt.", # War: Value-Add Ratio
+    "Admin-Quote": "Zeitaufwand für Büro, Dokumentation und Systempflege.", # War: Admin Burden
+    "Logistik-Anteil": "Zeitverlust durch interne Transporte und Rüstwege.", # War: Logistics Drag
+    "Koordinations-Aufwand": "Zeit für Absprachen, Meetings und Übergaben.", # War: Coordination Tax
+    "Risiko-Fenster": "Zeiträume ohne klare Verantwortlichkeit oder Aufsicht.", # War: Liability Gap
+    "Patienten-Fokus": "Anteil der Arbeitszeit mit direktem Einfluss auf das Patientenerlebnis.", # War: Service Intensity
+    "Ressourcen-Split": "Verhältnis Personalbindung Patientenverpflegung vs. Restaurant.",
+    "Prozess-Effizienz": "Verhältnis von reiner Bearbeitungszeit zur gesamten Durchlaufzeit.",
+    "Max. Personal-Last": "Maximale Anzahl Mitarbeiter, die gleichzeitig im Einsatz sind.",
+    "Arbeits-Dehnung (R2)": "Indikator für verlangsamtes Arbeiten (Parkinson) im Dienst R2 mangels Last.",
+    "Profil-Verwässerung (H1)": "Einsatz des H1 für aufgabenfremde Tätigkeiten.",
+    "Hygiene-Risiko (R1)": "Kritische Wechseldauer zwischen Schmutz- und Reinbereich.",
+    "Leerlauf-Lücke (G2)": "Explizite, ungenutzte Zeit im Dienst G2.",
+    "Teure Ausführung": "Einsatz von High-Skill-Personal für Low-Skill-Aufgaben (Kosten-Sicht).", # War: Qualifikations-Verschw.
 
-    # --- GASTRO / STEWARDING (NEW) ---
-    "Transport Intensity": "Anteil der Arbeitszeit für Holen/Bring-Dienste (Wagen/Logistik).",
-    "Elevator Dependency": "Zeitrisiko durch Aufzugwartezeiten (Geschätzt aus Transportwegen).",
-    "Return-Flow Velocity": "Zeitdauer von 'Station holt ab' bis 'Teller in Spülmaschine'.",
-    "Trolley Turnover": "Umschlaghäufigkeit der Speisewagen pro Tag.",
-    "Logistics Dead-Time": "Leere Wege (ohne Wagen) oder Warten auf Transport (Parkinson-Indikator).",
-    "Band-Machine Uptime": "Laufzeit der Hauptwaschstrasse (K6/K8 Input).",
-    "Granuldisk Load": "Auslastung der Topfspüle (K15) – Indikator für Produktionsvolumen.",
-    "Chemical Efficiency": "Verbrauch Reinigungsmittel pro Spülgang (Simuliert basierend auf Spülzeit).",
-    "Rack-Rate": "Körbe pro Stunde (Durchsatz-Indikator).",
-    "Tech-Maintenance Ratio": "Zeitaufwand für Reinigung/Wartung der Maschinen (nicht Spülen).",
-    "Hygiene Compliance (11:20)": "Einhaltung des kritischen Wechselslots vor Service.",
-    "Bio-Trans Volume": "Menge entsorgter Reste (Food Waste Indikator).",
-    "Clean-Side Integrity": "Personaldichte auf der 'Reinen Seite' (Vermeidung Rekontamination).",
-    "Deep-Clean Index": "Zeitinvest in Grundreinigungen (Wände, Böden, Kühlhäuser).",
-    "HACCP Admin": "Zeitaufwand für Dokumentation und Listenführung.",
-    "Service Support Factor": "Entlastung der Küche beim Anrichten (K2, K8 etc.).",
-    "Ergonomic Stress Score": "Anteil schwerer körperlicher Arbeit (Heben/Ziehen/Spülen).",
-    "Shift-Handover Quality": "Zeit für Übergaben (Früh -> Spät).",
-    "Solo-Risk Hours": "Stunden, in denen Mitarbeiter allein in kritischen Zonen sind.",
-    "Flex-Capacity": "Anteil der Aufgaben, die bei Leerlauf vorgezogen werden können.",
+    # --- GASTRODIENSTE (Logistik & Hygiene) ---
+    "Transport-Intensität": "Anteil der Arbeitszeit für reine Wegstrecken (Wagen schieben/holen).",
+    "Aufzug-Abhängigkeit": "Zeitrisiko durch Wartezeiten vor den Liften.", # War: Elevator Dependency
+    "Rücklauf-Tempo": "Dauer von 'Abholung Station' bis 'Eingabe Spülmaschine'.", # War: Return-Flow Velocity
+    "Wagen-Umschlag": "Wie oft wird ein Speisewagen pro Tag genutzt/gedreht.", # War: Trolley Turnover
+    "Logistik-Wartezeit": "Leere Wege oder Warten auf Transportmittel (Vermeidbar).", # War: Dead-Time
+    "Laufzeit Bandmaschine": "Aktive Betriebszeit der Hauptwaschstrasse.",
+    "Auslastung Topfspüle": "Nutzungsgrad der Granuldisk (Indikator für Produktionsmenge).",
+    "Chemie-Effizienz": "Verbrauch Reinigungsmittel pro Stunde (Simuliert).",
+    "Korb-Durchsatz": "Gesamtmenge gewaschener Körbe pro Stunde.", # War: Rack-Rate
+    "Wartungs-Quote": "Zeitaufwand für Pflege & Reinigung der Maschinen (Werterhalt).",
+    "Hygiene-Switch (11:20)": "Einhaltung des kritischen Wechselslots 'Schmutzig zu Sauber'.",
+    "Bio-Trans Volumen": "Menge entsorgter Speisereste (Food Waste Indikator).",
+    "Integrität Reine Seite": "Personaldichte im sauberen Bereich (Vermeidung Rekontamination).",
+    "Grundreinigungs-Index": "Investierte Zeit in Tiefenreinigung (Böden/Wände).",
+    "HACCP-Doku": "Zeitaufwand für gesetzlich vorgeschriebene Listenführung.",
+    "Service-Support": "Entlastung der Küche durch Gastro-Personal (Anrichten/Besteck).",
+    "Ergonomie-Belastung": "Anteil körperlich schwerer Arbeit (Heben >15kg / Zwangshaltungen).",
+    "Übergabe-Qualität": "Zeitinvest für saubere Schichtübergaben.",
+    "Alleinarbeits-Risiko": "Stunden, in denen Mitarbeiter in kritischen Zonen alleine sind (Sicherheit).",
+    "Springer-Potenzial": "Anteil der Aufgaben, die zeitlich flexibel verschoben werden können.",
 
-    # --- TOTAL OPERATIONS (NEW) ---
-    "Cost per Tray": "Gesamtkosten (Personal) geteilt durch Mahlzeiten.",
-    "Labor Cost Split": "Verhältnis Küche (Teuer) vs. Gastrodienste (Günstiger).",
-    "Overall Productivity": "Mahlzeiten pro FTE-Stunde (Gesamt).",
-    "Non-Value-Add Cost": "Kosten für Muda (Warten/Weg) in CHF (Total).",
-    "Overtime Risk": "Potenzial für Überstunden durch Prozess-Staus.",
-    "Production-Logistics Gap": "Zeitversatz zwischen 'Kochen fertig' und 'Spülen fertig'.",
-    "Service Readiness": "Bereitschaftsgrad Besteck/Geschirr bei Servicebeginn.",
-    "Mise-en-Place Sync": "Ineinandergreifen von Vorbereitung (Küche) und Bereitstellung (Gastro).",
-    "Peak Staff Load (Total)": "Maximale gleichzeitige Mitarbeiteranzahl im Haus.",
-    "Communication Tax": "Summe der Absprachezeiten über alle Abteilungen.",
-    "Infrastructure Stress": "Gleichzeitige Nutzung energieintensiver Geräte.",
-    "Space Utilization": "Dichte der Belegung in der Küche/Spüle zu Stosszeiten.",
-    "Waste-to-Value Ratio": "Verhältnis Food Waste zu produziertem Essen.",
-    "Equipment ROI Index": "Nutzung der teuren Maschinen.",
-    "Utilities Proxy": "Geschätzter Wasser/Stromverbrauch.",
-    "System Resilience": "Pufferzeiten im Gesamtsystem.",
-    "Hygiene Risk Total": "Summe aller kritischen Hygiene-Momente.",
-    "Patient Touchpoints": "Anzahl der Interaktionen mit Patienteneinfluss.",
-    "Process Standardization": "% der Aufgaben, die klar definiert sind.",
-    "Management Span": "Verhältnis Führungskräfte zu operativen Stunden."
+    # --- TOTAL OPERATIONS (Gesamtblick) ---
+    "Kosten pro Tablett": "Personalkosten geteilt durch Anzahl Mahlzeiten.",
+    "Kosten-Split": "Verhältnis Küche (Teuer) vs. Gastro (Günstiger).",
+    "Gesamt-Produktivität": "Mahlzeiten pro geleistete Personalstunde (Total).",
+    "Leerlauf-Kosten": "Monetärer Wert der nicht-wertschöpfenden Zeit (Total).",
+    "Überstunden-Risiko": "Wahrscheinlichkeit für Arbeitszeitüberschreitung durch Abendspitzen.",
+    "Sync-Lücke": "Zeitversatz zwischen Produktionsende und Spül-Ende.", # War: Prod-Logistics Gap
+    "Service-Bereitschaft": "Verfügbarkeit von Besteck/Geschirr bei Bandstart.",
+    "Mise-en-Place Sync": "Greifen Vorbereitung (Küche) und Bereitstellung (Gastro) ineinander?",
+    "Max. Personal (Total)": "Höchststand an Mitarbeitern gleichzeitig im Haus.",
+    "Absprache-Aufwand": "Summe der Koordinationszeiten über alle Abteilungen.",
+    "Energie-Spitzenlast": "Gleichzeitige Nutzung von Kipper, Ofen und Spülstraße.", # War: Infrastructure Stress
+    "Raum-Dichte": "Personaldichte in Küche/Spüle zu Stosszeiten (Stressfaktor).",
+    "Reste-Quote": "Verhältnis Food Waste zu produziertem Essen.",
+    "Anlagen-Nutzung (ROI)": "Wie gut sind teure Maschinen ausgelastet?",
+    "Verbrauchs-Proxy": "Geschätzter Wasser/Stromverbrauch basierend auf Aktivität.",
+    "System-Resilienz": "Pufferzeiten bei Ausfall von Technik (z.B. Lift).",
+    "Hygiene-Risiko Total": "Summe aller kritischen Kontaktpunkte.",
+    "Patienten-Kontakt": "Anzahl der Interaktionen, die den Patienten erreichen.",
+    "Prozess-Standard": "Anteil der Aufgaben, die klar definiert vs. improvisiert sind.",
+    "Führungs-Spanne": "Verhältnis Führungskräfte zu operativen Stunden."
 }
 
 SECTION_TOOLTIPS = {
@@ -293,7 +293,7 @@ class DataWarehouse:
 
     @staticmethod
     def get_gastro_data():
-        # New Gastro Data
+        # New Gastro Data from Plan (Based on K1-K15 provided text)
         data = [
             # K1
             {"Dienst": "K1", "Start": "06:45", "Ende": "07:00", "Task": "Mise en Place: Bain-Marie Wagen & Förderband vorbereiten", "Typ": "Service-Support"},
@@ -504,17 +504,19 @@ class DataWarehouse:
         # SKILL MATCH LOGIC
         def check_mismatch(row):
             user_skill = SKILL_LEVELS.get(row['Dienst'], 1)
+            # NEUE LOGIK: Cost-View statt "Fehler"
+            # Ein Chef (3) der putzt (1) ist "Teuer", nicht "Falsch".
             task_level = 1 
-            # Simple heuristic
             if row['Typ'] in ["Coord", "Admin"]: task_level = 2
             if "Mutationen" in row['Task']: task_level = 3
             if row['Typ'] == "Prod" and ("ET" in row['Task'] or "Finish" in row['Task']): task_level = 3
             if row['Typ'] == "Service": task_level = 2
             
-            if user_skill == 3 and task_level == 1: return "Kritische Fehlallokation"
-            elif user_skill == 3 and task_level == 2: return "Fachliche Unterforderung"
-            elif user_skill < 2 and task_level == 3: return "Qualitäts-Risiko"
-            return "Ideal-Besetzung"
+            if user_skill == 3 and task_level == 1: 
+                return "High-Cost Execution" # Wording Change
+            elif user_skill < 2 and task_level == 3: 
+                return "Qualitäts-Risiko"
+            return "Value-Add"
 
         df['Skill_Status'] = df.apply(check_mismatch, axis=1)
         return df
@@ -525,13 +527,22 @@ class DataWarehouse:
         df_g = DataWarehouse.get_gastro_data()
         return pd.concat([df_k, df_g], ignore_index=True)
 
-# --- 3. WORKLOAD ENGINE ---
+# --- 3. WORKLOAD ENGINE (Optimized for Reality) ---
 class WorkloadEngine:
+    # REVISED FACTORS: Admin ist Arbeit! 
     LOAD_FACTORS = {
         # Kitchen
-        "Service": 1.0, "Prod": 0.8, "Logistik": 0.6, "Admin": 0.5, "Coord": 0.4, "Potenzial": 0.1,
-        # Gastro specific
-        "Spülen": 1.0, "Transport": 0.8, "Reinigung": 0.9, "Service-Support": 0.9
+        "Service": 1.0,     # Volle Last (Stress)
+        "Prod": 0.9,        # Hohe Last
+        "Logistik": 0.8,    # Körperliche Arbeit
+        "Admin": 0.9,       # Mentale Arbeit (Korrigiert von 0.5)
+        "Coord": 0.8,       # Kommunikation
+        "Potenzial": 0.1,   # Echte Wartezeit
+        # Gastro
+        "Spülen": 1.0,      # Akkord
+        "Transport": 0.85,  # Laufwege
+        "Reinigung": 0.85,  # Physisch
+        "Service-Support": 0.95 
     }
 
     @staticmethod
@@ -569,21 +580,32 @@ class WorkloadEngine:
             })
         return pd.DataFrame(load_data)
 
-# --- 4. KPI ENGINE ---
+# --- 4. KPI ENGINE (Fixed Math & Wording) ---
 class KPI_Engine:
     HOURLY_RATE_CHF = 55.0
 
     @staticmethod
     def fmt(val, unit=None, mode='time'):
-        if mode == 'money': return f"{val:,.0f} CHF".replace(",", "'")
-        if unit == 'abs': return f"{val:.0f} Min"
+        """ FIXED: Keine automatische %-Konvertierung mehr für Zeiten """
+        if mode == 'money': 
+            return f"{val:,.0f} CHF".replace(",", "'")
+        
+        # Prozent nur wenn explizit gefordert oder logisch (z.B. Ratio)
+        if unit == 'pct': 
+            return f"{val:.1f}%"
+        
+        if unit == 'abs' or mode == 'time': 
+            return f"{val:.0f} Min"
+            
+        # Fallback für Strings
         if isinstance(val, str): return val
-        if isinstance(val, float) and val < 100: return f"{val:.1f}%"
-        return f"{val:.0f} Min"
+        
+        # Default numeric fallback
+        return f"{val:.1f}"
     
     @staticmethod
     def fmt_cost(val_min, mode):
-        """ Strict helper to convert minutes to cost if mode is money """
+        """ Konvertiert Minuten in CHF, wenn Modus aktiv """
         if mode == 'money':
             cost = (val_min / 60) * KPI_Engine.HOURLY_RATE_CHF
             return f"{cost:,.0f} CHF".replace(",", "'")
@@ -614,7 +636,7 @@ class KPI_Engine:
         val_add_min = df[df['Typ'].isin(['Prod', 'Service'])]['Duration'].sum()
         val_add_ratio = (val_add_min / total_min * 100) if total_min > 0 else 0
         
-        adm_burden_min = 145 # Hardcoded basis from original logic
+        adm_burden_min = df[df['Typ'] == 'Admin']['Duration'].sum()
         
         log_drag_min = df[df['Typ'] == 'Logistik']['Duration'].sum()
         log_drag_ratio = (log_drag_min / total_min * 100) if total_min > 0 else 0
@@ -639,7 +661,7 @@ class KPI_Engine:
 
         g2_gap = df[(df['Dienst'] == 'G2') & df['Task'].str.contains('Leerlauf', case=False, na=False)]['Duration'].sum()
 
-        mismatch_min = df[df['Skill_Status'] == "Kritische Fehlallokation"]['Duration'].sum()
+        mismatch_min = df[df['Skill_Status'] == "High-Cost Execution"]['Duration'].sum()
 
         # Overstaffing Index
         workload_df = WorkloadEngine.get_load_curve(df, sector_filter='kitchen')
@@ -657,30 +679,30 @@ class KPI_Engine:
         context_sw = f"{total_tasks / num_staff:.1f}x"
 
         return [
-            ("Skill-Drift (Leakage)", {"val": KPI_Engine.fmt_cost(leakage_min, mode), "sub": "Fachkraft-Einsatz", "trend": "bad"}),
-            ("Potenzial (Muda)", {"val": KPI_Engine.fmt_cost(potenzial_min, mode), "sub": "Nicht-Wertschöpfend", "trend": "bad"}),
-            ("Recovery Value (Yearly)", {"val": KPI_Engine.fmt(recov_val), "sub": "Täglich ca. 5.5 Std.", "trend": "good"}),
+            ("Fachkraft-Fremdeinsatz", {"val": KPI_Engine.fmt_cost(leakage_min, mode), "sub": "Fachkraft-Einsatz", "trend": "bad"}),
+            ("Potenzial (Leerlauf)", {"val": KPI_Engine.fmt_cost(potenzial_min, mode), "sub": "Nicht-Wertschöpfend", "trend": "bad"}),
+            ("Jahres-Einsparpotenzial", {"val": KPI_Engine.fmt(recov_val, mode=mode), "sub": "Täglich ca. 5.5 Std.", "trend": "good"}),
             ("Kernzeit-Vakuum", {"val": KPI_Engine.fmt_cost(idle_band_min, mode), "sub": "Wartezeit Service", "trend": "bad"}),
-            ("Context-Switch Rate", {"val": context_sw, "sub": "D1 Fragmentierung", "trend": "bad"}),
+            ("Aufgaben-Wechselrate", {"val": context_sw, "sub": "D1 Fragmentierung", "trend": "bad"}),
             
-            ("Industrialisierungsgrad", {"val": f"{ind_rate:.0f}%", "sub": "Convenience-Anteil", "trend": "neutral"}),
-            ("Value-Add Ratio", {"val": f"{val_add_ratio:.1f}%", "sub": "Prod + Service", "trend": "good"}),
-            ("Admin Burden", {"val": KPI_Engine.fmt_cost(adm_burden_min, mode), "sub": "Bürokratie-Last", "trend": "bad"}),
-            ("Logistics Drag", {"val": f"{log_drag_ratio:.1f}%", "sub": "Transport/Reinigung", "trend": "neutral"}),
-            ("Coordination Tax", {"val": f"{coord_tax_ratio:.1f}%", "sub": "Absprachen/Meetings", "trend": "neutral"}),
+            ("Industrialisierungsgrad", {"val": KPI_Engine.fmt(ind_rate, unit='pct'), "sub": "Convenience-Anteil", "trend": "neutral"}),
+            ("Wertschöpfungs-Quote", {"val": KPI_Engine.fmt(val_add_ratio, unit='pct'), "sub": "Prod + Service", "trend": "good"}),
+            ("Admin-Quote", {"val": KPI_Engine.fmt_cost(adm_burden_min, mode), "sub": "Bürokratie-Last", "trend": "bad"}),
+            ("Logistik-Anteil", {"val": KPI_Engine.fmt(log_drag_ratio, unit='pct'), "sub": "Transport/Reinigung", "trend": "neutral"}),
+            ("Koordinations-Aufwand", {"val": KPI_Engine.fmt(coord_tax_ratio, unit='pct'), "sub": "Absprachen/Meetings", "trend": "neutral"}),
             
-            ("Liability Gap", {"val": "105 Min", "sub": "Risiko D1 Pause", "trend": "bad"}),
-            ("Service Intensity", {"val": f"{serv_int_ratio:.0f}%", "sub": "Patient Touchpoint", "trend": "good"}),
-            ("Patient/Gastro Split", {"val": "62/38", "sub": "Ressourcen-Allokation", "trend": "neutral"}),
-            ("Process Cycle Eff.", {"val": "81.0%", "sub": "Netto-Effizienz", "trend": "good"}),
-            ("FTE-Verschwendung (Overstaffing)", {"val": KPI_Engine.fmt_cost(overstaffing_min, mode), "sub": "Bezahlte Leerzeit (Täglich)", "trend": "bad"}),
+            ("Risiko-Fenster", {"val": "105 Min", "sub": "Risiko D1 Pause", "trend": "bad"}),
+            ("Patienten-Fokus", {"val": KPI_Engine.fmt(serv_int_ratio, unit='pct'), "sub": "Patient Touchpoint", "trend": "good"}),
+            ("Ressourcen-Split", {"val": "62/38", "sub": "Ressourcen-Allokation", "trend": "neutral"}),
+            ("Prozess-Effizienz", {"val": "81.0%", "sub": "Netto-Effizienz", "trend": "good"}),
+            ("Kapazitäts-Überhang", {"val": KPI_Engine.fmt_cost(overstaffing_min, mode), "sub": "Bezahlte Leerzeit (Täglich)", "trend": "bad"}),
 
             # Deep Dives
-            ("R2 Inflation (Hidden)", {"val": KPI_Engine.fmt_cost(r2_parkinson_min, mode), "sub": "Gedehnte Arbeit", "trend": "bad"}),
-            ("H1 Skill-Dilution", {"val": f"{h1_dilution:.0f}%", "sub": "Fremdaufgaben", "trend": "bad"}),
-            ("R1 Hygiene-Risk", {"val": KPI_Engine.fmt_cost(r1_risk, mode), "sub": "Zeit an Rampe", "trend": "bad"}),
-            ("G2 Capacity Gap", {"val": KPI_Engine.fmt_cost(g2_gap, mode), "sub": "PM Leerlauf", "trend": "bad"}),
-            ("Qualifikations-Verschw.", {"val": KPI_Engine.fmt_cost(mismatch_min, mode), "sub": "High Skill/Low Task", "trend": "bad"}),
+            ("Arbeits-Dehnung (R2)", {"val": KPI_Engine.fmt_cost(r2_parkinson_min, mode), "sub": "Gedehnte Arbeit", "trend": "bad"}),
+            ("Profil-Verwässerung (H1)", {"val": KPI_Engine.fmt(h1_dilution, unit='pct'), "sub": "Fremdaufgaben", "trend": "bad"}),
+            ("Hygiene-Risiko (R1)", {"val": KPI_Engine.fmt_cost(r1_risk, mode), "sub": "Zeit an Rampe", "trend": "bad"}),
+            ("Leerlauf-Lücke (G2)", {"val": KPI_Engine.fmt_cost(g2_gap, mode), "sub": "PM Leerlauf", "trend": "bad"}),
+            ("Teure Ausführung", {"val": KPI_Engine.fmt_cost(mismatch_min, mode), "sub": "High Skill/Low Task", "trend": "bad"}),
         ]
 
     @staticmethod
@@ -705,29 +727,29 @@ class KPI_Engine:
         k13_parkinson = df[(df['Dienst'] == 'K13') & (df['Start'] >= "08:45") & (df['Ende'] <= "10:30")]['Duration'].sum()
         
         return [
-            ("Transport Intensity", {"val": f"{transport_int:.1f}%", "sub": "Wegzeiten (Wagen)", "trend": "bad"}),
-            ("Elevator Dependency", {"val": "15 Min", "sub": "Wartezeit Aufzug (Sim)", "trend": "neutral"}),
-            ("Return-Flow Velocity", {"val": "8 Min", "sub": "Station -> Spüle", "trend": "good"}),
-            ("Trolley Turnover", {"val": "4.2x", "sub": "Einsätze pro Wagen", "trend": "good"}),
-            ("Logistics Dead-Time", {"val": KPI_Engine.fmt_cost(k13_parkinson, mode), "sub": "K13 Wartezeit/Lager (Parkinson)", "trend": "bad"}),
+            ("Transport-Intensität", {"val": KPI_Engine.fmt(transport_int, unit='pct'), "sub": "Wegzeiten (Wagen)", "trend": "bad"}),
+            ("Aufzug-Abhängigkeit", {"val": "15 Min", "sub": "Wartezeit Aufzug (Sim)", "trend": "neutral"}),
+            ("Rücklauf-Tempo", {"val": "8 Min", "sub": "Station -> Spüle", "trend": "good"}),
+            ("Wagen-Umschlag", {"val": "4.2x", "sub": "Einsätze pro Wagen", "trend": "good"}),
+            ("Logistik-Wartezeit", {"val": KPI_Engine.fmt_cost(k13_parkinson, mode), "sub": "K13 Wartezeit/Lager (Parkinson)", "trend": "bad"}),
             
-            ("Band-Machine Uptime", {"val": "6.5h", "sub": "Hauptwaschstrasse", "trend": "neutral"}),
-            ("Granuldisk Load", {"val": "82%", "sub": "Topfspüle Auslastung", "trend": "bad"}),
-            ("Chemical Efficiency", {"val": "0.15L", "sub": "Pro Spülgang", "trend": "good"}),
-            ("Rack-Rate", {"val": "120/h", "sub": "Körbe Durchsatz", "trend": "neutral"}),
-            ("Tech-Maintenance Ratio", {"val": "5.5%", "sub": "Wartungszeit", "trend": "good"}),
+            ("Laufzeit Bandmaschine", {"val": "6.5h", "sub": "Hauptwaschstrasse", "trend": "neutral"}),
+            ("Auslastung Topfspüle", {"val": "82%", "sub": "Topfspüle Auslastung", "trend": "bad"}),
+            ("Chemie-Effizienz", {"val": "0.15L", "sub": "Pro Spülgang", "trend": "good"}),
+            ("Korb-Durchsatz", {"val": "120/h", "sub": "Körbe Durchsatz", "trend": "neutral"}),
+            ("Wartungs-Quote", {"val": "5.5%", "sub": "Wartungszeit", "trend": "good"}),
             
-            ("Hygiene Compliance (11:20)", {"val": "100%", "sub": "Wechselslot eingehalten", "trend": "good"}),
-            ("Bio-Trans Volume", {"val": "120 kg", "sub": "Food Waste (Est)", "trend": "bad"}),
-            ("Clean-Side Integrity", {"val": "High", "sub": "Personaldichte", "trend": "good"}),
-            ("Deep-Clean Index", {"val": KPI_Engine.fmt_cost(hygiene_min, mode), "sub": "Grundreinigung (Total)", "trend": "good"}),
-            ("HACCP Admin", {"val": "45 Min", "sub": "Doku-Aufwand", "trend": "neutral"}),
+            ("Hygiene-Switch (11:20)", {"val": "100%", "sub": "Wechselslot eingehalten", "trend": "good"}),
+            ("Bio-Trans Volumen", {"val": "120 kg", "sub": "Food Waste (Est)", "trend": "bad"}),
+            ("Integrität Reine Seite", {"val": "High", "sub": "Personaldichte", "trend": "good"}),
+            ("Grundreinigungs-Index", {"val": KPI_Engine.fmt_cost(hygiene_min, mode), "sub": "Grundreinigung (Total)", "trend": "good"}),
+            ("HACCP-Doku", {"val": "45 Min", "sub": "Doku-Aufwand", "trend": "neutral"}),
             
-            ("Service Support Factor", {"val": f"{svc_sup_factor:.1f}%", "sub": "Entlastung Küche", "trend": "good"}),
-            ("Ergonomic Stress Score", {"val": f"{ergo_load:.0f}%", "sub": "Physische Last", "trend": "bad"}),
-            ("Shift-Handover Quality", {"val": "15 Min", "sub": "Übergabezeit", "trend": "neutral"}),
-            ("Solo-Risk Hours", {"val": "2.5h", "sub": "Alleinarbeit (Abend)", "trend": "bad"}),
-            ("Flex-Capacity", {"val": "12%", "sub": "Verschiebbare Tasks", "trend": "neutral"}),
+            ("Service-Support", {"val": KPI_Engine.fmt(svc_sup_factor, unit='pct'), "sub": "Entlastung Küche", "trend": "good"}),
+            ("Ergonomie-Belastung", {"val": KPI_Engine.fmt(ergo_load, unit='pct'), "sub": "Physische Last", "trend": "bad"}),
+            ("Übergabe-Qualität", {"val": "15 Min", "sub": "Übergabezeit", "trend": "neutral"}),
+            ("Alleinarbeits-Risiko", {"val": "2.5h", "sub": "Alleinarbeit (Abend)", "trend": "bad"}),
+            ("Springer-Potenzial", {"val": "12%", "sub": "Verschiebbare Tasks", "trend": "neutral"}),
         ]
 
     @staticmethod
@@ -748,29 +770,29 @@ class KPI_Engine:
         muda_total = df[df['Typ'] == 'Potenzial']['Duration'].sum()
 
         return [
-            ("Cost per Tray", {"val": "8.50 CHF", "sub": "Personalanteil", "trend": "neutral"}),
-            ("Labor Cost Split", {"val": cost_ratio, "sub": "Prod (Blue) vs Gastro (Gray)", "trend": "neutral"}),
-            ("Overall Productivity", {"val": f"{prod_val:.1f}", "sub": "Mahlzeiten / Std", "trend": "good"}),
-            ("Non-Value-Add Cost", {"val": KPI_Engine.fmt_cost(muda_total, mode), "sub": "Muda (Total)", "trend": "bad"}),
-            ("Overtime Risk", {"val": "High", "sub": "Abendspitzen", "trend": "bad"}),
+            ("Kosten pro Tablett", {"val": "8.50 CHF", "sub": "Personalanteil", "trend": "neutral"}),
+            ("Kosten-Split", {"val": cost_ratio, "sub": "Prod (Blue) vs Gastro (Gray)", "trend": "neutral"}),
+            ("Gesamt-Produktivität", {"val": f"{prod_val:.1f}", "sub": "Mahlzeiten / Std", "trend": "good"}),
+            ("Leerlauf-Kosten", {"val": KPI_Engine.fmt_cost(muda_total, mode), "sub": "Muda (Total)", "trend": "bad"}),
+            ("Überstunden-Risiko", {"val": "High", "sub": "Abendspitzen", "trend": "bad"}),
             
-            ("Production-Logistics Gap", {"val": "45 Min", "sub": "Verzögerung Rücklauf", "trend": "bad"}),
-            ("Service Readiness", {"val": "98%", "sub": "Pünktlichkeit", "trend": "good"}),
+            ("Sync-Lücke", {"val": "45 Min", "sub": "Verzögerung Rücklauf", "trend": "bad"}),
+            ("Service-Bereitschaft", {"val": "98%", "sub": "Pünktlichkeit", "trend": "good"}),
             ("Mise-en-Place Sync", {"val": "85%", "sub": "Küche/Gastro", "trend": "good"}),
-            ("Peak Staff Load (Total)", {"val": "23 Pax", "sub": "Max. Gleichzeitig", "trend": "neutral"}),
-            ("Communication Tax", {"val": "12.5%", "sub": "Absprachen (Total)", "trend": "neutral"}),
+            ("Max. Personal (Total)", {"val": "23 Pax", "sub": "Max. Gleichzeitig", "trend": "neutral"}),
+            ("Absprache-Aufwand", {"val": "12.5%", "sub": "Absprachen (Total)", "trend": "neutral"}),
             
-            ("Infrastructure Stress", {"val": "11:30", "sub": "Peak Energy Load", "trend": "bad"}),
-            ("Space Utilization", {"val": "95%", "sub": "Dichte (High Peak)", "trend": "bad"}),
-            ("Waste-to-Value Ratio", {"val": "1:8", "sub": "Input/Output", "trend": "neutral"}),
-            ("Equipment ROI Index", {"val": "High", "sub": "Anlagennutzung", "trend": "good"}),
-            ("Utilities Proxy", {"val": "High", "sub": "Wasser/Strom", "trend": "bad"}),
+            ("Energie-Spitzenlast", {"val": "11:30", "sub": "Peak Energy Load", "trend": "bad"}),
+            ("Raum-Dichte", {"val": "95%", "sub": "Dichte (High Peak)", "trend": "bad"}),
+            ("Reste-Quote", {"val": "1:8", "sub": "Input/Output", "trend": "neutral"}),
+            ("Anlagen-Nutzung (ROI)", {"val": "High", "sub": "Anlagennutzung", "trend": "good"}),
+            ("Verbrauchs-Proxy", {"val": "High", "sub": "Wasser/Strom", "trend": "bad"}),
             
-            ("System Resilience", {"val": "Low", "sub": "Ausfall-Puffer", "trend": "bad"}),
-            ("Hygiene Risk Total", {"val": "Medium", "sub": "Aggregiertes Risiko", "trend": "neutral"}),
-            ("Patient Touchpoints", {"val": "1200+", "sub": "Täglich", "trend": "good"}),
-            ("Process Standardization", {"val": "75%", "sub": "Ad-hoc vs. Std", "trend": "neutral"}),
-            ("Management Span", {"val": "1:15", "sub": "Führungskraft/MA", "trend": "bad"}),
+            ("System-Resilienz", {"val": "Low", "sub": "Ausfall-Puffer", "trend": "bad"}),
+            ("Hygiene-Risiko Total", {"val": "Medium", "sub": "Aggregiertes Risiko", "trend": "neutral"}),
+            ("Patienten-Kontakt", {"val": "1200+", "sub": "Täglich", "trend": "good"}),
+            ("Prozess-Standard", {"val": "75%", "sub": "Ad-hoc vs. Std", "trend": "neutral"}),
+            ("Führungs-Spanne", {"val": "1:15", "sub": "Führungskraft/MA", "trend": "bad"}),
         ]
 
 # --- 5. MAIN APPLICATION ---
@@ -940,7 +962,11 @@ def main():
         with tab5:
             skill_pivot = df.groupby(['Dienst', 'Skill_Status'])['Duration'].sum().reset_index()
             fig_skill = px.bar(skill_pivot, x="Dienst", y="Duration", color="Skill_Status", 
-                            color_discrete_map={"Kritische Fehlallokation": "#EF4444", "Ideal-Besetzung": "#10B981", "Fachliche Unterforderung": "#F59E0B", "Qualitäts-Risiko": "#6366F1"},
+                            color_discrete_map={
+                                "High-Cost Execution": "#EF4444", 
+                                "Value-Add": "#10B981", 
+                                "Qualitäts-Risiko": "#6366F1"
+                            },
                             title="Qualifikations-Matrix: Identifikation von Ressourcen-Fehlallokation (Skill-Mismatch)")
             fig_skill.update_xaxes(categoryorder="array", categoryarray=["H3","H2","H1","R2","R1","G2","S1","E1","D1"])
             st.plotly_chart(clean_chart_layout(fig_skill), use_container_width=True, config={'displayModeBar': False})
@@ -964,9 +990,8 @@ def main():
             skill_pivot = df.groupby(['Dienst', 'Skill_Status'])['Duration'].sum().reset_index()
             fig_skill = px.bar(skill_pivot, x="Dienst", y="Duration", color="Skill_Status", 
                             color_discrete_map={
-                                "Kritische Fehlallokation": "#EF4444", 
-                                "Ideal-Besetzung": "#10B981", 
-                                "Fachliche Unterforderung": "#F59E0B", 
+                                "High-Cost Execution": "#EF4444", 
+                                "Value-Add": "#10B981", 
                                 "Qualitäts-Risiko": "#6366F1"
                             })
             st.plotly_chart(clean_chart_layout(fig_skill), use_container_width=True, config={'displayModeBar': False})
