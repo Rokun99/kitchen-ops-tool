@@ -40,7 +40,6 @@ KPI_BENCHMARKS = {
     "Peak Demand Ratio":        {"target": 2.0,  "unit": "x", "direction": "lower_better"},
 }
 
-# (Optional: Dictionary mit Erklärungen für Tooltips)
 KPI_DEFINITIONS = {
     "Fachkraft-Fremdeinsatz":   "Anteil der Zeit, in der teure Fachkräfte einfache Routinetätigkeiten erledigen.",
     "Potenzial (Leerlauf)":     "Nicht-wertschöpfende Zeit durch Warten oder unnötige Wege.",
@@ -118,7 +117,6 @@ st.markdown(f"""
         background-color: {COLORS['bg']};
     }}
 
-    /* ── Segmented Control ─────────────────────────────── */
     div[role="radiogroup"] input[type="radio"] {{ display: none; }}
 
     div[role="radiogroup"] {{
@@ -159,7 +157,6 @@ st.markdown(f"""
         transform: scale(1.02);
     }}
 
-    /* ── KPI Card (Modernisiert) ───────────────────────── */
     .kpi-card {{
         background: #FFFFFF;
         border: 1px solid #E2E8F0;
@@ -228,7 +225,6 @@ st.markdown(f"""
         text-overflow: ellipsis;
     }}
 
-    /* ── Tags ──────────────────────────────────────────── */
     .tag {{
         padding: 2px 7px;
         border-radius: 4px;
@@ -243,7 +239,6 @@ st.markdown(f"""
     .tag-good    {{ background:#ECFDF5; color:{COLORS['success']}; border:1px solid #A7F3D0; }}
     .tag-neutral {{ background:#F1F5F9; color:{COLORS['text_sub']};border:1px solid {COLORS['border']}; }}
 
-    /* ── Section Labels ────────────────────────────────── */
     .section-label {{
         font-size: 0.72rem;
         font-weight: 700;
@@ -256,7 +251,6 @@ st.markdown(f"""
         cursor: help;
     }}
 
-    /* ── Dashboard Header ──────────────────────────────── */
     .dash-header {{
         display: flex;
         align-items: center;
@@ -287,7 +281,6 @@ st.markdown(f"""
         padding: 4px 10px;
     }}
 
-    /* Streamlit Chrome Cleanup */
     #MainMenu, footer, header {{ visibility: hidden; }}
     .block-container {{ padding-top: 1.5rem !important; padding-bottom: 2rem !important; }}
     [data-testid="stAppViewContainer"] > .main {{ background: {COLORS['bg']}; }}
@@ -327,7 +320,6 @@ class DataWarehouse:
         df["Sector"]    = sector
         df["Skill_Status"] = df.apply(DataWarehouse._skill_match, axis=1)
         
-        # NEU: Stundensätze & Kosten
         df["Hourly_Rate"] = df["Dienst"].map(HOURLY_RATES_CHF).fillna(HOURLY_RATE_CHF_DEFAULT)
         df["Cost_CHF"] = (df["Duration"] / 60) * df["Hourly_Rate"]
         return df
@@ -363,7 +355,6 @@ class DataWarehouse:
         shifts["shift_cost_chf"] = (shifts["shift_netto_min"] / 60) * shifts["hourly_rate"]
         return shifts
 
-    # ── Kitchen ──────────────────────────────────────────
     @staticmethod
     def get_kitchen_data() -> pd.DataFrame:
         raw = [
@@ -493,7 +484,6 @@ class DataWarehouse:
         ]
         return DataWarehouse._process(raw, "kitchen")
 
-    # ── Gastro ───────────────────────────────────────────
     @staticmethod
     def get_gastro_data() -> pd.DataFrame:
         raw = [
@@ -703,7 +693,6 @@ LOAD_FACTORS = {
 }
 
 def get_load_curve(df: pd.DataFrame, sector_filter: str = None) -> pd.DataFrame:
-    """Vectorized load curve – keine iterrows(), keine Python-Loops."""
     timeline = pd.date_range("2026-01-01 05:30", "2026-01-01 19:40", freq="15min")
     
     work_df = df.copy()
@@ -743,7 +732,6 @@ def get_load_curve(df: pd.DataFrame, sector_filter: str = None) -> pd.DataFrame:
 # 4. KPI ENGINE  – Formatter & Helper
 # ─────────────────────────────────────────────────────────
 def _min_to_chf_by_dienst(df_slice: pd.DataFrame) -> str:
-    """Berechnet CHF aus den tatsächlichen rollenspezifischen Sätzen."""
     total = df_slice["Cost_CHF"].sum()
     return f"CHF {total:,.0f}".replace(",", "'")
 
@@ -779,20 +767,29 @@ def calc_productive_ratio(df: pd.DataFrame) -> dict:
         "benchmark": "60-70%",
     }
 
-def calc_idle_time(df: pd.DataFrame) -> dict:
+def calc_idle_time(df: pd.DataFrame, shifts_df: pd.DataFrame = None) -> dict:
     explicit_idle = df[df["Typ"] == "Potenzial"]["Duration"].sum()
     idle_per_dienst = {}
     for dienst in df["Dienst"].unique():
         d_df = df[df["Dienst"] == dienst].sort_values("Start_DT")
+        if len(d_df) < 2:
+            idle_per_dienst[dienst] = 0.0
+            continue
         gaps = (d_df["Start_DT"].iloc[1:].values - d_df["End_DT"].iloc[:-1].values)
-        gap_minutes = gaps.astype("timedelta64[m]").astype(float)
-        micro_idle = gap_minutes[(gap_minutes > 5) & (gap_minutes <= 30)].sum()
-        idle_per_dienst[dienst] = micro_idle
+        gap_min = gaps.astype("timedelta64[m]").astype(float)
+        idle_per_dienst[dienst] = gap_min[(gap_min > 5) & (gap_min <= 30)].sum()
     implicit_idle = sum(idle_per_dienst.values())
+    
+    structural_pause = 0.0
+    if shifts_df is not None:
+        structural_pause = shifts_df[shifts_df["pause_min"] > 30]["pause_min"].sum()
+        
     return {
         "explicit_min": explicit_idle,
         "implicit_min": implicit_idle,
+        "structural_pause_min": structural_pause,
         "total_min": explicit_idle + implicit_idle,
+        "total_with_structure_min": explicit_idle + implicit_idle + structural_pause,
     }
 
 def calc_peak_ratio(wl_df: pd.DataFrame) -> dict:
@@ -810,8 +807,8 @@ def calc_peak_ratio(wl_df: pd.DataFrame) -> dict:
     }
 
 def calc_risk_windows(df: pd.DataFrame) -> float:
-    fachkraft_dienste = [d for d, s in SKILL_LEVELS.items() if s == 3]
-    fk_df = df[df["Dienst"].isin(fachkraft_dienste)]
+    skill_3_in_df = [d for d in df["Dienst"].unique() if SKILL_LEVELS.get(d, 0) == 3]
+    fk_df = df[df["Dienst"].isin(skill_3_in_df)]
     
     kern_start = pd.to_datetime("2026-01-01 06:30")
     kern_end = pd.to_datetime("2026-01-01 18:30")
@@ -835,7 +832,7 @@ def calc_risk_windows(df: pd.DataFrame) -> float:
 # ─────────────────────────────────────────────────────────
 # 4.1 KPIs KITCHEN
 # ─────────────────────────────────────────────────────────
-def calculate_kitchen(df: pd.DataFrame, mode: str) -> list:
+def calculate_kitchen(df: pd.DataFrame, mode: str, shifts_df: pd.DataFrame) -> list:
     total_min   = df["Duration"].sum()
     k_persons   = df["Dienst"].nunique()
     total_tasks = len(df)
@@ -887,7 +884,7 @@ def calculate_kitchen(df: pd.DataFrame, mode: str) -> list:
     svc_ratio = (svc_min / total_min * 100) if total_min > 0 else 0.0
 
     prod_data = calc_productive_ratio(df)
-    idle_data = calc_idle_time(df)
+    idle_data = calc_idle_time(df, shifts_df)
 
     eff_min   = df[df["Typ"].isin(["Prod", "Service", "Coord"])]["Duration"].sum()
     eff_ratio = (eff_min / total_min * 100) if total_min > 0 else 0.0
@@ -917,12 +914,18 @@ def calculate_kitchen(df: pd.DataFrame, mode: str) -> list:
         yearly_val_str = f"CHF {yearly_cost:,.0f}".replace(",", "'") + "/Jahr"
     else:
         yearly_val_str = f"{yearly_saving_min/60:.1f} Std/Jahr"
+        
+    k_cost = df["Cost_CHF"].sum()
+    total_df_for_split = DataWarehouse.get_combined_data()
+    total_cost = total_df_for_split["Cost_CHF"].sum()
+    k_share = (k_cost / total_cost * 100) if total_cost > 0 else 0
 
     return [
         ("Fachkraft-Fremdeinsatz",   {"val": _fmt_val(leakage_min, mode, leakage_df),       "sub": f"Fachkraft in Hilfsarbeit ({leakage_min:.0f} Min)", "trend": "bad"}),
         ("Potenzial (Leerlauf)",     {"val": _fmt_val(potenzial_min, mode, potenzial_df),   "sub": f"Explizite Wartezeit ({potenzial_min:.0f} Min/Tag)", "trend": "bad"}),
         ("Jahres-Einsparpotenzial",  {"val": yearly_val_str,                                "sub": f"Basis: Leerlauf-Kosten × {WORK_DAYS_YEAR} Tage", "trend": "good"}),
         ("Kernzeit-Vakuum",          {"val": _fmt_val(idle_band_min, mode, idle_band_df),   "sub": f"Leerlauf in Bandzeit ({idle_band_min:.0f} Min)", "trend": "bad"}),
+        ("Aufgaben-Wechselrate",     {"val": context_sw,                                    "sub": f"Ø Tasks/Person ({total_tasks} Tasks / {k_persons} MA)", "trend": "bad"}),
         ("Produktiv-Quote",          {"val": f"{prod_data['ratio_pct']:.1f}%",              "sub": f"Prod+Service {prod_data['productive_min']:.0f} Min | Vermeidbar: {prod_data['avoidable_unproductive_min']:.0f} Min", "trend": "good" if prod_data['ratio_pct'] >= 60 else "bad"}),
         
         ("Industrialisierungsgrad",  {"val": f"{ind_rate:.1f}%",                            "sub": f"Convenience {conv_min:.0f} / Prod {prod_min:.0f} Min", "trend": "neutral"}),
@@ -933,21 +936,21 @@ def calculate_kitchen(df: pd.DataFrame, mode: str) -> list:
         
         ("Risiko-Fenster",           {"val": f"{risk_window_min} Min",                      "sub": "Kein Fachpersonal (Skill=3) in Kernzeit", "trend": "bad" if risk_window_min > 0 else "good"}),
         ("Patienten-Fokus",          {"val": f"{svc_ratio:.1f}%",                           "sub": f"Service-Zeit {svc_min:.0f} Min", "trend": "good"}),
-        ("Ressourcen-Split",         {"val": "100 / 0",                                     "sub": "Küche allein (Total-View für Split)", "trend": "neutral"}),
+        ("Ressourcen-Split",         {"val": f"{k_share:.0f}%",                             "sub": f"Küchen-Anteil an Gesamtkosten (CHF {k_cost:,.0f})", "trend": "neutral"}),
         ("Prozess-Effizienz",        {"val": f"{eff_ratio:.1f}%",                           "sub": f"Prod+Service+Coord {eff_min:.0f} Min", "trend": "good"}),
         ("Kapazitäts-Überhang",      {"val": _fmt_val(overstaffing_min, mode),              "sub": f"Bezahlte Leerzeit {overstaffing_min:.0f} Min/Tag", "trend": "bad"}),
         
         ("Arbeits-Dehnung (R2)",     {"val": _fmt_val(r2_park_min, mode, r2_park_df),       "sub": f"R2 Parkinson 08:00–10:00 ({r2_park_min:.0f} Min)", "trend": "bad"}),
         ("Profil-Verwässerung (H1)", {"val": f"{h1_dilution:.1f}%",                         "sub": f"Fremdaufgaben H1: {h1_foreign:.0f} Min", "trend": "bad"}),
         ("Hygiene-Risiko (R1)",      {"val": _fmt_val(r1_risk_min, mode, r1_risk_df),       "sub": f"Zeit an Rampe/Schleuse {r1_risk_min:.0f} Min", "trend": "bad"}),
-        ("Idle Time",                {"val": f"{idle_data['total_min']:.0f} Min",           "sub": f"Explizit {idle_data['explicit_min']:.0f} Min + Implizit {idle_data['implicit_min']:.0f} Min", "trend": "bad"}),
+        ("Idle Time",                {"val": f"{idle_data['total_with_structure_min']:.0f} Min", "sub": f"Explizit {idle_data['explicit_min']:.0f} | Implizit {idle_data['implicit_min']:.0f} | Struktur {idle_data['structural_pause_min']:.0f}", "trend": "bad"}),
         ("Teure Ausführung",         {"val": _fmt_val(mismatch_min, mode, mismatch_df),     "sub": f"High-Skill für Low-Task: {mismatch_min:.0f} Min", "trend": "bad"}),
     ]
 
 # ─────────────────────────────────────────────────────────
 # 4.2 KPIs GASTRO
 # ─────────────────────────────────────────────────────────
-def calculate_gastro(df: pd.DataFrame, mode: str) -> list:
+def calculate_gastro(df: pd.DataFrame, mode: str, shifts_df: pd.DataFrame) -> list:
     total_min = df["Duration"].sum()
     if total_min == 0: return []
 
@@ -1011,7 +1014,7 @@ def calculate_gastro(df: pd.DataFrame, mode: str) -> list:
 # ─────────────────────────────────────────────────────────
 # 4.3 KPIs TOTAL
 # ─────────────────────────────────────────────────────────
-def calculate_total(df: pd.DataFrame, mode: str) -> list:
+def calculate_total(df: pd.DataFrame, mode: str, shifts_df: pd.DataFrame) -> list:
     total_min = df["Duration"].sum()
     if total_min == 0: return []
 
@@ -1183,7 +1186,7 @@ def render_load_curve(wl_df: pd.DataFrame, sector_label: str):
         x=wl_df["Zeit"], y=wl_df["Real Demand (FTE)"],
         name="Reale Last",
         mode="lines",
-        line=dict(color=COLORS["accent"], width=2.5, shape="spline", smoothing=0.8),
+        line=dict(color=COLORS["accent"], width=2.5),
         fill="tozeroy",
         fillcolor="rgba(99,102,241,0.10)",
         hovertemplate="<b>%{x}</b><br>Last: %{y:.1f} FTE<extra></extra>",
@@ -1231,11 +1234,17 @@ def main():
     with col_left:
         sector_mode = st.radio(
             "BEREICH:",
-            ["🍳  Küche (Produktion)", "🧹  Gastrodienste (Logistik)", "📊  Total Operations (Gesamt)"],
+            ["🍳 Küche", "🧹 Gastro", "📊 Total"],
             horizontal=True,
         )
     with col_right:
-        unit_mode = st.radio("Einheit:", ["Zeit", "CHF"], horizontal=True, label_visibility="collapsed")
+        unit_mode = st.radio(
+            "Einheit:", 
+            ["minutes", "CHF"], 
+            horizontal=True, 
+            label_visibility="collapsed",
+            format_func=lambda x: "⏱ Zeit" if x == "minutes" else "💰 CHF"
+        )
         mode = "money" if unit_mode == "CHF" else "time"
 
     # ── Data ─────────────────────────────────────────────
@@ -1253,13 +1262,13 @@ def main():
 
     # ── KPIs ─────────────────────────────────────────────
     if current_sector == "kitchen":
-        kpis = calculate_kitchen(df, mode)
+        kpis = calculate_kitchen(df, mode, shifts_df)
     elif current_sector == "gastro":
-        kpis = calculate_gastro(df, mode)
+        kpis = calculate_gastro(df, mode, shifts_df)
     else:
-        kpis = calculate_total(df, mode)
+        kpis = calculate_total(df, mode, shifts_df)
 
-    section_header(f'Management Cockpit — {sector_mode.split("  ")[-1]}', "Strategische Übersicht der wichtigsten Leistungskennzahlen.")
+    section_header(f'Management Cockpit — {sector_mode}', "Strategische Übersicht der wichtigsten Leistungskennzahlen.")
 
     rows_n = (len(kpis) + 4) // 5
     for row_i in range(rows_n):
@@ -1306,7 +1315,7 @@ def main():
                 "<b>Rote Balken markieren teuren Kapazitäts-Überhang.</b>"
             )
         wl_df = get_load_curve(df, current_sector)
-        fig_load = render_load_curve(wl_df, sector_mode.split("  ")[-1])
+        fig_load = render_load_curve(wl_df, sector_mode)
         st.plotly_chart(fig_load, use_container_width=True, config={"displayModeBar": False})
 
     # ── Detail-Analyse Tabs ──────────────────────────────
@@ -1320,6 +1329,7 @@ def main():
             fig = px.timeline(df, x_start="Start_DT", x_end="End_DT", y="Dienst",
                               color="Typ", hover_name="Task", color_discrete_map=COLOR_MAP, height=550)
             fig.update_yaxes(categoryorder="array", categoryarray=CHART_ORDER_K)
+            fig.update_xaxes(tickformat="%H:%M", dtick=3600000, minor=dict(dtick=900000, showgrid=True, gridcolor="#F8FAFC"))
             st.plotly_chart(style_plotly_figure(fig, height=550), use_container_width=True, config={"displayModeBar": False})
 
         with t2:
@@ -1328,6 +1338,7 @@ def main():
                 fig = px.timeline(df_w, x_start="Start_DT", x_end="End_DT", y="Dienst",
                                   hover_name="Task", color_discrete_sequence=["#F43F5E"], height=350)
                 fig.update_yaxes(categoryorder="array", categoryarray=CHART_ORDER_K)
+                fig.update_xaxes(tickformat="%H:%M", dtick=3600000, minor=dict(dtick=900000, showgrid=True, gridcolor="#F8FAFC"))
                 st.plotly_chart(style_plotly_figure(fig, height=350), use_container_width=True, config={"displayModeBar": False})
             else:
                 st.info("Keine expliziten Potenzial-Blöcke identifiziert.")
@@ -1345,7 +1356,7 @@ def main():
             df_pie = df.groupby("Typ")["Duration"].sum().reset_index()
             fig = px.pie(df_pie, values="Duration", names="Typ", color="Typ",
                          color_discrete_map=COLOR_MAP, hole=0.6, height=450)
-            fig.update_traces(textinfo="percent+label", textfont_size=13)
+            fig.update_traces(textinfo="percent", textfont_size=11, hovertemplate="<b>%{label}</b><br>%{value:.0f} Min (%{percent})<extra></extra>")
             fig.update_layout(showlegend=False, annotations=[dict(text="Küche", x=0.5, y=0.5, font_size=18, showarrow=False)])
             st.plotly_chart(style_plotly_figure(fig, height=450), use_container_width=True, config={"displayModeBar": False})
 
@@ -1369,6 +1380,7 @@ def main():
                               color="Typ", hover_name="Task", color_discrete_map=COLOR_MAP, height=h)
             if current_sector == "gastro":
                 fig.update_yaxes(categoryorder="array", categoryarray=CHART_ORDER_G)
+            fig.update_xaxes(tickformat="%H:%M", dtick=3600000, minor=dict(dtick=900000, showgrid=True, gridcolor="#F8FAFC"))
             st.plotly_chart(style_plotly_figure(fig, height=h), use_container_width=True, config={"displayModeBar": False})
 
         with t2:
@@ -1394,21 +1406,12 @@ def main():
     # ── Personal-Einsatzprofil ───────────────────────────
     section_header('Personal-Einsatzprofil (Staffing Load)', "Visuelle Darstellung der anwesenden Mitarbeiter über den Tagesverlauf.")
     
-    load_pts = []
-    for h in range(5, 20):
-        for m in [0, 15, 30, 45]:
-            t = datetime(2026, 1, 1, h, m)
-            mask = (df["Start_DT"] <= t) & (df["End_DT"] > t)
-            if current_sector == "kitchen":
-                mask &= df["Sector"] == "kitchen"
-            elif current_sector == "gastro":
-                mask &= df["Sector"] == "gastro"
-            load_pts.append({"Zeit": f"{h:02d}:{m:02d}", "Staff": int(mask.sum())})
+    wl_load = get_load_curve(df)
+    load_df = wl_load[["Zeit", "Capacity (FTE)"]].rename(columns={"Capacity (FTE)": "Staff"})
 
-    load_df = pd.DataFrame(load_pts)
     y_max   = 26 if current_sector == "total" else 14
 
-    fig_lp = px.area(load_df, x="Zeit", y="Staff", line_shape="spline")
+    fig_lp = px.area(load_df, x="Zeit", y="Staff")
     fig_lp.update_traces(line_color="#0F172A", fillcolor="rgba(15,23,42,0.05)")
     style_plotly_figure(fig_lp, height=230)
     fig_lp.update_layout(yaxis=dict(range=[0, y_max], title="Active FTE"))
