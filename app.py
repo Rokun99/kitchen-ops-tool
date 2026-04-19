@@ -821,29 +821,29 @@ def calculate_kitchen(df: pd.DataFrame, mode: str) -> list:
         yearly_val_str = f"{yearly_saving_min/60:.1f} Std/Jahr"
 
     return [
-        ("Fachkraft-Fremdeinsatz",   {"val": _fmt_val(leakage_min, mode),      "sub": f"Fachkraft in Hilfsarbeit ({leakage_min:.0f} Min/Tag)",   "trend": "bad"}),
+        ("Fachkraft-Fremdeinsatz",   {"val": _fmt_val(leakage_min, mode),       "sub": f"Fachkraft in Hilfsarbeit ({leakage_min:.0f} Min/Tag)",   "trend": "bad"}),
         ("Potenzial (Leerlauf)",      {"val": _fmt_val(potenzial_min, mode),    "sub": f"Explizite Wartezeit ({potenzial_min:.0f} Min/Tag)",        "trend": "bad"}),
-        ("Jahres-Einsparpotenzial",   {"val": yearly_val_str,                   "sub": f"Basis: {potenzial_min:.0f} Min × {WORK_DAYS_YEAR} Tage",  "trend": "good"}),
-        ("Kernzeit-Vakuum",           {"val": _fmt_val(idle_band_min, mode),    "sub": f"Leerlauf 11:00–12:30 ({idle_band_min:.0f} Min)",           "trend": "bad"}),
-        ("Aufgaben-Wechselrate",      {"val": context_sw,                       "sub": f"Ø Tasks/Person ({total_tasks} Tasks / {k_persons} MA)",   "trend": "bad"}),
+        ("Jahres-Einsparpotenzial",   {"val": yearly_val_str,                    "sub": f"Basis: {potenzial_min:.0f} Min × {WORK_DAYS_YEAR} Tage",  "trend": "good"}),
+        ("Kernzeit-Vakuum",           {"val": _fmt_val(idle_band_min, mode),    "sub": f"Leerlauf 11:00–12:30 ({idle_band_min:.0f} Min)",            "trend": "bad"}),
+        ("Aufgaben-Wechselrate",      {"val": context_sw,                        "sub": f"Ø Tasks/Person ({total_tasks} Tasks / {k_persons} MA)",   "trend": "bad"}),
 
-        ("Industrialisierungsgrad",   {"val": f"{ind_rate:.1f}%",               "sub": f"Convenience {conv_min:.0f} / Prod {prod_min:.0f} Min",    "trend": "neutral"}),
-        ("Wertschöpfungs-Quote",      {"val": f"{val_add_ratio:.1f}%",          "sub": f"Prod+Service = {val_add_min:.0f} Min",                    "trend": "good"}),
-        ("Admin-Quote",               {"val": _fmt_val(admin_min, mode),        "sub": f"Büro/Doku-Last ({admin_min:.0f} Min/Tag)",                 "trend": "bad"}),
-        ("Logistik-Anteil",           {"val": f"{log_ratio:.1f}%",              "sub": f"Transport/Reinigung {log_min:.0f} Min",                   "trend": "neutral"}),
-        ("Koordinations-Aufwand",     {"val": f"{coord_ratio:.1f}%",            "sub": f"Absprachen {coord_min:.0f} Min/Tag",                      "trend": "neutral"}),
+        ("Industrialisierungsgrad",   {"val": f"{ind_rate:.1f}%",                "sub": f"Convenience {conv_min:.0f} / Prod {prod_min:.0f} Min",    "trend": "neutral"}),
+        ("Wertschöpfungs-Quote",      {"val": f"{val_add_ratio:.1f}%",           "sub": f"Prod+Service = {val_add_min:.0f} Min",                     "trend": "good"}),
+        ("Admin-Quote",               {"val": _fmt_val(admin_min, mode),        "sub": f"Büro/Doku-Last ({admin_min:.0f} Min/Tag)",                  "trend": "bad"}),
+        ("Logistik-Anteil",           {"val": f"{log_ratio:.1f}%",               "sub": f"Transport/Reinigung {log_min:.0f} Min",                    "trend": "neutral"}),
+        ("Koordinations-Aufwand",     {"val": f"{coord_ratio:.1f}%",             "sub": f"Absprachen {coord_min:.0f} Min/Tag",                       "trend": "neutral"}),
 
-        ("Risiko-Fenster",            {"val": f"{risk_window_min} Min",         "sub": "D1 Mittagspause (12:45–14:30)",                            "trend": "bad"}),
-        ("Patienten-Fokus",           {"val": f"{svc_ratio:.1f}%",              "sub": f"Service-Zeit {svc_min:.0f} Min",                          "trend": "good"}),
-        ("Ressourcen-Split",          {"val": "100 / 0",                        "sub": "Küche allein (Total-View für Split)",                      "trend": "neutral"}),
-        ("Prozess-Effizienz",         {"val": f"{eff_ratio:.1f}%",              "sub": f"Prod+Service+Coord {eff_min:.0f} Min",                    "trend": "good"}),
+        ("Risiko-Fenster",            {"val": f"{risk_window_min} Min",          "sub": "D1 Mittagspause (12:45–14:30)",                             "trend": "bad"}),
+        ("Patienten-Fokus",           {"val": f"{svc_ratio:.1f}%",               "sub": f"Service-Zeit {svc_min:.0f} Min",                           "trend": "good"}),
+        ("Ressourcen-Split",          {"val": "100 / 0",                         "sub": "Küche allein (Total-View für Split)",                       "trend": "neutral"}),
+        ("Prozess-Effizienz",         {"val": f"{eff_ratio:.1f}%",               "sub": f"Prod+Service+Coord {eff_min:.0f} Min",                     "trend": "good"}),
         ("Kapazitäts-Überhang",       {"val": _fmt_val(overstaffing_min, mode), "sub": f"Bezahlte Leerzeit {overstaffing_min:.0f} Min/Tag",        "trend": "bad"}),
 
-        ("Arbeits-Dehnung (R2)",      {"val": _fmt_val(r2_park_min, mode),      "sub": f"R2 Parkinson 08:00–10:00 ({r2_park_min:.0f} Min)",        "trend": "bad"}),
-        ("Profil-Verwässerung (H1)",  {"val": f"{h1_dilution:.1f}%",            "sub": f"Fremdaufgaben H1: {h1_foreign:.0f} Min",                  "trend": "bad"}),
-        ("Hygiene-Risiko (R1)",       {"val": _fmt_val(r1_risk_min, mode),      "sub": f"Zeit an Rampe/Schleuse {r1_risk_min:.0f} Min",            "trend": "bad"}),
-        ("Leerlauf-Lücke (G2)",       {"val": _fmt_val(g2_gap_min, mode),       "sub": f"PM Leerlauf G2: {g2_gap_min:.0f} Min",                   "trend": "bad"}),
-        ("Teure Ausführung",          {"val": _fmt_val(mismatch_min, mode),     "sub": f"High-Skill für Low-Task: {mismatch_min:.0f} Min",         "trend": "bad"}),
+        ("Arbeits-Dehnung (R2)",      {"val": _fmt_val(r2_park_min, mode),       "sub": f"R2 Parkinson 08:00–10:00 ({r2_park_min:.0f} Min)",        "trend": "bad"}),
+        ("Profil-Verwässerung (H1)",  {"val": f"{h1_dilution:.1f}%",             "sub": f"Fremdaufgaben H1: {h1_foreign:.0f} Min",                   "trend": "bad"}),
+        ("Hygiene-Risiko (R1)",       {"val": _fmt_val(r1_risk_min, mode),       "sub": f"Zeit an Rampe/Schleuse {r1_risk_min:.0f} Min",             "trend": "bad"}),
+        ("Leerlauf-Lücke (G2)",       {"val": _fmt_val(g2_gap_min, mode),        "sub": f"PM Leerlauf G2: {g2_gap_min:.0f} Min",                    "trend": "bad"}),
+        ("Teure Ausführung",          {"val": _fmt_val(mismatch_min, mode),      "sub": f"High-Skill für Low-Task: {mismatch_min:.0f} Min",          "trend": "bad"}),
     ]
 
 
@@ -899,29 +899,29 @@ def calculate_gastro(df: pd.DataFrame, mode: str) -> list:
     cost_per_tray_chf = (total_min / 60 * HOURLY_RATE_CHF) / N_MEALS
 
     return [
-        ("Transport-Intensität",    {"val": f"{transport_int:.1f}%",            "sub": f"Wegzeiten {transport_min:.0f} Min / {total_min:.0f} Min Total",  "trend": "bad"}),
-        ("Aufzug-Abhängigkeit",     {"val": "15 Min",                           "sub": "Wartezeit Lift (1 Runde à 3 Min × 5 Trips simuliert)",             "trend": "neutral"}),
-        ("Rücklauf-Tempo",          {"val": "8 Min",                            "sub": "Station → Spüle (geschätzter Weg + Andocken)",                     "trend": "good"}),
-        ("Wagen-Umschlag",          {"val": "4.2x",                             "sub": "3 Mahlzeiten + Zwischentransporte pro Wagen",                      "trend": "good"}),
-        ("Logistik-Wartezeit",      {"val": _fmt_val(k13_park_min, mode),       "sub": f"K13 Lager/Wartephase {k13_park_min:.0f} Min",                     "trend": "bad"}),
+        ("Transport-Intensität",    {"val": f"{transport_int:.1f}%",             "sub": f"Wegzeiten {transport_min:.0f} Min / {total_min:.0f} Min Total",  "trend": "bad"}),
+        ("Aufzug-Abhängigkeit",     {"val": "15 Min",                            "sub": "Wartezeit Lift (1 Runde à 3 Min × 5 Trips simuliert)",             "trend": "neutral"}),
+        ("Rücklauf-Tempo",          {"val": "8 Min",                             "sub": "Station → Spüle (geschätzter Weg + Andocken)",                      "trend": "good"}),
+        ("Wagen-Umschlag",          {"val": "4.2x",                              "sub": "3 Mahlzeiten + Zwischentransporte pro Wagen",                       "trend": "good"}),
+        ("Logistik-Wartezeit",      {"val": _fmt_val(k13_park_min, mode),        "sub": f"K13 Lager/Wartephase {k13_park_min:.0f} Min",                      "trend": "bad"}),
 
-        ("Laufzeit Bandmaschine",   {"val": f"{spuel_min/60:.1f}h",             "sub": f"Spülen-Zeit Total {spuel_min:.0f} Min",                           "trend": "neutral"}),
-        ("Auslastung Topfspüle",    {"val": f"{mach_util:.1f}%",                "sub": f"Spülen {spuel_min:.0f} / Total {total_min:.0f} Min",              "trend": "bad"}),
-        ("Chemie-Effizienz",        {"val": "0.15 L",                           "sub": "Pro Spülgang (Herstellerrichtwert)",                               "trend": "good"}),
-        ("Korb-Durchsatz",          {"val": "120/h",                            "sub": "Bandmaschine Kapazität (Typ. Klinik)",                             "trend": "neutral"}),
-        ("Wartungs-Quote",          {"val": f"{wartungs_pct:.1f}%",             "sub": f"Maschinenpflege {wartungs_min:.0f} Min",                          "trend": "good"}),
+        ("Laufzeit Bandmaschine",   {"val": f"{spuel_min/60:.1f}h",              "sub": f"Spülen-Zeit Total {spuel_min:.0f} Min",                            "trend": "neutral"}),
+        ("Auslastung Topfspüle",    {"val": f"{mach_util:.1f}%",                 "sub": f"Spülen {spuel_min:.0f} / Total {total_min:.0f} Min",               "trend": "bad"}),
+        ("Chemie-Effizienz",        {"val": "0.15 L",                            "sub": "Pro Spülgang (Herstellerrichtwert)",                                "trend": "good"}),
+        ("Korb-Durchsatz",          {"val": "120/h",                             "sub": "Bandmaschine Kapazität (Typ. Klinik)",                              "trend": "neutral"}),
+        ("Wartungs-Quote",          {"val": f"{wartungs_pct:.1f}%",              "sub": f"Maschinenpflege {wartungs_min:.0f} Min",                           "trend": "good"}),
 
-        ("Hygiene-Switch (11:20)",  {"val": "100%",                             "sub": "Alle K-Dienste wechseln 11:15–11:30",                              "trend": "good"}),
-        ("Bio-Trans Volumen",       {"val": f"{bio_trans_kg:.0f} kg",           "sub": f"156g × {N_MEALS} Gäste",                                          "trend": "bad"}),
-        ("Integrität Reine Seite",  {"val": "Hoch",                             "sub": "K7 dediziert Reine Seite (Strukturell gesichert)",                 "trend": "good"}),
-        ("Grundreinigungs-Index",   {"val": _fmt_val(hygiene_min, mode),        "sub": f"Reinigung {hygiene_min:.0f} Min / {hygiene_ratio:.1f}%",          "trend": "good"}),
-        ("HACCP-Doku",              {"val": _fmt_val(admin_min, mode),          "sub": f"Checkout/Visieren {admin_min:.0f} Min ({n_staff} Dienste)",        "trend": "neutral"}),
+        ("Hygiene-Switch (11:20)",  {"val": "100%",                              "sub": "Alle K-Dienste wechseln 11:15–11:30",                               "trend": "good"}),
+        ("Bio-Trans Volumen",       {"val": f"{bio_trans_kg:.0f} kg",            "sub": f"156g × {N_MEALS} Gäste",                                           "trend": "bad"}),
+        ("Integrität Reine Seite",  {"val": "Hoch",                              "sub": "K7 dediziert Reine Seite (Strukturell gesichert)",                  "trend": "good"}),
+        ("Grundreinigungs-Index",   {"val": _fmt_val(hygiene_min, mode),         "sub": f"Reinigung {hygiene_min:.0f} Min / {hygiene_ratio:.1f}%",           "trend": "good"}),
+        ("HACCP-Doku",              {"val": _fmt_val(admin_min, mode),           "sub": f"Checkout/Visieren {admin_min:.0f} Min ({n_staff} Dienste)",        "trend": "neutral"}),
 
-        ("Service-Support",         {"val": f"{svc_sup_pct:.1f}%",              "sub": f"Entlastung Küche {svc_sup_min:.0f} Min",                          "trend": "good"}),
-        ("Ergonomie-Belastung",     {"val": f"{ergo_load_pct:.1f}%",            "sub": f"Spülen+Transport {(spuel_min+transport_min):.0f} Min",            "trend": "bad"}),
-        ("Übergabe-Qualität",       {"val": "15 Min",                           "sub": "Checkout K1/K2/K5/K6/K7/K8 (je 9–15 Min)",                        "trend": "neutral"}),
-        ("Alleinarbeits-Risiko",    {"val": f"{allein_h:.1f}h",                 "sub": f"K14 Abendphase solo {allein_min:.0f} Min",                        "trend": "bad"}),
-        ("Springer-Potenzial",      {"val": "12%",                              "sub": "Verschiebbare Tasks (Lager, Recycling, Brot)",                     "trend": "neutral"}),
+        ("Service-Support",         {"val": f"{svc_sup_pct:.1f}%",               "sub": f"Entlastung Küche {svc_sup_min:.0f} Min",                           "trend": "good"}),
+        ("Ergonomie-Belastung",     {"val": f"{ergo_load_pct:.1f}%",             "sub": f"Spülen+Transport {(spuel_min+transport_min):.0f} Min",             "trend": "bad"}),
+        ("Übergabe-Qualität",       {"val": "15 Min",                            "sub": "Checkout K1/K2/K5/K6/K7/K8 (je 9–15 Min)",                          "trend": "neutral"}),
+        ("Alleinarbeits-Risiko",    {"val": f"{allein_h:.1f}h",                  "sub": f"K14 Abendphase solo {allein_min:.0f} Min",                         "trend": "bad"}),
+        ("Springer-Potenzial",      {"val": "12%",                               "sub": "Verschiebbare Tasks (Lager, Recycling, Brot)",                      "trend": "neutral"}),
     ]
 
 
@@ -980,28 +980,28 @@ def calculate_total(df: pd.DataFrame, mode: str) -> list:
 
     return [
         ("Kosten pro Tablett",       {"val": f"CHF {cost_per_tray:.2f}",             "sub": f"{total_hours:.1f}h × CHF {HOURLY_RATE_CHF} / {N_MEALS} Gäste", "trend": "neutral"}),
-        ("Kosten-Split",             {"val": cost_split,                              "sub": f"Küche {k_min:.0f} vs. Gastro {g_min:.0f} Min",                  "trend": "neutral"}),
-        ("Gesamt-Produktivität",     {"val": f"{productivity:.1f}",                   "sub": f"Mahlzeiten/Stunde ({N_MEALS} / {total_hours:.1f}h)",             "trend": "good"}),
-        ("Leerlauf-Kosten",          {"val": _fmt_val(muda_min, mode),                "sub": f"Potenzial-Blöcke {muda_min:.0f} Min/Tag",                       "trend": "bad"}),
-        ("Überstunden-Risiko",       {"val": "Hoch",                                  "sub": "K14 endet 19:40 (> 9h ohne Pause)",                              "trend": "bad"}),
+        ("Kosten-Split",             {"val": cost_split,                               "sub": f"Küche {k_min:.0f} vs. Gastro {g_min:.0f} Min",                  "trend": "neutral"}),
+        ("Gesamt-Produktivität",     {"val": f"{productivity:.1f}",                    "sub": f"Mahlzeiten/Stunde ({N_MEALS} / {total_hours:.1f}h)",             "trend": "good"}),
+        ("Leerlauf-Kosten",          {"val": _fmt_val(muda_min, mode),                 "sub": f"Potenzial-Blöcke {muda_min:.0f} Min/Tag",                        "trend": "bad"}),
+        ("Überstunden-Risiko",       {"val": "Hoch",                                   "sub": "K14 endet 19:40 (> 9h ohne Pause)",                               "trend": "bad"}),
 
-        ("Sync-Lücke",               {"val": f"{sync_gap_min:.0f} Min",               "sub": "Prod-Ende → letztes Spülen-Ende",                                "trend": "bad"}),
-        ("Service-Bereitschaft",     {"val": "98%",                                   "sub": "Mise en Place K-Dienste 06:45 bereit",                            "trend": "good"}),
-        ("Mise-en-Place Sync",       {"val": "85%",                                   "sub": "Küche/Gastro Übergabe (Logistik-Übergang 10:45)",                 "trend": "good"}),
-        ("Max. Personal (Total)",    {"val": f"{max_staff} FTE",                      "sub": "Höchststand gleichzeitig (aus Belastungskurve)",                  "trend": "neutral"}),
-        ("Absprache-Aufwand",        {"val": f"{coord_total_pct:.1f}%",               "sub": f"Coord-Zeit {coord_total_min:.0f} Min/Tag",                       "trend": "neutral"}),
+        ("Sync-Lücke",               {"val": f"{sync_gap_min:.0f} Min",                "sub": "Prod-Ende → letztes Spülen-Ende",                                 "trend": "bad"}),
+        ("Service-Bereitschaft",     {"val": "98%",                                    "sub": "Mise en Place K-Dienste 06:45 bereit",                             "trend": "good"}),
+        ("Mise-en-Place Sync",       {"val": "85%",                                    "sub": "Küche/Gastro Übergabe (Logistik-Übergang 10:45)",                 "trend": "good"}),
+        ("Max. Personal (Total)",    {"val": f"{max_staff} FTE",                       "sub": "Höchststand gleichzeitig (aus Belastungskurve)",                  "trend": "neutral"}),
+        ("Absprache-Aufwand",        {"val": f"{coord_total_pct:.1f}%",                "sub": f"Coord-Zeit {coord_total_min:.0f} Min/Tag",                        "trend": "neutral"}),
 
-        ("Energie-Spitzenlast",      {"val": "11:30",                                 "sub": "Kipper + Ofen + Bandmaschine simultan",                           "trend": "bad"}),
-        ("Raum-Dichte",              {"val": f"{max_staff} FTE",                      "sub": "Peak in Spüle+Küche gleichzeitig",                                "trend": "bad"}),
-        ("Reste-Quote",              {"val": f"{(N_MEALS*0.156):.0f} kg",             "sub": f"Bio-Trans: 156g × {N_MEALS} Gäste",                              "trend": "neutral"}),
-        ("Anlagen-Nutzung (ROI)",    {"val": "Hoch",                                  "sub": "Bandmaschine > 6h, Casserolier > 5h/Tag",                        "trend": "good"}),
-        ("Verbrauchs-Proxy",         {"val": "Hoch",                                  "sub": "Bandmaschine + Kipper + Topfspüle parallel",                     "trend": "bad"}),
+        ("Energie-Spitzenlast",      {"val": "11:30",                                  "sub": "Kipper + Ofen + Bandmaschine simultan",                            "trend": "bad"}),
+        ("Raum-Dichte",              {"val": f"{max_staff} FTE",                       "sub": "Peak in Spüle+Küche gleichzeitig",                                "trend": "bad"}),
+        ("Reste-Quote",              {"val": f"{(N_MEALS*0.156):.0f} kg",              "sub": f"Bio-Trans: 156g × {N_MEALS} Gäste",                               "trend": "neutral"}),
+        ("Anlagen-Nutzung (ROI)",    {"val": "Hoch",                                   "sub": "Bandmaschine > 6h, Casserolier > 5h/Tag",                         "trend": "good"}),
+        ("Verbrauchs-Proxy",         {"val": "Hoch",                                   "sub": "Bandmaschine + Kipper + Topfspüle parallel",                      "trend": "bad"}),
 
-        ("System-Resilienz",         {"val": "Niedrig",                               "sub": "Kein Puffer bei Lift-/Maschinenausfall",                          "trend": "bad"}),
-        ("Hygiene-Risiko Total",     {"val": f"{hygiene_risk_min:.0f} Min",           "sub": "Risikominuten Schnittstellen (Rampe/Switch)",                     "trend": "neutral"}),
-        ("Patienten-Kontakt",        {"val": f"{service_tasks} Tasks",                "sub": "Service+Service-Support-Blöcke Total",                            "trend": "good"}),
-        ("Prozess-Standard",         {"val": f"{process_std_pct:.1f}%",               "sub": f"Definierte Tasks {val_tasks}/{len(df)} (Prod+Svc)",              "trend": "neutral"}),
-        ("Führungs-Spanne",          {"val": fuehr_spanne,                            "sub": f"{fuehr_count} Leitende / {total_dienste} Dienste (Ideal 1:8)",   "trend": "bad"}),
+        ("System-Resilienz",         {"val": "Niedrig",                                "sub": "Kein Puffer bei Lift-/Maschinenausfall",                          "trend": "bad"}),
+        ("Hygiene-Risiko Total",     {"val": f"{hygiene_risk_min:.0f} Min",            "sub": "Risikominuten Schnittstellen (Rampe/Switch)",                      "trend": "neutral"}),
+        ("Patienten-Kontakt",        {"val": f"{service_tasks} Tasks",                 "sub": "Service+Service-Support-Blöcke Total",                             "trend": "good"}),
+        ("Prozess-Standard",         {"val": f"{process_std_pct:.1f}%",                "sub": f"Definierte Tasks {val_tasks}/{len(df)} (Prod+Svc)",               "trend": "neutral"}),
+        ("Führungs-Spanne",          {"val": fuehr_spanne,                             "sub": f"{fuehr_count} Leitende / {total_dienste} Dienste (Ideal 1:8)",   "trend": "bad"}),
     ]
 
 
